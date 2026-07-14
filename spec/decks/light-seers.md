@@ -5,7 +5,7 @@
 - **Name:** Light Seer’s Tarot (Chris-Anne lineage)
 - **Voice:** Psychological — inner pattern, growth, self-view
 - **When it fits:** Seeker wants counsel about how they meet life, not only omen; growth language; emotional honesty without clinical therapy
-- **Role:** Prophet’s **preferred** deck (see [character.md](../character.md)) — not a platform default
+- **Role:** Pythia’s **preferred** deck (see [character.md](../character.md)) — not a platform default
 - **Phase:** Full body for Phase 1 ritual core
 
 ## Structure

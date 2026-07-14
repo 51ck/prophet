@@ -14,9 +14,9 @@ Multiple decks exist as named systems the prophet can reason about and use in ri
 | [Light Seer’s](decks/light-seers.md) | Psychological — inner pattern, growth, self-view |
 | [Marseille](decks/marseille.md) | Traditional — spare majors-forward reading style |
 
-### Prophet’s preferred
+### Pythia’s preferred
 
-**Light Seer’s** is the prophet’s preferred deck (character taste), not a platform default. See [character.md](character.md).
+**Light Seer’s** is Pythia’s preferred deck (character taste), not a platform default. See [character.md](character.md).
 
 ### Deck selection (locked)
 

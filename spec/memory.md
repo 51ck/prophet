@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Mira remembers the seeker so each reading has continuity — without turning the product into endless companionship chat or a raw transcript vault.
+Pythia remembers the seeker so each reading has continuity — without turning the product into endless companionship chat or a raw transcript vault.
 
 ## Lifecycle
 

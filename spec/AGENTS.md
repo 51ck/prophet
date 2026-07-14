@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Own the pure-idea product specification for Tarot Prophet: what the service is, how sessions work, how decks and ritual stay authentic, who Mira is, how seeker memory works, how Telegram should feel, and the phased roadmap. No implementation, stack, or engineering layout lives here (see [tech/](../tech/AGENTS.md)).
+Own the pure-idea product specification for Tarot Prophet: what the service is, how sessions work, how decks and ritual stay authentic, who Pythia is, how seeker memory works, how Telegram should feel, and the phased roadmap. No implementation, stack, or engineering layout lives here (see [tech/](../tech/AGENTS.md)).
 
 ## Ownership
 
@@ -39,7 +39,7 @@ Idea documents (not child DOX folders):
 - [vision.md](vision.md) — locked problem, what / why / authenticity bar
 - [session.md](session.md) — recall → question → offer deck → ritual → close → refactor
 - [deck-and-ritual.md](deck-and-ritual.md) — catalog, selection, shuffle honesty, draw/open
-- [character.md](character.md) — Mira persona
+- [character.md](character.md) — Pythia persona
 - [memory.md](memory.md) — seeker memory lifecycle + fluency
 - [agent.md](agent.md) — prophet role + conceptual capabilities
 - [spreads.md](spreads.md) — Phase 1 spreads
