@@ -8,9 +8,30 @@ Prophet code/product name: **Pythia**.
 
 | Layer | Choice | Role |
 |-------|--------|------|
-| Language | TypeScript | App and agent logic |
+| Language | TypeScript **7** | App and agent logic |
+| Runtime / packages | **Bun** (workspaces monorepo) | Install, scripts, tests, local run |
 | Agent framework | Mastra | Pythia agent, tools, model calls |
 | Telegram | Grammy | Phase 1 channel adapter (DM first) |
+| Deploy | Docker Compose on VPS | Single compose stack |
+| Images | GHCR on push to `master` | CI builds and pushes; VPS pulls |
+
+### Models (locked)
+
+Mastra model router: `provider/model-id`. Switch with `MODEL_ID`.
+
+| Env | Purpose |
+|-----|---------|
+| `OPENAI_API_KEY` | OpenAI models |
+| `DEEPSEEK_API_KEY` | DeepSeek models |
+| `MODEL_ID` | e.g. `deepseek/deepseek-v4-flash` (default lean) or `openai/gpt-4.1-mini` |
+
+Ritual engine uses **no LLM**. Models only for dialogue, tool choice, interpretation, memory refactor.
+
+## Tooling (locked)
+
+- `bun run typecheck` — `tsc --noEmit` (TypeScript 7)
+- `bun run lint` — oxlint (ESLint’s typescript-eslint not stable on TS 7 yet)
+- Pre-commit hook (`.githooks`) runs **lint + typecheck**
 
 ## Core vs adapters (locked)
 
@@ -26,7 +47,7 @@ Telegram is a **frontend adapter**. Ritual honesty, Pythia’s mind, and seeker 
 ### Adapters (channel I/O only)
 
 - **Telegram** (Grammy) — Phase 1: messages, buttons, DM identity
-- **Web** (future) — richer chrome; optional UI tools that map onto core verbs (e.g. visual cut → `shuffle({ op: seekerCut, … })`)
+- **Web** (future) — richer chrome; optional UI tools that map onto core verbs
 
 ### Tool rule
 
@@ -34,12 +55,12 @@ Channel-specific tools are allowed for UX. They must invoke core ritual/memory/s
 
 ### Phase 1 module layout
 
-One process, module packages — not microservices:
+One process, Bun workspaces — not microservices:
 
 - `packages/core` — agent + ritual + memory + session (in-process interface)
-- `packages/telegram` — Grammy adapter
+- `packages/telegram` — Grammy adapter (after core MVP)
 
-Public HTTP API only when a second client needs it. Web = future adapter package.
+Public HTTP API only when a second client needs it.
 
 ```mermaid
 flowchart TB
@@ -67,65 +88,52 @@ flowchart TB
   pythia --> character[CharacterPromptPythia]
 ```
 
-- **Telegram adapter** receives messages, sends replies, optional light buttons
-- **Adapter session bridge** maps Telegram user/chat → core seeker/session ids; does not own ritual truth
-- **Pythia agent (core)** reasons with character + recalled memory + deck content; calls tools for mechanical ritual and memory writes
-- **Deck state** is authoritative for cards; agent never invents draws
-- **Seeker memory store** holds notes across sessions; agent recalls at start, saves during, refactors at end
-
 ## State ownership
 
 | State | Owner | Notes |
 |-------|--------|------|
 | Chat transport | Telegram adapter | Message I/O, buttons |
 | Reading session arc | Core session + agent | Idle → recall → intake → offer deck → committed → ritual → closing → refactor → ended |
-| Deck / table (order, orientation, face) | Core ritual engine | Mechanical; tools mutate; agent narrates true state |
+| Deck / table | Core ritual engine | Mechanical; tools mutate; agent narrates true state |
 | Seeker memory | Core memory store + tools | Persist across sessions; refactor at end |
-| Character | Prompt / config from [character.md](../spec/character.md) | Pythia; not mutable mid-reading by seeker |
+| Character | Prompt from [character.md](../spec/character.md) | Pythia |
 
 ## Conceptual verbs → tools
 
 Map from [agent.md](../spec/agent.md):
 
-| Verb | Tool / mechanism (conceptual name) |
-|------|-------------------------------------|
+| Verb | Tool / mechanism |
+|------|------------------|
 | Recall memories | `recallSeekerMemory` |
 | Intake / lock question | Agent dialogue + `lockQuestion` |
 | Offer / confirm deck | Agent dialogue + `confirmDeck` |
-| Shuffle ops | `shuffle` (ops: mix, cut, shift, rotate, seekerCut) |
+| Shuffle ops | `shuffle` (mix, cut, shift, rotate, seekerCut) |
 | Select spread | `selectSpread` |
 | Draw | `drawToPositions` |
 | Open / reveal | `openPosition` |
-| Interpret | Agent (reads deck content + opened state) — not a fake-draw tool |
+| Interpret | Agent (reads deck content + opened state) |
 | Save memory | `saveSeekerMemory` |
 | Close session | `closeSession` |
 | Refactor memories | `refactorSeekerMemory` |
 | Defer / refuse | Agent + `endWithoutRitual` |
 
-Inspectability: optional `getDeckSnapshot` for debugging / future UX — must not leak into inventing cards.
-
 ## Deck content
 
-- Phase 1: load [Light Seer’s](../spec/decks/light-seers.md) (or a derived structured form generated from it)
-- Catalog stubs remain for offer language; full ritual body is Light Seer’s until Phase 2
-- Content feeds interpretation prompts; identity of drawn cards comes only from deck state
+- Phase 1: structured Light Seer’s body in `packages/core` derived from [spec](../spec/decks/light-seers.md)
+- Card identity comes only from deck state
 
-## Session flow (system)
+## Deploy (locked)
 
-1. Incoming DM → adapter resolves seeker id → core `recallSeekerMemory`
-2. Agent intake until `lockQuestion`
-3. Agent offers deck; `confirmDeck`
-4. Ritual tools mutate deck state; agent narrates and interprets
-5. `closeSession` → `refactorSeekerMemory`
-6. Mid-ritual abandon: drop session; next visit fresh (Phase 1 UX lock)
+1. Push to `master` → GitHub Actions builds image → push to **GHCR**
+2. VPS runs **Docker Compose** pulling that image
+3. Secrets via env / compose env file on VPS — never in git
 
 ## Env / secrets (names only)
 
 - `TELEGRAM_BOT_TOKEN`
-- LLM / Mastra provider keys as required by chosen model host
-- Optional DB URL if memory store is not local-file for dev
-
-Values live outside git (see root `.gitignore`).
+- `OPENAI_API_KEY` / `DEEPSEEK_API_KEY`
+- `MODEL_ID`
+- Optional `MEMORY_DIR` / DB URL for seeker memory
 
 ## Out of scope here
 
@@ -137,4 +145,4 @@ Values live outside git (see root `.gitignore`).
 
 ## Build gate
 
-Implement code only after this architecture matches current `spec/`. If product rules change, update `spec/` first, then this doc, then code.
+If product rules change, update `spec/` first, then this doc, then code.

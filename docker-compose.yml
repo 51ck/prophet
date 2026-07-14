@@ -1,0 +1,12 @@
+services:
+  prophet:
+    image: ghcr.io/OWNER/prophet:latest
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - prophet-memory:/app/data/memory
+    restart: unless-stopped
+
+volumes:
+  prophet-memory:

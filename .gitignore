@@ -1,11 +1,12 @@
-# Local / ConPort
-context_portal/
-logs/
-
 # Env & secrets
 .env
 .env.*
 !.env.example
+
+# Local / ConPort
+context_portal/
+logs/
+data/
 
 # Dependencies & build
 node_modules/
