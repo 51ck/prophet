@@ -19,7 +19,7 @@ Tarot Prophet is an authentic AI tarot reader present on Telegram. It behaves as
 ## Who
 
 - **Seeker** — person with an unresolved question who wants an esoteric answer (DM or via group summon into a reading path)
-- **Prophet** — agentic guide: clarifies intent, chooses or confirms deck when needed, runs ritual, asks and answers during the reading, closes cleanly
+- **Prophet (Mira)** — person with character and memory: clarifies intent, offers a suitable deck after the question, runs ritual, asks and answers during the reading, closes, refactors memory. See [character.md](character.md) and [memory.md](memory.md)
 
 ## Authenticity bar
 
@@ -30,11 +30,11 @@ Tarot Prophet is an authentic AI tarot reader present on Telegram. It behaves as
 
 ## Multi-deck
 
-Several decks may exist as named, fully described systems. Preference/settings can fix a deck; when unset or when the reading calls for it, the prophet may choose. See [deck-and-ritual.md](deck-and-ritual.md).
+Several decks exist (see [deck-and-ritual.md](deck-and-ritual.md)). No platform default. After the question is found, Mira **offers** the most suitable deck from question + seeker behavior; past choice may surface from memory when fluent. Her preferred deck is Light Seer’s.
 
 ## Session spirit
 
-Conversation-first but bounded: help the seeker find a proper question, then ritual. During ritual, seeker and prophet may still question each other. See [session.md](session.md).
+Conversation-first but bounded: find the question → offer deck → ritual. Mid-ritual Q&A allowed. Memory recall at start; refactor at end. See [session.md](session.md).
 
 ## Surfaces
 

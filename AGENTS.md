@@ -80,4 +80,5 @@ When the user requests a durable behavior change, record it here or in the relev
 
 ## Child DOX Index
 
-- [spec/](spec/AGENTS.md) — product idea: locked problem, vision, session arc, deck/ritual authenticity, prophet role, Telegram UX principles, economics intent, roadmap. Implementation-free.
+- [spec/](spec/AGENTS.md) — product idea: locked problem, Mira character, seeker memory, session arc, decks/ritual, Telegram UX, economics, roadmap. Implementation-free.
+- [tech/](tech/AGENTS.md) — architecture and stack (TS / Mastra / Grammy); how idea becomes system. Does not weaken `spec/` authenticity.

@@ -2,26 +2,45 @@
 
 ## Decks
 
-Multiple decks may exist. Each is a named system the prophet can reason about and use in ritual.
+Multiple decks exist as named systems the prophet can reason about and use in ritual. Concrete bodies live under [decks/](decks/AGENTS.md).
 
-### Deck selection
+### Catalog (locked)
 
-- Seeker preference / settings may fix a default deck
-- Seeker may name a deck for this reading
-- If unset, or if the reading asks for a different voice, the **prophet may choose** and say why briefly
-- Deck for a session is confirmed before or at Commit — not swapped silently mid-layout
+| Deck | Voice / when it fits |
+|------|----------------------|
+| [Rider–Waite](decks/rider-waite.md) | Classic — clear archetypal language, familiar structure |
+| [Thoth](decks/thoth.md) | Deep esoteric analysis — dense symbol, occult lineage |
+| [Wild Unknown](decks/wild-unknown.md) | Intuitive and emotional — feeling, image, gut |
+| [Light Seer’s](decks/light-seers.md) | Psychological — inner pattern, growth, self-view |
+| [Marseille](decks/marseille.md) | Traditional — spare majors-forward reading style |
 
-### What a deck definition must contain (idea)
+### Prophet’s preferred
+
+**Light Seer’s** is the prophet’s preferred deck (character taste), not a platform default. See [character.md](character.md).
+
+### Deck selection (locked)
+
+No global default. Ritual deck is chosen **after** the question is found.
+
+1. **Find the question first** (intake)
+2. **Offer a deck** — from that question **and** seeker behavior; short why
+3. **Past deck in memory** — if the seeker used a deck before, recall it at the offer moment **only when fluent** (not a forced dump)
+4. Seeker accepts, names another, or pushes back; prophet confirms before Commit
+5. If nothing else fits and she leans on taste → Light Seer’s (preferred)
+
+Deck for a session is confirmed before or at Commit — not swapped silently mid-layout.
+
+### What a deck definition must contain
 
 Enough for honest ritual and talk — not a storage format:
 
 - **Identity** — name, tradition/lineage note, when it fits
 - **Structure** — card list (e.g. majors, suits, courts), count
-- **Orientation** — whether reversed/upright (or equivalent) is used; how orientation is assigned in shuffle/draw
+- **Orientation** — whether reversed/upright is used; how orientation is assigned
 - **Meanings** — card language rich enough for interpretation in that deck’s voice
-- **Imagery cues** — what the seeker would “see” when a card opens (for ceremonial reveal talk)
+- **Imagery cues** — what the seeker would “see” when a card opens
 
-Catalog of concrete decks grows over time; this doc only requires that every usable deck is fully described in the above sense.
+Phase 1: Light Seer’s is fully described. Other decks: identity + when-it-fits + voice until Phase 2.
 
 ## Honest deck state
 
@@ -48,8 +67,8 @@ The point is not theatrical noise: operations change real order and orientation.
 
 ## Spread and draw
 
-- A **spread** is a named set of positions with roles (past/present/advice, etc.)
-- Exact spread catalog is not fixed at idea stage; principles: match question complexity; prefer fewer positions when the question is sharp
+- A **spread** is a named set of positions with roles — see [spreads.md](spreads.md)
+- Prefer fewer positions when the question is sharp
 - **Draw** moves cards from the shuffled pile into positions, usually face-down
 - Drawn cards stay what they are until opened
 
@@ -71,5 +90,7 @@ The point is not theatrical noise: operations change real order and orientation.
 
 ## Related
 
-- Session timing of ritual: [session.md](session.md)
+- Deck bodies: [decks/AGENTS.md](decks/AGENTS.md)
+- Spreads: [spreads.md](spreads.md)
+- Session timing: [session.md](session.md)
 - Who may run which acts: [agent.md](agent.md)
