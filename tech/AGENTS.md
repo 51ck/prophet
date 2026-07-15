@@ -32,3 +32,4 @@ Does not own: product vision, ritual authenticity rules, character voice (those 
 Idea / architecture documents:
 
 - [architecture.md](architecture.md) — Phase 1 system shape; core vs adapters; TS / Mastra / Grammy
+- [telegram-tasks.md](telegram-tasks.md) — collect-only backlog: adapter baseline, buttons, parse_mode formatting, soft profile (prototype → product)
