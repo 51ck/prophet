@@ -14,7 +14,7 @@ Bun workspaces · TypeScript 7 · oxlint · Mastra · Grammy (adapter next) · D
 ## Packages
 
 - `@prophet/core` — ritual, session, memory, Pythia agent
-- `@prophet/telegram` — stub; Grammy next
+- `@prophet/telegram` — Grammy DM adapter
 
 ## Dev
 
@@ -23,10 +23,11 @@ bun install
 bun run lint
 bun run typecheck
 bun test
+bun run bot
 ```
 
 Pre-commit runs lint + typecheck.
 
 ## Env
 
-Copy `.env.example` → `.env`. Set `DEEPSEEK_API_KEY` or `OPENAI_API_KEY` and `MODEL_ID`.
+Copy `.env.example` → `.env`. Set `TELEGRAM_BOT_TOKEN`, `DEEPSEEK_API_KEY` or `OPENAI_API_KEY`, and `MODEL_ID`.

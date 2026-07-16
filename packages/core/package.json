@@ -11,6 +11,10 @@
     "test": "bun test"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "1.0.40",
+    "@ai-sdk/openai": "2.0.106",
+    "@ai-sdk/provider-utils-v5": "npm:@ai-sdk/provider-utils@3.0.25",
+    "@ai-sdk/provider-v5": "npm:@ai-sdk/provider@2.0.3",
     "@mastra/core": "latest",
     "zod": "^4.0.5"
   },

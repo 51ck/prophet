@@ -11,5 +11,4 @@ FROM oven/bun:1.3-slim
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app /app
-# Telegram entry comes later; image builds core-ready
-CMD ["bun", "--version"]
+CMD ["bun", "run", "bot"]

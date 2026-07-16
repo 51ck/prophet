@@ -8,11 +8,16 @@
     "lint": "oxlint packages",
     "lint:fix": "oxlint packages --fix",
     "test": "bun test packages/core",
+    "bot": "bun run packages/telegram/src/main.ts",
     "prepare": "git config core.hooksPath .githooks || true"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "oxlint": "^1.74.0",
     "typescript": "7.0.2"
+  },
+  "dependencies": {
+    "@ai-sdk/provider-utils-v5": "npm:@ai-sdk/provider-utils@3.0.25",
+    "@ai-sdk/provider-v5": "npm:@ai-sdk/provider@2.0.3"
   }
 }
