@@ -78,9 +78,11 @@ Default section order:
 
 When the user requests a durable behavior change, record it here or in the relevant child AGENTS.md
 
+- **In-repo tickets:** Build work is tracked on `tech/*-tasks.md` boards under [tech/tickets.md](tech/tickets.md). Agents take one open `T<n>.<m>` slice, mark `[x]` when done, ref ID in commit. Spec stays idea/roadmap; boards hold tickets. GitHub Issues optional glue only.
+
 ## Child DOX Index
 
 - [spec/](spec/AGENTS.md) — product idea: locked problem, Pythia character, seeker memory, session arc, decks/ritual, Telegram UX, economics, roadmap. Implementation-free.
-- [tech/](tech/AGENTS.md) — architecture: Pythia core vs adapters; Bun + TS 7 + Mastra + Grammy; Docker/GHCR. Does not weaken `spec/` authenticity.
+- [tech/](tech/AGENTS.md) — architecture + in-repo ticket system + theme boards. Does not weaken `spec/` authenticity.
 - [packages/core/](packages/core/AGENTS.md) — channel-agnostic Pythia core (ritual, session, memory, agent)
-- [packages/telegram/](packages/telegram/AGENTS.md) — Grammy adapter (stub until wired)
+- [packages/telegram/](packages/telegram/AGENTS.md) — Grammy DM adapter

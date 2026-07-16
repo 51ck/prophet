@@ -52,7 +52,7 @@ Product verbs — what the prophet can *do* as idea, not an API:
 | **Select spread** | Positions matched to the locked question |
 | **Draw** | Place cards into positions (typically face-down) |
 | **Open / reveal** | Turn a position face-up; speak what is there |
-| **Ask seeker** | Clarify feeling, choice of next open, nuance of question |
+| **Ask seeker** | Clarify feeling, choice of next open, nuance of question; for simple closed asks, offer a small set of choices (channel may show buttons) including decline when the ask is optional |
 | **Interpret** | Read opened cards against locked question and deck voice |
 | **Save memory** | Note stable useful facts during session |
 | **Close session** | Synthesis and clean end |

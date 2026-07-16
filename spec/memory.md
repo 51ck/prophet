@@ -24,14 +24,28 @@ flowchart LR
 ## What belongs in memory
 
 - Who they are to her (light relationship notes)
+- **Optional soft profile** (prefer structured when stable): preferred name/address, language, age or age range, sex/gender — only if the seeker shared or confirmed them
 - **Past deck choices** (and soft preference if shown)
 - Recurring themes and prior reading gists (summaries, not full layouts)
 - Open threads they may return to
 - Practical preferences that aid fluency (pace, how they like reveals)
+- Light “declined to share X” marks so she does not re-grill after a reject
+
+## Soft profile (introduce)
+
+Purpose: serve more accurate tone and counsel — not a CRM form.
+
+- Ask during **first-session introduce / early intake**, woven into talk — one gentle ask at a time when natural
+- Every field is **rejectable** (say no, skip, or ignore); ritual must not wait on demographics
+- Prefer channel hints before asking: Telegram display name / `language_code` as defaults to refine, not quiz
+- Age and sex are sensitive: optional; ranges and soft wording over interrogation
+- Returning visits: use what she has fluently; do not reopen a declined field unless a long gap or the seeker invites it
+
+Open: exact Phase 1 field set and whether age is range-only — tracked in [tech/telegram-tasks.md](../tech/telegram-tasks.md) (T3).
 
 ## Fluency rule
 
-Recalled facts surface **only when they fit the moment**. Especially past deck: bring it up while offering a deck after the question lands — if natural. Never open with a memory dump.
+Recalled facts surface **only when they fit the moment**. Especially past deck: bring it up while offering a deck after the question lands — if natural. Never open with a memory dump. Soft profile is for register and address — never a stereotype lecture from age or sex alone.
 
 ## Out of scope
 

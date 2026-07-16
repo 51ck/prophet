@@ -21,7 +21,7 @@ Root DOX owns repo-wide agent contracts. `tech/` owns how ideas become systems.
 ## Local Contracts
 
 - Idea docs stay implementation-free: no stack names, no library choices, no source-tree layouts for code, no API schemas
-- Roadmap phases are product milestones, not build tickets
+- Roadmap phases are product milestones, not build tickets — tickets live under [tech/tickets.md](../tech/tickets.md) and `tech/*-tasks.md` boards
 - Locked product decisions live in the docs below; change them by editing the owning doc, then refresh this index if files move
 - Open questions stay labeled as open — do not pretend resolved
 - No platform “default deck”; Light Seer’s is prophet’s preferred
@@ -43,6 +43,6 @@ Idea documents (not child DOX folders):
 - [memory.md](memory.md) — seeker memory lifecycle + fluency
 - [agent.md](agent.md) — prophet role + conceptual capabilities
 - [spreads.md](spreads.md) — Phase 1 spreads
-- [telegram-ux.md](telegram-ux.md) — DM + Phase 1 locks; group later
+- [telegram-ux.md](telegram-ux.md) — DM + Phase 1 locks; buttons for closed choices; formatting; soft profile hooks; group later
 - [economics.md](economics.md) — sustainability intent; Stars deferred
 - [roadmap.md](roadmap.md) — phased path; monetization late

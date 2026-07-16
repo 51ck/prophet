@@ -12,6 +12,7 @@ Own how the product idea in [spec/](../spec/AGENTS.md) becomes a running system.
 - Deploy: Docker Compose + GHCR on `master`
 - Lint / typecheck / pre-commit expectations
 - Env/secrets naming (not values)
+- In-repo ticket system + theme boards ([tickets.md](tickets.md))
 
 Does not own product vision or ritual authenticity rules (`spec/`).
 
@@ -22,10 +23,12 @@ Does not own product vision or ritual authenticity rules (`spec/`).
 - Prophet code name is **Pythia**
 - Bun is the package manager and preferred local runtime
 - No secrets in repo
+- Build tickets live on `tech/*-tasks.md` boards per [tickets.md](tickets.md) — not in `spec/`
 
 ## Work Guidance
 
 - Before commit: `bun run lint` (oxlint) and `bun run typecheck` (enforced by `.githooks`)
+- Agentic build work: take one open ticket ID from a board; mark `[x]` when done; commit message refs the ID
 
 ## Verification
 
@@ -35,5 +38,7 @@ Does not own product vision or ritual authenticity rules (`spec/`).
 
 ## Child DOX Index
 
-- [architecture.md](architecture.md) — system shape, stack, deploy, models
-- [../packages/core/AGENTS.md](../packages/core/AGENTS.md) — core package (when present)
+- [architecture.md](architecture.md) — system shape, stack, deploy, models; core vs adapters
+- [tickets.md](tickets.md) — in-repo ticket system (IDs, boards, agent loop)
+- [telegram-tasks.md](telegram-tasks.md) — Telegram board: T0–T3 (adapter, format, buttons, soft profile)
+- [../packages/core/AGENTS.md](../packages/core/AGENTS.md) — core package

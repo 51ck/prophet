@@ -15,6 +15,7 @@ Pure-idea DOX pack in `spec/`: vision, session, deck/ritual, decks, character, m
 - Character + memory behavior (recall → find question → offer deck → ritual → close → refactor)
 - DM-only Telegram path with Phase 1 UX locks
 - Honest shuffle / draw / open; mid-ritual Q&A without breaking card state
+- Telegram product gap after core MVP (buttons, formatting, soft profile) — board: [tech/telegram-tasks.md](../tech/telegram-tasks.md) per [tech/tickets.md](../tech/tickets.md)
 
 **Done when:** a seeker can complete a real reading whose cards come only from ritual, with continuity of memory and a person-like prophet.
 
