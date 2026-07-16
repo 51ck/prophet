@@ -81,4 +81,6 @@ When the user requests a durable behavior change, record it here or in the relev
 ## Child DOX Index
 
 - [spec/](spec/AGENTS.md) — product idea: locked problem, Pythia character, seeker memory, session arc, decks/ritual, Telegram UX, economics, roadmap. Implementation-free.
-- [tech/](tech/AGENTS.md) — architecture: Pythia core vs channel adapters (TS / Mastra / Grammy). Does not weaken `spec/` authenticity.
+- [tech/](tech/AGENTS.md) — architecture: Pythia core vs adapters; Bun + TS 7 + Mastra + Grammy; Docker/GHCR. Does not weaken `spec/` authenticity.
+- [packages/core/](packages/core/AGENTS.md) — channel-agnostic Pythia core (ritual, session, memory, agent)
+- [packages/telegram/](packages/telegram/AGENTS.md) — Grammy adapter (stub until wired)

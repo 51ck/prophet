@@ -2,33 +2,38 @@
 
 ## Purpose
 
-Own how the product idea in [spec/](../spec/AGENTS.md) becomes a running system. Stack choices, component ownership, core vs channel adapters, and tool mapping live here. Product authenticity rules stay owned by `spec/`.
+Own how the product idea in [spec/](../spec/AGENTS.md) becomes a running system. Stack, Bun monorepo layout, core vs adapters, models, deploy, and tool mapping live here.
 
 ## Ownership
 
-- Runtime architecture and stack
-- **Prophet core** (Pythia agent, ritual engine, memory, session) vs **channel adapters** (Telegram now; web later)
-- Mapping of conceptual prophet verbs → agent tools
-- Session state vs deck state vs seeker memory ownership (system view)
-- Where deck content is loaded for the agent
+- Runtime architecture and stack (TS 7, Bun, Mastra, Grammy)
+- Prophet core vs channel adapters
+- Model env (`MODEL_ID`, OpenAI / DeepSeek keys)
+- Deploy: Docker Compose + GHCR on `master`
+- Lint / typecheck / pre-commit expectations
 - Env/secrets naming (not values)
 
-Does not own: product vision, ritual authenticity rules, character voice (those stay in `spec/`).
+Does not own product vision or ritual authenticity rules (`spec/`).
 
 ## Local Contracts
 
-- Architecture docs may name stack; they must not weaken authenticity contracts in `spec/`
-- Adapters own I/O only; channel tools must call core ritual/memory/session verbs
-- Code that appears later must match tool/state ownership described here
+- Must not weaken `spec/` authenticity
+- Adapters own I/O only; channel tools call core verbs
 - Prophet code name is **Pythia**
+- Bun is the package manager and preferred local runtime
 - No secrets in repo
 
 ## Work Guidance
 
+- Before commit: `bun run lint` (oxlint) and `bun run typecheck` (enforced by `.githooks`)
+
 ## Verification
+
+- `bun run lint`
+- `bun run typecheck`
+- `bun test` (packages with tests)
 
 ## Child DOX Index
 
-Idea / architecture documents:
-
-- [architecture.md](architecture.md) — Phase 1 system shape; core vs adapters; TS / Mastra / Grammy
+- [architecture.md](architecture.md) — system shape, stack, deploy, models
+- [../packages/core/AGENTS.md](../packages/core/AGENTS.md) — core package (when present)
