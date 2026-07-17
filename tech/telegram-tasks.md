@@ -11,6 +11,7 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 1. **Prophet can act in Telegram** — structured choices as buttons, not only typed replies
 2. **Messages look intentional** — formatting reaches Telegram, not raw `*` markup
 3. **Introduce + seeker profile** — language → name/self; transparent fill; one-seeker isolation
+4. **Session path** — Card of the Day vs find a question
 
 ---
 
@@ -47,7 +48,7 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 
 **Tasks:**
 
-- [ ] **T1.1** Spec lock: when buttons are allowed (closed set ≤ N; yes/no; language; lock; deck; cut; open-next) vs free prose only
+- [ ] **T1.1** Spec lock: when buttons are allowed (closed set ≤ N; yes/no; language; session path; lock; deck; cut; open-next) vs free prose only
 - [ ] **T1.2** Core channel-agnostic “ask with options” verb (options + optional skip/reject) — adapter decides chrome
 - [ ] **T1.3** Grammy: inline keyboard; callback → seeker turn; expire/replace after answer
 - [ ] **T1.4** Pythia prefers options for simple asks (intake, offer, ritual pace) — not every utterance
@@ -112,14 +113,35 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 
 ---
 
+## T9 — Session path (day card vs question)
+
+**Problem:** Seeker arrival should not always force long intake. Light day counsel and a full question-reading are both valid.
+
+**Done when:** After introduce/presence, prophet offers **Card of the Day** or **find a question**; day path uses implicit day-counsel + `card-of-day`; question path keeps intake → lock → reading.
+
+**Depends on:** T0; T1 for path buttons; T3 introduce; `card-of-day` spread (T8.2)
+
+**Spec / arch:** [spec/session.md](../spec/session.md), [spec/spreads.md](../spec/spreads.md), [spec/telegram-ux.md](../spec/telegram-ux.md)
+
+**Tasks:**
+
+- [x] **T9.1** Spec lock: path choice + day-card implicit question — done in session/telegram-ux/spreads/agent
+- [ ] **T9.2** After presence: offer path (day card / find question); buttons via T1; free text still valid
+- [ ] **T9.3** Day-card path: lock implicit day counsel → deck (quick lean ok) → `card-of-day` ritual
+- [ ] **T9.4** Question path: existing intake → lock → deck → spread matched to question
+- [ ] **T9.5** Prompt: present both paths without menu maze; after day card, invite deeper question only if natural
+
+---
+
 ## Suggested build order
 
 ```text
 T0 adapter baseline (done)
   → T2 formatting (cheap, high visible quality)
-  → T1 ask-with-options + buttons (needed for ru/en)
+  → T1 ask-with-options + buttons (needed for ru/en + path choice)
   → T3.8–T3.10 memory + isolation
   → T3.11–T3.14 introduce flow + language change + prompt
+  → T9 session path (needs T1 + card-of-day from T8.2)
 ```
 
 Roadmap: Phase 1 DM path completing + early Phase 3 fluency. Introduce/profile = Phase 1 memory enrichment.
@@ -140,4 +162,5 @@ Roadmap: Phase 1 DM path completing + early Phase 3 fluency. Introduce/profile =
 - UX: [spec/telegram-ux.md](../spec/telegram-ux.md)
 - Memory: [spec/memory.md](../spec/memory.md)
 - Session: [spec/session.md](../spec/session.md)
+- Spreads: [spec/spreads.md](../spec/spreads.md)
 - Roadmap: [spec/roadmap.md](../spec/roadmap.md)

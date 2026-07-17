@@ -32,6 +32,7 @@
 | Message formatting | Channel sends with a chosen Telegram parse mode; broken markup falls back to plain text |
 | Soft profile on introduce | Language (ru/en) first → name + few words about self; profile filled **transparently** (no “saving data” talk); scoped to this seeker only — see [memory.md](memory.md) |
 | Language | Chosen once at introduce; prophet may change it later on seeker request |
+| Session path | After presence: offer **Card of the Day** or **find a question** (then answer) — see [session.md](session.md) |
 | Abandon mid-ritual | Next visit = **fresh start** (no resume yet) |
 | Group | Not in Phase 1 |
 

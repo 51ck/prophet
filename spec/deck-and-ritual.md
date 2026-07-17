@@ -22,7 +22,7 @@ Multiple decks exist as named systems the prophet can reason about and use in ri
 
 No global default. Ritual deck is chosen **after** the question is found.
 
-1. **Find the question first** (intake)
+1. **Find the question first** (intake) — except **Card of the Day** path, which uses an implicit day-counsel question — see [session.md](session.md)
 2. **Offer a deck** — from that question **and** seeker behavior; short why
 3. **Past deck in memory** — if the seeker used a deck before, recall it at the offer moment **only when fluent** (not a forced dump)
 4. Seeker accepts, names another, or pushes back; prophet confirms before Commit

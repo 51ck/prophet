@@ -9,17 +9,22 @@ Pythia remembers the seeker so each reading has continuity — without turning t
 ```mermaid
 flowchart LR
   start[SessionStart] --> recall[RecallMemories]
-  recall --> intake[FindQuestion]
-  intake --> offer[OfferDeck]
+  recall --> intro[Introduce]
+  intro --> path[PathChoice]
+  path -->|day card| offer[OfferDeck]
+  path -->|question| intake[FindQuestion]
+  intake --> offer
   offer --> ritual[Ritual]
   ritual --> close[Closing]
   close --> refactor[RefactorMemories]
   refactor --> endNode[Ended]
 ```
 
-1. **Recall** at session start (before / as intake) — load notes so continuity can be felt
-2. **Save** during the session when something stable and useful appears
-3. **Refactor** at session end — compress, dedupe, drop stale, keep voice consistent
+1. **Recall** at session start — load notes so continuity can be felt
+2. **Introduce** (first visits / incomplete profile) — language, name, self — before any path offer — see soft profile below and [session.md](session.md)
+3. **Path** — Card of the Day or find a question — only after presence/language are ready
+4. **Save** during the session when something stable and useful appears
+5. **Refactor** at session end — compress, dedupe, drop stale, keep voice consistent
 
 ## What belongs in memory
 

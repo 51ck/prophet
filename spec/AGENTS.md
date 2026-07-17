@@ -7,7 +7,7 @@ Own the pure-idea product specification for Tarot Prophet: what the service is, 
 ## Ownership
 
 - Product vision and authenticity bar
-- Session shape (recall → question → offer deck → ritual → close → refactor)
+- Session shape (recall → introduce → path choice → intake or day card → offer deck → commit → ritual → close → refactor)
 - Deck and ritual semantics (conceptual) + deck bodies under decks/
 - Prophet character and conceptual capabilities
 - Seeker memory lifecycle
@@ -37,12 +37,12 @@ Root DOX owns repo-wide agent contracts. `tech/` owns how ideas become systems.
 Idea documents (not child DOX folders):
 
 - [vision.md](vision.md) — locked problem, what / why / authenticity bar
-- [session.md](session.md) — recall → question → offer deck → ritual → close → refactor
+- [session.md](session.md) — recall → introduce → path (day card | question) → commit → ritual → close → refactor
 - [deck-and-ritual.md](deck-and-ritual.md) — catalog, selection, shuffle honesty, desk/pile free verbs, draw/open; board [tech/ritual-tasks.md](../tech/ritual-tasks.md)
 - [character.md](character.md) — Pythia persona
-- [memory.md](memory.md) — seeker memory lifecycle + fluency
+- [memory.md](memory.md) — seeker memory lifecycle + fluency (introduce before path choice)
 - [agent.md](agent.md) — prophet role + conceptual capabilities
-- [spreads.md](spreads.md) — Phase 1 spreads
+- [spreads.md](spreads.md) — popular spreads catalog + offering rule; board T8
 - [telegram-ux.md](telegram-ux.md) — DM + Phase 1 locks; buttons for closed choices; formatting; soft profile hooks; group later
 - [economics.md](economics.md) — sustainability intent; Stars deferred
 - [roadmap.md](roadmap.md) — phased path; monetization late

@@ -5,19 +5,36 @@
 Conversation-first, then ritual. Length of talk is limited so the session stays a reading, not an open-ended chat.
 
 1. **Recall** — at start, load seeker memories (inner); continuity may surface only when fluent — see [memory.md](memory.md)
-2. **Intake (short)** — Prophet helps the seeker find a *proper question*: clear, honest, workable for cards. Few turns; no wandering forever
-3. **Offer / confirm deck** — after the question is found (or near-locked), prophet offers the most suitable deck from question + seeker behavior; may recall past deck choice only if fluent; seeker accepts or names another; confirm before Commit — see [deck-and-ritual.md](deck-and-ritual.md)
-4. **Commit** — Question locked; deck confirmed; ritual may begin
-5. **Ritual** — Shuffle with genuine physical-analogue operations → choose/apply spread → draw into positions → open cards (face-down until opened). Deck state stays honest throughout
-6. **Mid-ritual dialogue** — Seeker and prophet may ask each other questions without inventing or rewriting cards
-7. **Closing** — Synthesis of the opened layout against the locked question. Session ends cleanly
-8. **Refactor memories** — after close (inner): compress and freshen seeker notes — see [memory.md](memory.md)
+2. **Introduce** (first visits) — language, name, a few words about self — see [memory.md](memory.md)
+3. **Path choice** — after the seeker is present, prophet offers two ways in (buttons fine):
+   - **Card of the Day** — light one-card counsel for the day’s atmosphere / focus (spread `card-of-day`)
+   - **Find a question** — short intake toward a proper question, then a fuller reading
+4. **Intake (short)** — only on the question path: help find a *proper question*. Few turns; no wandering forever
+5. **Offer / confirm deck** — prophet offers a suitable deck; day-card path may lean quickly on preferred / past deck if fluent; seeker may still name another — see [deck-and-ritual.md](deck-and-ritual.md)
+6. **Commit** — Question locked (explicit, or implicit day counsel on the day-card path); deck confirmed; ritual may begin
+7. **Ritual** — Shuffle → choose/apply spread → draw → open. Deck state stays honest throughout
+8. **Mid-ritual dialogue** — Seeker and prophet may ask without inventing or rewriting cards
+9. **Closing** — Synthesis against the locked (or day) question. Session ends cleanly
+10. **Refactor memories** — after close (inner) — see [memory.md](memory.md)
 
 Further talk is a new session (or an explicit short coda), not endless drift.
 
+### Path: Card of the Day
+
+- Implicit question: counsel for **this day** (atmosphere, focus, or advice) — no long intake
+- Deck offer → **Commit** (day counsel + deck) → spread `card-of-day` only — see [spreads.md](spreads.md)
+- Still real ritual: shuffle / draw / reveal; face-down until open
+- After closing, seeker may start a new session to find a deeper question
+
+### Path: Find a question
+
+- Intake → proper question → deck offer → **Commit** (question + deck locked) → spread matched to the question → ritual
+- Default lean remains **Three Roads** unless another catalog spread fits better
+- Do not select or lay a named spread before Commit
+
 ## Proper question
 
-The seeker’s starting point: something they cannot settle ordinarily, and that they want answered esoterically. Intake shapes that into a *proper question*:
+The seeker’s starting point on the **question path**: something they cannot settle ordinarily, and that they want answered esoterically. Intake shapes that into a *proper question*:
 
 - Specific enough that cards can speak to it
 - Honest about what the seeker actually wants to know
@@ -25,6 +42,8 @@ The seeker’s starting point: something they cannot settle ordinarily, and that
 - Oriented to omen/counsel — not a substitute for ordinary steps they still refuse to take when those are clearly enough
 
 Prophet steers toward that during intake, keeping the path short (time saved). If the seeker cannot lock a question, prophet may defer or end rather than fake a reading.
+
+On the **day-card path**, the implicit day-counsel question counts as locked for Commit — no fake specificity required.
 
 ## Bounds
 
@@ -55,8 +74,9 @@ Not allowed:
 |-------|---------|
 | Idle | No active reading |
 | Recall | Loading seeker memory (often invisible to seeker) |
-| Intake | Finding / shaping the question |
-| OfferDeck | Offering / confirming deck after question |
+| PathChoice | Offering Card of the Day vs find a question (may fold into early presence) |
+| Intake | Finding / shaping the question (question path only) |
+| OfferDeck | Offering / confirming deck after question or day counsel |
 | Committed | Question and deck locked; ritual about to run or running |
 | Ritual | Shuffle / layout / draw / open in progress |
 | Closing | Synthesis and farewell |

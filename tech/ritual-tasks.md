@@ -23,6 +23,7 @@ Gap: pile top/bottom/index addressing (T4.3), free desk moves (return, draw bott
 2. **Mechanical verbs** — shuffle / draw / return / rotate / reveal with real state
 3. **Secrecy + tests** — face-down hidden; free-mode scenarios covered
 4. **Prophet tools** — session ritual composes these verbs; no LLM peek
+5. **Popular spreads catalog** — simple / thematic / classic layouts as named desk layouts
 
 ---
 
@@ -104,14 +105,42 @@ Gap: pile top/bottom/index addressing (T4.3), free desk moves (return, draw bott
 
 ---
 
+## T8 — Popular spreads catalog
+
+**Problem:** Runtime only wires Three Roads. Product needs the usual popular layouts so Pythia can match spread size to the question.
+
+**Done when:** Catalog in [spec/spreads.md](../spec/spreads.md) is registered in core; `beginRitual` / select-spread can use any of them; tests cover slot counts + ids; prompt knows when to offer which.
+
+**Depends on:** T4.2 (desk layout); prefer after T5.6 so spreads compose free verbs — can land defs earlier if `selectSpread` still used
+
+**Spec / arch:** [spec/spreads.md](../spec/spreads.md)
+
+**Catalog (from spec):**
+
+| Tier | Spreads |
+|------|---------|
+| Simple | `card-of-day` (1), `single-focus` (1), `yes-no` (3 fixed), `two-poles` (2), `past-present-future` (3), `thoughts-feelings-actions` (3), `three-roads` (3) |
+| Thematic 4–7 | `relationship`, `work-finance`, `choice` |
+| Classic 10+ | `celtic-cross`, `twelve-houses` |
+
+**Tasks:**
+
+- [x] **T8.1** Spec lock: ids, position roles, offering rule — done in spreads.md
+- [ ] **T8.2** Core defs: all simple spreads as fixed `SpreadDef` (`yes-no` = 3 slots) + register in runtime map
+- [ ] **T8.3** Core defs: thematic (`relationship`, `work-finance`, `choice`)
+- [ ] **T8.4** Core defs: `celtic-cross` (10)
+- [ ] **T8.5** Core defs: `twelve-houses` (12)
+- [ ] **T8.6** Tests: each spread → correct desk slot count/ids/kinds; selectSpread replaces layout
+- [ ] **T8.7** Pythia prompt + offer logic: prefer fewer; `card-of-day` only on day path; sharp hinge → `single-focus`; spread after Commit
+
+---
+
 ## Suggested build order
 
 ```text
-T4.1 spec (done)
-  → T4.2–T4.3 desk/pile model
-  → T5 verbs
-  → T6 tests (gate for “done”)
-  → T7 tools + session + prompt
+T4.1–T4.2 (done) → T4.3 → T5 → T6 → T7
+T8.1 (done) → T8.2–T8.5 defs (can parallel after T4.2)
+  → T8.6 tests → T8.7 prompt/offer
 ```
 
 Parallel with Telegram board is fine; ritual honesty is core, not adapter.
@@ -121,11 +150,11 @@ Parallel with Telegram board is fine; ritual honesty is core, not adapter.
 - Card image CDN / visual chrome
 - Multi-deck in play at once (Phase 1: one confirmed deck)
 - LLM choosing outcomes
+- Inventing huge niche spreads beyond the locked catalog
 - Telegram formatting / buttons (see [telegram-tasks.md](telegram-tasks.md))
 
 ## Related
 
 - Ticket system: [tickets.md](tickets.md)
-- Spec: [deck-and-ritual.md](../spec/deck-and-ritual.md)
+- Spec: [deck-and-ritual.md](../spec/deck-and-ritual.md), [spreads.md](../spec/spreads.md)
 - Core package: [packages/core/AGENTS.md](../packages/core/AGENTS.md)
-- Spreads: [spec/spreads.md](../spec/spreads.md)
