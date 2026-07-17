@@ -64,6 +64,8 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 
 **Depends on:** T0
 
+**Spec / arch / reference:** [spec/telegram-ux.md](../spec/telegram-ux.md), [packages/telegram/docs/formatting.md](../packages/telegram/docs/formatting.md) (Bot API formatting + Rich Messages)
+
 **Tasks:**
 
 - [x] **T2.1** Choose Telegram parse mode for Phase 1 outbound — **HTML** (not MarkdownV2; fewer escape pitfalls)
