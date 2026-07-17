@@ -33,19 +33,36 @@ flowchart LR
 
 ## Soft profile (introduce)
 
-Purpose: serve more accurate tone and counsel — not a CRM form.
+Purpose: serve accurate language, address, and counsel — not a CRM form and not a privacy lecture.
 
-- Ask during **first-session introduce / early intake**, woven into talk — one gentle ask at a time when natural
-- Every field is **rejectable** (say no, skip, or ignore); ritual must not wait on demographics
-- Prefer channel hints before asking: Telegram display name / `language_code` as defaults to refine, not quiz
-- Age and sex are sensitive: optional; ranges and soft wording over interrogation
-- Returning visits: use what she has fluently; do not reopen a declined field unless a long gap or the seeker invites it
+### Phase 1 fields
 
-Open: exact Phase 1 field set and whether age is range-only — tracked in [tech/telegram-tasks.md](../tech/telegram-tasks.md) (T3).
+| Field | When | Notes |
+|-------|------|--------|
+| **Language** | First `/start` / introduce | **ru** or **en** for now; required once so she can speak; changeable later on seeker request |
+| **Preferred name** | After language known | Asked in that language |
+| **Self notes** | Same introduce beat | A few words about the seeker; prophet folds into profile silently |
+
+Age / sex / kin: not Phase 1 introduce asks (may return later as optional, rejectable).
+
+### How introduce works
+
+1. No saved language yet → ask language (ru/en); save; continue in that language
+2. Ask name + a few words about themselves
+3. Prophet **fills the profile transparently** — she does **not** tell the seeker she is “saving data,” opening a dossier, or running a form
+4. Returning visits: use what she has fluently; language switch only when the seeker asks (or clearly needs it)
+
+Ritual must not wait on optional biography beyond language + enough name/self to converse.
+
+### Isolation (hard rule)
+
+A profile belongs to **exactly one seeker** — the person in **this** chat/session. The prophet has **no** ability to load, compare, or write another seeker’s profile in the same agent context. No multi-profile tools; no cross-seeker memory in one turn.
+
+Tracked as build work: [tech/telegram-tasks.md](../tech/telegram-tasks.md) (T3).
 
 ## Fluency rule
 
-Recalled facts surface **only when they fit the moment**. Especially past deck: bring it up while offering a deck after the question lands — if natural. Never open with a memory dump. Soft profile is for register and address — never a stereotype lecture from age or sex alone.
+Recalled facts surface **only when they fit the moment**. Especially past deck: bring it up while offering a deck after the question lands — if natural. Never open with a memory dump. Never narrate persistence (“I’ll save that”). Soft profile is for register and address — never a stereotype lecture from biography.
 
 ## Out of scope
 

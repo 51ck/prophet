@@ -2,19 +2,20 @@ import type {
   CardDef,
   CardInstance,
   DeckState,
+  DeskSlot,
   Orientation,
   ShuffleOp,
   SpreadDef,
-  TablePosition,
 } from "./types.ts";
 
 function cloneState(state: DeckState): DeckState {
   return {
     deckId: state.deckId,
     pile: state.pile.map((c) => ({ ...c })),
-    table: state.table.map((p) => ({
+    desk: state.desk.map((p) => ({
       id: p.id,
       role: p.role,
+      kind: p.kind,
       card: p.card ? { ...p.card } : null,
     })),
   };
@@ -29,7 +30,7 @@ export function createDeckState(
     orientation: "upright" as Orientation,
     faceUp: false,
   }));
-  return { deckId, pile, table: [] };
+  return { deckId, pile, desk: [] };
 }
 
 /** Fisher–Yates mix; optional RNG for tests. */
@@ -128,22 +129,41 @@ export const SINGLE_FOCUS: SpreadDef = {
   positions: [{ id: "focus", role: "Focus — the hinge of the question" }],
 };
 
+/** Named spread replaces the desk layout (spread-kind empty slots). */
 export function selectSpread(state: DeckState, spread: SpreadDef): DeckState {
   const next = cloneState(state);
-  next.table = spread.positions.map(
-    (p): TablePosition => ({
+  next.desk = spread.positions.map(
+    (p): DeskSlot => ({
       id: p.id,
       role: p.role,
+      kind: "spread",
       card: null,
     }),
   );
   return next;
 }
 
-/** Draw from top of pile into empty table slots in order. */
+/**
+ * Add an empty free placement on the desk (no named spread required).
+ * Does not touch the pile. Fails if id already exists.
+ */
+export function addFreeSlot(
+  state: DeckState,
+  id: string,
+  role = "free",
+): DeckState {
+  const next = cloneState(state);
+  if (next.desk.some((s) => s.id === id)) {
+    throw new Error(`Desk already has slot "${id}"`);
+  }
+  next.desk.push({ id, role, kind: "free", card: null });
+  return next;
+}
+
+/** Draw from top of pile into empty desk slots in order. */
 export function drawToPositions(state: DeckState): DeckState {
   const next = cloneState(state);
-  for (const pos of next.table) {
+  for (const pos of next.desk) {
     if (pos.card !== null) continue;
     const card = next.pile.shift();
     if (!card) break;
@@ -154,7 +174,7 @@ export function drawToPositions(state: DeckState): DeckState {
 
 export function openPosition(state: DeckState, positionId: string): DeckState {
   const next = cloneState(state);
-  const pos = next.table.find((p) => p.id === positionId);
+  const pos = next.desk.find((p) => p.id === positionId);
   if (!pos?.card) {
     throw new Error(`No card at position "${positionId}"`);
   }
@@ -165,9 +185,10 @@ export function openPosition(state: DeckState, positionId: string): DeckState {
 export function getDeckSnapshot(state: DeckState): {
   deckId: string;
   pileCount: number;
-  table: {
+  desk: {
     id: string;
     role: string;
+    kind: DeskSlot["kind"];
     faceUp: boolean;
     defId: string | null;
     orientation: Orientation | null;
@@ -176,18 +197,21 @@ export function getDeckSnapshot(state: DeckState): {
   return {
     deckId: state.deckId,
     pileCount: state.pile.length,
-    table: state.table.map((p) => ({
+    desk: state.desk.map((p) => ({
       id: p.id,
       role: p.role,
+      kind: p.kind,
       faceUp: p.card?.faceUp ?? false,
       defId: p.card?.faceUp ? (p.card.defId ?? null) : null,
       orientation: p.card?.faceUp ? (p.card.orientation ?? null) : null,
-      // Face-down: hide identity from casual snapshot consumers
     })),
   };
 }
 
 /** Inspect face-down identity — for tests / trusted ritual path only. */
-export function peekTable(state: DeckState): TablePosition[] {
-  return cloneState(state).table;
+export function peekDesk(state: DeckState): DeskSlot[] {
+  return cloneState(state).desk;
 }
+
+/** @deprecated Prefer peekDesk */
+export const peekTable = peekDesk;

@@ -48,13 +48,17 @@ Product verbs — what the prophet can *do* as idea, not an API:
 | **Intake dialogue** | Short exchange to shape the question |
 | **Lock question** | Commit the reading’s focus |
 | **Offer / confirm deck** | Suitability from question + behavior; fluent past-deck memory; then confirm |
-| **Shuffle** | Compose honest ops (mix, cut, shift, rotate, seeker cut) |
-| **Select spread** | Positions matched to the locked question |
-| **Draw** | Place cards into positions (typically face-down) |
-| **Open / reveal** | Turn a position face-up; speak what is there |
+| **Select spread** | Named desk positions matched to the locked question (layout over the same desk) |
+| **Shuffle** | Compose honest ops on the pile (mix, cut, shift, rotate, seeker cut) |
+| **Draw / place** | Move a card from pile to desk (top / bottom / index), usually face-down |
+| **Return** | Move a desk card back into the pile (top / bottom / index) |
+| **Rotate** | Flip orientation on pile cards or a desk card |
+| **Open / reveal** | Turn a face-down desk card face-up; speak what is there |
+| **Inspect snapshot** | See desk layout; face-down cards hide identity |
 | **Ask seeker** | Clarify feeling, choice of next open, nuance of question; for simple closed asks, offer a small set of choices (channel may show buttons) including decline when the ask is optional |
 | **Interpret** | Read opened cards against locked question and deck voice |
-| **Save memory** | Note stable useful facts during session |
+| **Save memory** | Note stable useful facts during session — including transparent profile fill (no seeker-facing “I am saving this”) |
+| **Set / change language** | Persist seeker language (Phase 1: ru/en); switch register when seeker asks |
 | **Close session** | Synthesis and clean end |
 | **Refactor memories** | Compress / freshen notes after close |
 | **Defer / refuse** | Stop without a fake ritual when intake fails |
@@ -69,9 +73,12 @@ The prophet uses capabilities; she does not replace the deck.
 ## Limits
 
 - No inventing cards or silent reshuffles to “fix” interpretation
+- No peeking face-down identity for prophet or seeker before reveal
 - No unbounded post-close companionship as part of the core product
 - No mid-ritual quiet deck swap
 - No forced memory dumps that break fluency
+- No announcing profile persistence to the seeker (“I’ll save your data,” form/CRM voice)
+- **One seeker profile per agent context** — cannot load, compare, or write another person’s profile in the same session/turn
 - Economics / paywalls are out of scope for the ritual mind until a later phase defines them
 
 ## Related

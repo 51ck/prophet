@@ -16,17 +16,26 @@ export type CardInstance = {
   faceUp: boolean;
 };
 
-export type TablePosition = {
+/** Named spread layout vs free placement on the desk. */
+export type DeskSlotKind = "spread" | "free";
+
+/** One place on the desk — may be empty or hold a card. */
+export type DeskSlot = {
   id: string;
   role: string;
+  kind: DeskSlotKind;
   card: CardInstance | null;
 };
+
+/** @deprecated Prefer DeskSlot — same shape. */
+export type TablePosition = DeskSlot;
 
 export type DeckState = {
   deckId: string;
   /** Top of array = top of pile (next draw). */
   pile: CardInstance[];
-  table: TablePosition[];
+  /** Cards in play: named spread slots and/or free placements. */
+  desk: DeskSlot[];
 };
 
 export type ShuffleOp =

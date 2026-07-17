@@ -28,7 +28,7 @@ Those belong to a later product phase. See [roadmap.md](roadmap.md).
 
 - Pay for access or capacity — never for a “better” card outcome
 - Ritual authenticity unchanged for paying and non-paying seekers within an allowed session
-- Stewardship (limits, abuse control) may precede full paid launch
+- Stewardship precedes full paid launch: manifest, public website (terms + description), usage statistics, admin panel for tracking, plus limits/abuse control — see Phase 4 in [roadmap.md](roadmap.md)
 
 ## Related
 

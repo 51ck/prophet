@@ -26,7 +26,7 @@ describe("reading runtime arc", () => {
     runtime.shuffle([{ type: "mix" }, { type: "cut" }, { type: "rotate", count: 5 }]);
     runtime.draw();
     const snap = runtime.open("situation");
-    const sit = snap.table.find((t) => t.id === "situation");
+    const sit = snap.desk.find((t) => t.id === "situation");
     expect(sit?.faceUp).toBe(true);
     expect(sit?.defId).toBeTruthy();
 

@@ -44,14 +44,35 @@ Phase 1: Light Seer’s is fully described. Other decks: identity + when-it-fits
 
 ## Honest deck state
 
-At any moment in ritual, the deck (and table) has a real state:
+At any moment in ritual, the **deck** (ordered pile) and **desk** (cards placed in play) have a real state:
 
-- Ordered pile(s) / hand / positions
+- Ordered pile(s) — top, bottom, and middle are real positions
+- Desk placements — cards on the table (named spread slots or free placements)
 - Each card’s identity in that position
 - Orientation where the deck uses it
 - Face-down vs face-up
 
 Prophet interpretation never overrides that state. Undoing or reshuffling mid-reading is an explicit ritual act, not a silent edit.
+
+### Mental model (locked)
+
+Imagine a **free mode**: the prophet may ask the engine to shuffle, place a card on the desk, reveal it, return it to the pile, draw again, take from the bottom, place three cards, return the middle one, reshuffle, then draw from the middle of the pile. Session ritual is that same engine — composed into a reading — not a separate fake path.
+
+### Mechanical verbs (product)
+
+| Verb | Meaning |
+|------|---------|
+| **Shuffle** | Honest reorder / cut / shift / rotate ops on the pile |
+| **Draw** | Move a card from the pile onto the desk (top by default; also bottom or a pile index) |
+| **Place / return** | Move between pile and desk (e.g. return a desk card to top, bottom, or a pile index) |
+| **Rotate** | Flip orientation on a pile segment or a desk card where the deck uses reversals |
+| **Reveal / open** | Turn a face-down desk card face-up — identity becomes knowable |
+
+### Secrecy (locked)
+
+Until **reveal**, neither prophet nor seeker may learn which card it is. Agent-facing snapshots hide face-down identity. Tests and trusted internals may peek; the ritual mind must not.
+
+Build board: [tech/ritual-tasks.md](../tech/ritual-tasks.md).
 
 ## Shuffle honesty
 
@@ -67,17 +88,19 @@ The point is not theatrical noise: operations change real order and orientation.
 
 ## Spread and draw
 
-- A **spread** is a named set of positions with roles — see [spreads.md](spreads.md)
+- A **spread** is a named set of desk positions with roles — see [spreads.md](spreads.md)
 - Prefer fewer positions when the question is sharp
-- **Draw** moves cards from the shuffled pile into positions, usually face-down
+- **Draw / place** moves cards from the pile onto the desk, usually face-down
+- Named spreads are a convenience layout over the same desk; they do not bypass free pile↔desk verbs
 - Drawn cards stay what they are until opened
 
 ## Open / reveal
 
 - Cards stay face-down until opened
-- Opening reveals identity (and orientation) for that position
+- Opening reveals identity (and orientation) for that desk card
 - Pacing may be one-by-one, position-by-position, or a deliberate full reveal — prophet and seeker can negotiate within the session arc
 - Opening does not change which card is there
+- Prophet and seeker **do not know** the card before reveal
 
 ## Authenticity rules (summary)
 
@@ -85,8 +108,9 @@ The point is not theatrical noise: operations change real order and orientation.
 |---------|-------------|
 | Compose shuffle ops that reorder/orient for real | Invent a card that was not drawn |
 | Narrate ritual that matches state | Quietly swap cards to fit a nicer story |
-| Choose spread and pacing | Claim reversed/upright without orientation in state |
-| Re-shuffle only as an explicit new act | Treat interpretation as if it were the draw |
+| Choose spread and pacing; free pile↔desk moves as explicit acts | Claim reversed/upright without orientation in state |
+| Re-shuffle / return / redraw only as explicit acts | Treat interpretation as if it were the draw |
+| | Peek face-down identity for the prophet or seeker before reveal |
 
 ## Related
 

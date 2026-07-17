@@ -6,7 +6,7 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 
 ## Ownership
 
-- Deck state and shuffle/draw/open mechanics
+- Deck state and shuffle/draw/open mechanics — pile + desk; free verbs per [tech/ritual-tasks.md](../../tech/ritual-tasks.md)
 - Session state machine
 - Seeker memory store
 - Pythia agent + tool wiring

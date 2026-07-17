@@ -40,7 +40,7 @@ Telegram is a **frontend adapter**. Ritual honesty, Pythia’s mind, and seeker 
 ### Core (channel-agnostic)
 
 - Pythia agent (character, intake, offer deck, interpret)
-- Ritual engine (honest deck state: shuffle / draw / open)
+- Ritual engine (honest deck/desk state: shuffle / draw / return / rotate / open) — board [ritual-tasks.md](ritual-tasks.md)
 - Seeker memory (recall / save / refactor)
 - Session arc state machine
 
@@ -94,7 +94,7 @@ flowchart TB
 |-------|--------|------|
 | Chat transport | Telegram adapter | Message I/O, buttons |
 | Reading session arc | Core session + agent | Idle → recall → intake → offer deck → committed → ritual → closing → refactor → ended |
-| Deck / table | Core ritual engine | Mechanical; tools mutate; agent narrates true state |
+| Deck / desk | Core ritual engine | Mechanical pile + desk; tools mutate; agent narrates true state |
 | Seeker memory | Core memory store + tools | Persist across sessions; refactor at end |
 | Character | Prompt from [character.md](../spec/character.md) | Pythia |
 

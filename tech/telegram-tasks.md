@@ -10,7 +10,7 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 
 1. **Prophet can act in Telegram** — structured choices as buttons, not only typed replies
 2. **Messages look intentional** — formatting reaches Telegram, not raw `*` markup
-3. **Soft profile for accuracy** — name / age / language / sex (and kin) collected fluently, optionally, rejectably during introduce
+3. **Introduce + seeker profile** — language → name/self; transparent fill; one-seeker isolation
 
 ---
 
@@ -47,7 +47,7 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 
 **Tasks:**
 
-- [ ] **T1.1** Spec lock: when buttons are allowed (closed set ≤ N; yes/no; lock; deck; cut; open-next; profile skips) vs free prose only
+- [ ] **T1.1** Spec lock: when buttons are allowed (closed set ≤ N; yes/no; language; lock; deck; cut; open-next) vs free prose only
 - [ ] **T1.2** Core channel-agnostic “ask with options” verb (options + optional skip/reject) — adapter decides chrome
 - [ ] **T1.3** Grammy: inline keyboard; callback → seeker turn; expire/replace after answer
 - [ ] **T1.4** Pythia prefers options for simple asks (intake, offer, ritual pace) — not every utterance
@@ -73,34 +73,42 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 
 ---
 
-## T3 — Soft seeker profile (introduce, fluent, rejectable)
+## T3 — Introduce flow + seeker profile
 
-**Problem:** Accurate readings need light facts; forms break character; never asking leaves Pythia guessing.
+**Problem:** First visit needs a language and a sense of who the seeker is — without form theater, without “we are saving your data,” and without any cross-seeker profile access.
 
-**Done when:** Optional profile fields can be asked fluently, skipped, stored in memory, and used without stereotyping or gating ritual.
+**Done when:** New seeker picks **ru/en**, prophet continues in that language, asks name + a few words about themselves, fills profile silently, can change language later on request; agent tools never touch another seeker’s profile in the same context.
 
-**Depends on:** T0; T1 for buttoned reject; memory beyond notes-only MVP
+**Depends on:** T0; T1 for language buttons (T3.4+); memory beyond notes-only MVP
 
-**Candidate fields (all optional):**
+**Spec / arch:** [spec/memory.md](../spec/memory.md), [spec/telegram-ux.md](../spec/telegram-ux.md), [spec/agent.md](../spec/agent.md)
 
-| Field | Why | Notes |
-|-------|-----|--------|
-| Preferred name / address | Trust, continuity | Telegram `first_name` default |
-| Language | Reply language | Prefer `language_code`; ask if unclear |
-| Age (range ok) | Life-stage counsel | Skip-friendly |
-| Sex / gender | Pronouns / framing if sought | Rejectable; do not invent |
+**Product intent:**
 
-**Product intent:** see [spec/memory.md](../spec/memory.md) — weave into introduce; rejectable; never gate ritual.
+1. No language saved → ask **ru / en** → save → speak that language
+2. Ask **name** + **few words about seeker**
+3. Profile fill is **transparent** — never announce persistence / CRM / “I’ll remember that for my records”
+4. Profile is **only** for this seeker chat/session — no multi-profile interaction
+
+**Cancelled (superseded by locks above):**
+
+- [x] **T3.1** (cancelled) Spec: Phase 1 soft-profile fields; privacy one-liner if needed
+- [x] **T3.2** (cancelled) Memory shape: structured optional profile + free notes
+- [x] **T3.3** (cancelled) Introduce: at most one gentle profile ask per turn when natural
+- [x] **T3.4** (cancelled) Seed name + language from Telegram; ask only to refine
+- [x] **T3.5** (cancelled) Buttons for profile + Skip / Prefer not to say
+- [x] **T3.6** (cancelled) On reject: remember declined; no re-grill
+- [x] **T3.7** (cancelled) Prompt: use profile for register — never stereotype from sex/age alone
 
 **Tasks:**
 
-- [ ] **T3.1** Spec: Phase 1 soft-profile fields; privacy one-liner if needed
-- [ ] **T3.2** Memory shape: structured optional profile + free notes
-- [ ] **T3.3** Introduce: at most one gentle profile ask per turn when natural; never block lockQuestion
-- [ ] **T3.4** Seed name + language from Telegram; ask only to refine
-- [ ] **T3.5** Buttons for profile + Skip / Prefer not to say (reuse T1)
-- [ ] **T3.6** On reject: remember declined; no re-grill; reopen only after gap / explicit ask
-- [ ] **T3.7** Prompt: use profile for register — never stereotype from sex/age alone
+- [x] **T3.8** Spec lock: introduce order (lang → name/self); transparent fill; profile isolation — done in memory/telegram-ux/agent + this board
+- [ ] **T3.9** Memory shape: `language` (ru|en) + preferred name + self notes; keyed strictly by seeker id
+- [ ] **T3.10** Core: profile read/write verbs bound to **current seeker only** — no tool to select/load another profile
+- [ ] **T3.11** `/start` / first turn: if no language, ask ru|en (T1 buttons); persist; continue in that language
+- [ ] **T3.12** After language: ask name + few words about seeker; write profile from answers **without** meta disclosure
+- [ ] **T3.13** Language change on seeker request: persist + switch register for later turns
+- [ ] **T3.14** Prompt/character: transparent profile use; never narrate saving; never imply access to other seekers
 
 ---
 
@@ -109,19 +117,22 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 ```text
 T0 adapter baseline (done)
   → T2 formatting (cheap, high visible quality)
-  → T1 ask-with-options + buttons
-  → T3 soft profile on introduce (uses T1 + memory)
+  → T1 ask-with-options + buttons (needed for ru/en)
+  → T3.8–T3.10 memory + isolation
+  → T3.11–T3.14 introduce flow + language change + prompt
 ```
 
-Roadmap: Phase 1 DM path completing + early Phase 3 fluency. Soft profile = Phase 1 memory enrichment.
+Roadmap: Phase 1 DM path completing + early Phase 3 fluency. Introduce/profile = Phase 1 memory enrichment.
 
 ## Out of scope (this board)
 
 - Mini-apps / web UI as main shell
-- Mandatory demographics gate
+- Mandatory age/sex/kin demographics gate
+- Age/sex as Phase 1 introduce fields
 - Group summon etiquette (Phase 3 later)
 - Stars / paywall
 - Card image CDN
+- Languages beyond ru/en (Phase 1)
 
 ## Related
 

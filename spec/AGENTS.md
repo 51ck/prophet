@@ -38,7 +38,7 @@ Idea documents (not child DOX folders):
 
 - [vision.md](vision.md) — locked problem, what / why / authenticity bar
 - [session.md](session.md) — recall → question → offer deck → ritual → close → refactor
-- [deck-and-ritual.md](deck-and-ritual.md) — catalog, selection, shuffle honesty, draw/open
+- [deck-and-ritual.md](deck-and-ritual.md) — catalog, selection, shuffle honesty, desk/pile free verbs, draw/open; board [tech/ritual-tasks.md](../tech/ritual-tasks.md)
 - [character.md](character.md) — Pythia persona
 - [memory.md](memory.md) — seeker memory lifecycle + fluency
 - [agent.md](agent.md) — prophet role + conceptual capabilities

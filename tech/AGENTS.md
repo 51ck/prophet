@@ -40,5 +40,6 @@ Does not own product vision or ritual authenticity rules (`spec/`).
 
 - [architecture.md](architecture.md) — system shape, stack, deploy, models; core vs adapters
 - [tickets.md](tickets.md) — in-repo ticket system (IDs, boards, agent loop)
-- [telegram-tasks.md](telegram-tasks.md) — Telegram board: T0–T3 (adapter, format, buttons, soft profile)
+- [telegram-tasks.md](telegram-tasks.md) — Telegram board: T0–T3 (adapter, format, buttons, introduce/profile)
+- [ritual-tasks.md](ritual-tasks.md) — Ritual board: T4–T7 (desk/pile, verbs, tests, prophet tools)
 - [../packages/core/AGENTS.md](../packages/core/AGENTS.md) — core package

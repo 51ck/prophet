@@ -30,7 +30,8 @@
 | Reveal chrome | **Text names** + short imagery cue; card images later |
 | Controls | Natural language first; light buttons for lock question / cut / open-next **and** other simple closed prophet questions |
 | Message formatting | Channel sends with a chosen Telegram parse mode; broken markup falls back to plain text |
-| Soft profile on introduce | Optional, fluent, rejectable — see [memory.md](memory.md); never gates the ritual |
+| Soft profile on introduce | Language (ru/en) first → name + few words about self; profile filled **transparently** (no “saving data” talk); scoped to this seeker only — see [memory.md](memory.md) |
+| Language | Chosen once at introduce; prophet may change it later on seeker request |
 | Abandon mid-ritual | Next visit = **fresh start** (no resume yet) |
 | Group | Not in Phase 1 |
 
@@ -41,11 +42,12 @@
 3. **Interruptions** — how group noise or multiple speakers affect a single reading
 4. **Session resume** — after Phase 1, mid-ritual leave: resume vs always fresh?
 5. **Visibility of deck state** — how much inspectability without breaking ceremony
-6. **Button budget** — exact max options per ask; whether profile Skip is always shown beside choices
+6. **Button budget** — exact max options per ask
+7. **More languages** — beyond ru/en
 
 ## Prototype → product tasks
 
-Build board (in-repo tickets): [tech/telegram-tasks.md](../tech/telegram-tasks.md) — see [tech/tickets.md](../tech/tickets.md). T0 adapter done; open: buttons, formatting, soft profile.
+Build board (in-repo tickets): [tech/telegram-tasks.md](../tech/telegram-tasks.md) — see [tech/tickets.md](../tech/tickets.md). T0 adapter done; open: buttons, formatting, introduce/profile (T3).
 
 ## Non-goals (for now)
 

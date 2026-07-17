@@ -2,6 +2,7 @@ export { LIGHT_SEERS_CARDS, LIGHT_SEERS_DECK_ID } from "./deck/light-seers.ts";
 export {
   THREE_ROADS,
   SINGLE_FOCUS,
+  addFreeSlot,
   applyShuffleOp,
   applyShuffleOps,
   createDeckState,
@@ -9,6 +10,7 @@ export {
   getDeckSnapshot,
   mixPile,
   openPosition,
+  peekDesk,
   peekTable,
   selectSpread,
 } from "./ritual/engine.ts";
@@ -16,6 +18,8 @@ export type {
   CardDef,
   CardInstance,
   DeckState,
+  DeskSlot,
+  DeskSlotKind,
   Orientation,
   ShuffleOp,
   SpreadDef,
