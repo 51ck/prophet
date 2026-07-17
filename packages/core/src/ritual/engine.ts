@@ -287,6 +287,31 @@ export function placeOnDesk(
 /** Product verb alias: draw = place from pile onto desk face-down. */
 export const draw = placeOnDesk;
 
+/**
+ * Return one card from a desk slot to the pile at PileAddress.
+ * Leaves the desk slot empty (spread or free). Card goes face-down; orientation kept.
+ * Default address is top. Throws if the slot is missing or empty.
+ */
+export function returnToPile(
+  state: DeckState,
+  slotId: string,
+  address: PileAddress = { kind: "top" },
+): DeckState {
+  const existing = state.desk.find((s) => s.id === slotId);
+  if (!existing?.card) {
+    throw new Error(`No card at desk slot "${slotId}"`);
+  }
+
+  const card: CardInstance = { ...existing.card, faceUp: false };
+  const next = cloneState(state);
+  const slot = next.desk.find((s) => s.id === slotId);
+  if (!slot) {
+    throw new Error(`Desk slot "${slotId}" missing after clone`);
+  }
+  slot.card = null;
+  return insertIntoPile(next, card, address);
+}
+
 /** Draw from top of pile into empty desk slots in order. */
 export function drawToPositions(state: DeckState): DeckState {
   const next = cloneState(state);
