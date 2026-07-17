@@ -69,7 +69,7 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 **Tasks:**
 
 - [x] **T2.1** Choose Telegram parse mode for Phase 1 outbound — **HTML** (not MarkdownV2; fewer escape pitfalls)
-- [ ] **T2.2** Adapter send path always applies chosen `parse_mode`; never forward raw LLM string unprocessed
+- [x] **T2.2** Adapter send path always applies chosen `parse_mode`; never forward raw LLM string unprocessed
 - [ ] **T2.3** Convert/sanitize model output → Telegram-safe markup
 - [ ] **T2.4** Fallback: parse fail → resend plain text (no crash, no half-broken stars)
 - [ ] **T2.5** Prompt: short ceremonial prose; light emphasis only — no heavy markdown tables/lists in DM

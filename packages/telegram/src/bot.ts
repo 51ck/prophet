@@ -37,12 +37,20 @@ function extractReplyText(result: unknown): string {
   return "The cards are quiet for a moment — try again.";
 }
 
-/** Phase 1 outbound parse_mode. HTML over MarkdownV2: escape only <>& vs many MarkdownV2 specials. Apply in T2.2+. */
+/** Phase 1 outbound parse_mode. HTML over MarkdownV2: escape only <>& vs many MarkdownV2 specials. */
 export const PHASE1_PARSE_MODE = "HTML" as const;
+
+/** Escape plain text for Telegram HTML parse_mode. Emphasis conversion is T2.3. */
+function escapeHtml(text: string): string {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
 
 async function reply(ctx: Context, text: string): Promise<void> {
   for (const part of chunkText(text)) {
-    await ctx.reply(part);
+    await ctx.reply(escapeHtml(part), { parse_mode: PHASE1_PARSE_MODE });
   }
 }
 
@@ -56,7 +64,7 @@ export function createBot(hub: SessionHub): Bot {
 
   bot.command("start", async (ctx) => {
     if (ctx.chat?.type !== "private") {
-      await ctx.reply("Write me in a private chat for a reading.");
+      await reply(ctx, "Write me in a private chat for a reading.");
       return;
     }
     const seekerId = String(ctx.from?.id ?? "");
@@ -71,7 +79,7 @@ export function createBot(hub: SessionHub): Bot {
 
   bot.command("new", async (ctx) => {
     if (ctx.chat?.type !== "private") {
-      await ctx.reply("Write me in a private chat for a reading.");
+      await reply(ctx, "Write me in a private chat for a reading.");
       return;
     }
     const seekerId = String(ctx.from?.id ?? "");
