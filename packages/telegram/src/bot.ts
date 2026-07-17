@@ -1,5 +1,6 @@
 import { Bot, type Context } from "grammy";
 import type { InlineKeyboard } from "grammy";
+import type { SeekerLanguage } from "@prophet/core";
 import { extractAskWithOptions } from "./ask.ts";
 import { isTelegramParseError, toTelegramHtml } from "./format.ts";
 import {
@@ -8,6 +9,13 @@ import {
   parseAskCallback,
   resolveAskChoice,
 } from "./keyboard.ts";
+import {
+  LANGUAGE_ASK_PROMPT,
+  languageAsk,
+  presenceOpener,
+  resolveLanguageChoice,
+  savedLanguage,
+} from "./language-gate.ts";
 import {
   claimPendingAsk,
   type ActiveReading,
@@ -108,6 +116,37 @@ async function clearPendingKeyboard(
   return pending;
 }
 
+/** Ask ru|en with T1 buttons; skip when language already saved. */
+async function askLanguageIfNeeded(
+  ctx: Context,
+  reading: ActiveReading,
+): Promise<boolean> {
+  if (savedLanguage(reading.runtime.readProfile())) return false;
+  const ask = languageAsk();
+  const sent = await reply(ctx, LANGUAGE_ASK_PROMPT, {
+    reply_markup: buildAskKeyboard(ask),
+  });
+  reading.history.push({ role: "assistant", content: LANGUAGE_ASK_PROMPT });
+  if (sent) {
+    reading.pendingAsk = {
+      ask,
+      chatId: sent.chat.id,
+      messageId: sent.message_id,
+    };
+  }
+  return true;
+}
+
+async function sendPresence(
+  ctx: Context,
+  reading: ActiveReading,
+  language: SeekerLanguage,
+): Promise<void> {
+  const opener = presenceOpener(language);
+  reading.history.push({ role: "assistant", content: opener });
+  await reply(ctx, opener);
+}
+
 async function runSeekerTurn(
   ctx: Context,
   hub: SessionHub,
@@ -121,6 +160,18 @@ async function runSeekerTurn(
   // Typed reply always claims pending ask — never force-retry until they tap.
   const pending = await clearPendingKeyboard(bot, reading);
   const turnText = normalizeTypedAskReply(pending?.ask, text);
+
+  if (!savedLanguage(reading.runtime.readProfile())) {
+    const language = resolveLanguageChoice(turnText);
+    if (!language) {
+      await askLanguageIfNeeded(ctx, reading);
+      return;
+    }
+    await reading.runtime.updateProfile({ language });
+    reading.history.push({ role: "user", content: turnText });
+    await sendPresence(ctx, reading, language);
+    return;
+  }
 
   reading.history.push({ role: "user", content: turnText });
 
@@ -171,10 +222,10 @@ export function createBot(hub: SessionHub): Bot {
     if (!seekerId) return;
 
     const reading = await hub.startFresh(seekerId);
-    const opener =
-      "I am Pythia. Tell me what you cannot settle by ordinary means — we will find a proper question, then read.";
-    reading.history.push({ role: "assistant", content: opener });
-    await reply(ctx, opener);
+    if (await askLanguageIfNeeded(ctx, reading)) return;
+
+    const language = savedLanguage(reading.runtime.readProfile())!;
+    await sendPresence(ctx, reading, language);
   });
 
   bot.command("new", async (ctx) => {
@@ -184,11 +235,16 @@ export function createBot(hub: SessionHub): Bot {
     }
     const seekerId = String(ctx.from?.id ?? "");
     if (!seekerId) return;
-    await hub.startFresh(seekerId);
-    await reply(
-      ctx,
-      "Fresh session. What question do you want answered esoterically?",
-    );
+    const reading = await hub.startFresh(seekerId);
+    if (await askLanguageIfNeeded(ctx, reading)) return;
+
+    const language = savedLanguage(reading.runtime.readProfile())!;
+    const fresh =
+      language === "ru"
+        ? "Новая сессия. Какой вопрос хочешь решить эзотерически?"
+        : "Fresh session. What question do you want answered esoterically?";
+    reading.history.push({ role: "assistant", content: fresh });
+    await reply(ctx, fresh);
   });
 
   bot.on("callback_query:data", async (ctx) => {

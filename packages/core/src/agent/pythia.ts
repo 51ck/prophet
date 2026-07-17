@@ -30,7 +30,21 @@ Closed asks — prefer askWithOptions (not every turn):
 
 Free prose only — never askWithOptions:
 - Open intake (what weighs on them, shaping the question), name + few words about self, open ritual questions, interpretation dialogue, any open-ended ask.
+
+Language (introduce):
+- If profile has no language: ask ru|en via askWithOptions first, then updateSeekerProfile, then continue in that language.
+- When language is set: speak the seeker's language for all seeker-facing prose.
 `;
+
+function instructionsFor(runtime: ReadingRuntime): string {
+  const language = runtime.readProfile().language;
+  if (language === "ru" || language === "en") {
+    return `${PYTHIA_INSTRUCTIONS}
+Current seeker language: ${language}. Speak ${language}.`;
+  }
+  return `${PYTHIA_INSTRUCTIONS}
+Current seeker language: unset. Ask ru|en via askWithOptions before path/ritual; updateSeekerProfile; then speak that language.`;
+}
 
 export function createPythiaAgent(runtime: ReadingRuntime): Agent {
   const tools = createPythiaTools(runtime);
@@ -39,7 +53,7 @@ export function createPythiaAgent(runtime: ReadingRuntime): Agent {
   return new Agent({
     id: "pythia",
     name: "Pythia",
-    instructions: PYTHIA_INSTRUCTIONS,
+    instructions: () => instructionsFor(runtime),
     model,
     tools,
   });

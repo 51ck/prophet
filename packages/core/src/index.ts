@@ -59,6 +59,13 @@ export type {
 export { createPythiaAgent, startReading } from "./agent/pythia.ts";
 export { createPythiaTools } from "./agent/tools.ts";
 export {
+  LANGUAGE_ASK_PROMPT,
+  createLanguageAsk,
+  isLanguageAsk,
+  parseSeekerLanguage,
+  presenceOpener,
+} from "./profile/language.ts";
+export {
   ASK_WITH_OPTIONS_KIND,
   MAX_ASK_OPTIONS,
   MIN_ASK_OPTIONS,
