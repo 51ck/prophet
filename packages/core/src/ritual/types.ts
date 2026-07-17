@@ -47,6 +47,13 @@ export type PileAddress =
   | { kind: "bottom" }
   | { kind: "index"; index: number };
 
+/**
+ * Honest pile reorder / orient ops (physical analogues).
+ * - `cut.at` — pile index (omit → random). Index 0 = top.
+ * - `seekerCut.at` — fraction in [0, 1] of pile depth (seeker participation).
+ * - `shift` — move a contiguous block; `from`/`to` are pile indices.
+ * - `rotate` — flip orientation on pile prefix (`count` omitted → whole pile).
+ */
 export type ShuffleOp =
   | { type: "mix" }
   | { type: "cut"; at?: number }

@@ -70,9 +70,13 @@ export function applyShuffleOp(
     }
     case "cut":
     case "seekerCut": {
+      // seekerCut.at is a depth fraction [0,1]; cut.at is a pile index.
       const at =
         op.type === "seekerCut"
-          ? clampIndex(op.at * next.pile.length, next.pile.length)
+          ? clampIndex(
+              Math.max(0, Math.min(1, op.at)) * next.pile.length,
+              next.pile.length,
+            )
           : clampIndex(
               op.at ?? Math.floor(random() * next.pile.length),
               next.pile.length,
