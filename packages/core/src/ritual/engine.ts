@@ -346,15 +346,27 @@ export function drawToPositions(state: DeckState): DeckState {
   return next;
 }
 
+/** Flip a desk card face-up. Keeps defId and orientation; only faceUp changes. */
 export function openPosition(state: DeckState, positionId: string): DeckState {
+  const existing = state.desk.find((p) => p.id === positionId);
+  if (!existing?.card) {
+    throw new Error(`No card at desk slot "${positionId}"`);
+  }
+
   const next = cloneState(state);
   const pos = next.desk.find((p) => p.id === positionId);
   if (!pos?.card) {
-    throw new Error(`No card at position "${positionId}"`);
+    throw new Error(`Desk slot "${positionId}" missing after clone`);
   }
   pos.card = { ...pos.card, faceUp: true };
   return next;
 }
+
+/** Product verb alias: reveal = open face-down desk card. */
+export const reveal = openPosition;
+
+/** Product verb alias: open = openPosition. */
+export const open = openPosition;
 
 export function getDeckSnapshot(state: DeckState): {
   deckId: string;

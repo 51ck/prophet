@@ -10,11 +10,13 @@ import {
   drawToPositions,
   getDeckSnapshot,
   insertIntoPile,
+  open,
   openPosition,
   peekDesk,
   placeOnDesk,
   resolvePileDrawIndex,
   resolvePileInsertIndex,
+  reveal,
   returnToPile,
   rotateDeskCard,
   selectSpread,
@@ -213,6 +215,48 @@ describe("ritual engine", () => {
     expect(() => rotateDeskCard(state, "ghost")).toThrow(/No card at desk slot/);
     state = addFreeSlot(state, "empty");
     expect(() => rotateDeskCard(state, "empty")).toThrow(/No card at desk slot/);
+  });
+
+  test("reveal flips face-up; defId and orientation unchanged", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "focus");
+    state = rotateDeskCard(state, "focus");
+    const before = peekDesk(state).find((s) => s.id === "focus")!.card!;
+    expect(before.faceUp).toBe(false);
+    expect(before.orientation).toBe("reversed");
+
+    const snapBefore = getDeckSnapshot(state).desk.find((t) => t.id === "focus");
+    expect(snapBefore?.faceUp).toBe(false);
+    expect(snapBefore?.defId).toBeNull();
+    expect(snapBefore?.orientation).toBeNull();
+
+    state = reveal(state, "focus");
+    const after = peekDesk(state).find((s) => s.id === "focus")!.card!;
+    expect(after).toEqual({
+      defId: before.defId,
+      orientation: "reversed",
+      faceUp: true,
+    });
+
+    const snapAfter = getDeckSnapshot(state).desk.find((t) => t.id === "focus");
+    expect(snapAfter?.faceUp).toBe(true);
+    expect(snapAfter?.defId).toBe(before.defId);
+    expect(snapAfter?.orientation).toBe("reversed");
+  });
+
+  test("open aliases openPosition; rejects missing or empty slot", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "a");
+    const id = peekDesk(state)[0]!.card!.defId;
+    state = open(state, "a");
+    expect(getDeckSnapshot(state).desk[0]?.defId).toBe(id);
+    expect(open).toBe(openPosition);
+    expect(reveal).toBe(openPosition);
+
+    state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    expect(() => reveal(state, "ghost")).toThrow(/No card at desk slot/);
+    state = addFreeSlot(state, "empty");
+    expect(() => openPosition(state, "empty")).toThrow(/No card at desk slot/);
   });
 
 });
