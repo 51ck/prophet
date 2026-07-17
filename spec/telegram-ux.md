@@ -17,10 +17,36 @@
 
 - Prefer short prophet turns over walls of text
 - One clear next step when the seeker might be stuck (lock question, accept deck, cut, open next)
-- Optional controls (buttons or quick replies) when they speed a **simple closed choice** — ritual steps and short yes/no / pick-one asks — not as a menu maze
+- Optional controls (buttons or quick replies) only for **simple closed choices** — see [Buttons vs free prose](#buttons-vs-free-prose); never a menu maze
 - Free text always remains valid alongside buttons; decline / skip is first-class when the ask is optional
 - Outbound messages must render intentional emphasis (Telegram parse mode) — seekers must not see raw `*` markup
 - Group: protect seeker privacy by default until a deliberate design says otherwise
+
+## Buttons vs free prose
+
+**Budget:** at most **N = 6** labeled choices per ask (skip / decline chrome does not count toward N). Prefer 2–3. Short labels. One closed ask at a time.
+
+**Buttons allowed** — prophet asks a closed set the seeker can pick without composing an answer:
+
+| Moment | Typical closed set |
+|--------|--------------------|
+| Language (introduce or later change) | ru / en |
+| Session path | Card of the Day / find a question |
+| Lock question | confirm / rephrase (and similar yes/no) |
+| Deck offer | accept offered deck / choose another (≤ N named decks if shortlisted) |
+| Cut | accept cut invite / decline (and similar pace yes/no) |
+| Open-next | open next / wait (and similar reveal-pace yes/no) |
+| Other closed yes/no or pick-one | any simple closed set with **2…N** options |
+
+**Free prose only** — no buttons; seeker answers in their own words:
+
+- Open intake (what weighs on them, shaping the question)
+- Name and “few words about self” after language
+- Open ritual questions (feeling, nuance, anything not a small closed set)
+- Interpretation dialogue and free counsel after cards
+- Any ask where the honest answer set is open-ended or would need more than N labels
+
+**Always:** typed reply remains valid even when buttons are shown; optional asks may include skip / prefer-not; never force-retry until the seeker taps a button.
 
 ## Phase 1 locks (DM ritual core)
 
@@ -28,7 +54,7 @@
 |-------|----------|
 | Surface | **DM only** for full ritual |
 | Reveal chrome | **Text names** + short imagery cue; card images later |
-| Controls | Natural language first; light buttons for lock question / cut / open-next **and** other simple closed prophet questions |
+| Controls | Natural language first; buttons only for closed sets ≤ **N = 6** (language, path, lock, deck, cut, open-next, yes/no / pick-one) — free prose otherwise; see above |
 | Message formatting | Channel sends with a chosen Telegram parse mode; broken markup falls back to plain text |
 | Soft profile on introduce | Language (ru/en) first → name + few words about self; profile filled **transparently** (no “saving data” talk); scoped to this seeker only — see [memory.md](memory.md) |
 | Language | Chosen once at introduce; prophet may change it later on seeker request |
@@ -43,8 +69,7 @@
 3. **Interruptions** — how group noise or multiple speakers affect a single reading
 4. **Session resume** — after Phase 1, mid-ritual leave: resume vs always fresh?
 5. **Visibility of deck state** — how much inspectability without breaking ceremony
-6. **Button budget** — exact max options per ask
-7. **More languages** — beyond ru/en
+6. **More languages** — beyond ru/en
 
 ## Prototype → product tasks
 

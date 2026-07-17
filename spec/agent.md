@@ -57,7 +57,7 @@ Product verbs — what the prophet can *do* as idea, not an API:
 | **Rotate** | Flip orientation on pile cards or a desk card |
 | **Open / reveal** | Turn a face-down desk card face-up; speak what is there |
 | **Inspect snapshot** | See desk layout; face-down cards hide identity |
-| **Ask seeker** | Clarify feeling, choice of next open, nuance of question; for simple closed asks, offer a small set of choices (channel may show buttons) including decline when the ask is optional |
+| **Ask seeker** | Clarify feeling, choice of next open, nuance of question; for simple closed asks (≤ 6 choices), offer a small set of choices (channel may show buttons) including decline when the ask is optional — see [telegram-ux.md](telegram-ux.md) Buttons vs free prose |
 | **Interpret** | Read opened cards against locked question and deck voice |
 | **Save memory** | Note stable useful facts during session — including transparent profile fill (no seeker-facing “I am saving this”) |
 | **Set / change language** | Persist seeker language (Phase 1: ru/en); switch register when seeker asks |
