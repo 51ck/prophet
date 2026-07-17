@@ -93,9 +93,11 @@ export function applyShuffleOp(
       return next;
     }
     case "rotate": {
-      const n = op.count ?? next.pile.length;
-      const take = Math.min(n, next.pile.length);
-      for (let i = 0; i < take; i++) {
+      const from = Math.max(0, op.from ?? 0);
+      if (from >= next.pile.length) return next;
+      const n = op.count ?? next.pile.length - from;
+      const end = Math.min(from + Math.max(0, n), next.pile.length);
+      for (let i = from; i < end; i++) {
         const card = next.pile[i];
         if (!card) continue;
         card.orientation =
@@ -310,6 +312,26 @@ export function returnToPile(
   }
   slot.card = null;
   return insertIntoPile(next, card, address);
+}
+
+/** Flip orientation on one desk card by slot id. Throws if missing or empty. */
+export function rotateDeskCard(state: DeckState, slotId: string): DeckState {
+  const existing = state.desk.find((s) => s.id === slotId);
+  if (!existing?.card) {
+    throw new Error(`No card at desk slot "${slotId}"`);
+  }
+
+  const next = cloneState(state);
+  const slot = next.desk.find((s) => s.id === slotId);
+  if (!slot?.card) {
+    throw new Error(`Desk slot "${slotId}" missing after clone`);
+  }
+  slot.card = {
+    ...slot.card,
+    orientation:
+      slot.card.orientation === "upright" ? "reversed" : "upright",
+  };
+  return next;
 }
 
 /** Draw from top of pile into empty desk slots in order. */

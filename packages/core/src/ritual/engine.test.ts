@@ -16,6 +16,7 @@ import {
   resolvePileDrawIndex,
   resolvePileInsertIndex,
   returnToPile,
+  rotateDeskCard,
   selectSpread,
 } from "../ritual/engine.ts";
 import type { CardInstance, PileAddress } from "../ritual/types.ts";
@@ -190,6 +191,30 @@ describe("ritual engine", () => {
     expect(() => returnToPile(state, "empty")).toThrow(/No card at desk slot/);
   });
 
+  test("rotateDeskCard flips orientation; second rotate restores", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "focus");
+    expect(peekDesk(state).find((s) => s.id === "focus")?.card?.orientation).toBe(
+      "upright",
+    );
+    state = rotateDeskCard(state, "focus");
+    expect(peekDesk(state).find((s) => s.id === "focus")?.card?.orientation).toBe(
+      "reversed",
+    );
+    expect(peekDesk(state).find((s) => s.id === "focus")?.card?.faceUp).toBe(false);
+    state = rotateDeskCard(state, "focus");
+    expect(peekDesk(state).find((s) => s.id === "focus")?.card?.orientation).toBe(
+      "upright",
+    );
+  });
+
+  test("rotateDeskCard rejects missing or empty slot", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    expect(() => rotateDeskCard(state, "ghost")).toThrow(/No card at desk slot/);
+    state = addFreeSlot(state, "empty");
+    expect(() => rotateDeskCard(state, "empty")).toThrow(/No card at desk slot/);
+  });
+
 });
 
 describe("shuffle ops", () => {
@@ -298,6 +323,17 @@ describe("shuffle ops", () => {
     let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
     state = applyShuffleOps(state, [{ type: "rotate" }]);
     expect(state.pile.every((c) => c.orientation === "reversed")).toBe(true);
+  });
+
+  test("rotate with from+count flips mid pile segment only", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = applyShuffleOps(state, [{ type: "rotate", from: 2, count: 3 }]);
+    expect(state.pile[0]?.orientation).toBe("upright");
+    expect(state.pile[1]?.orientation).toBe("upright");
+    expect(
+      state.pile.slice(2, 5).every((c) => c.orientation === "reversed"),
+    ).toBe(true);
+    expect(state.pile[5]?.orientation).toBe("upright");
   });
 
   test("composed ops conserve card set and leave desk untouched", () => {

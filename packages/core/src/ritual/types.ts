@@ -52,13 +52,13 @@ export type PileAddress =
  * - `cut.at` — pile index (omit → random). Index 0 = top.
  * - `seekerCut.at` — fraction in [0, 1] of pile depth (seeker participation).
  * - `shift` — move a contiguous block; `from`/`to` are pile indices.
- * - `rotate` — flip orientation on pile prefix (`count` omitted → whole pile).
+ * - `rotate` — flip orientation on pile segment (`from` default 0; `count` omitted → to end).
  */
 export type ShuffleOp =
   | { type: "mix" }
   | { type: "cut"; at?: number }
   | { type: "shift"; from: number; count: number; to: number }
-  | { type: "rotate"; count?: number }
+  | { type: "rotate"; from?: number; count?: number }
   | { type: "seekerCut"; at: number };
 
 export type SpreadDef = {

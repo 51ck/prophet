@@ -19,6 +19,7 @@ export {
   resolvePileDrawIndex,
   returnToPile,
   resolvePileInsertIndex,
+  rotateDeskCard,
   selectSpread,
 } from "./ritual/engine.ts";
 export type {
