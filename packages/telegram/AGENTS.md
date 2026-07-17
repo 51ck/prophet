@@ -14,6 +14,7 @@ Telegram channel adapter for Pythia. Owns bot I/O only; calls `@prophet/core`.
 
 - No ritual truth here — core owns deck state
 - Phase 1: private chats only
+- Phase 1 outbound `parse_mode`: **HTML** (`PHASE1_PARSE_MODE`) — not MarkdownV2
 - Follow [tech/architecture.md](../../tech/architecture.md)
 
 ## Work Guidance

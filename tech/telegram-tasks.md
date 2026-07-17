@@ -9,7 +9,7 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 ## Themes
 
 1. **Prophet can act in Telegram** — structured choices as buttons, not only typed replies
-2. **Messages look intentional** — formatting reaches Telegram, not raw `*` markup
+2. **Messages look intentional** — formatting reaches Telegram, not raw `*` markup (Phase 1 `parse_mode`: **HTML**)
 3. **Introduce + seeker profile** — language → name/self; transparent fill; one-seeker isolation
 4. **Session path** — Card of the Day vs find a question
 
@@ -66,7 +66,7 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 
 **Tasks:**
 
-- [ ] **T2.1** Choose Telegram parse mode for Phase 1 outbound (prefer HTML, or MarkdownV2 with strict escapers)
+- [x] **T2.1** Choose Telegram parse mode for Phase 1 outbound — **HTML** (not MarkdownV2; fewer escape pitfalls)
 - [ ] **T2.2** Adapter send path always applies chosen `parse_mode`; never forward raw LLM string unprocessed
 - [ ] **T2.3** Convert/sanitize model output → Telegram-safe markup
 - [ ] **T2.4** Fallback: parse fail → resend plain text (no crash, no half-broken stars)
