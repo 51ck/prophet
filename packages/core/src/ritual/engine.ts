@@ -93,9 +93,11 @@ export function applyShuffleOp(
       return next;
     }
     case "rotate": {
-      const n = op.count ?? next.pile.length;
-      const take = Math.min(n, next.pile.length);
-      for (let i = 0; i < take; i++) {
+      const from = Math.max(0, op.from ?? 0);
+      if (from >= next.pile.length) return next;
+      const n = op.count ?? next.pile.length - from;
+      const end = Math.min(from + Math.max(0, n), next.pile.length);
+      for (let i = from; i < end; i++) {
         const card = next.pile[i];
         if (!card) continue;
         card.orientation =
@@ -312,27 +314,69 @@ export function returnToPile(
   return insertIntoPile(next, card, address);
 }
 
-/** Draw from top of pile into empty desk slots in order. */
-export function drawToPositions(state: DeckState): DeckState {
+/** Flip orientation on one desk card by slot id. Throws if missing or empty. */
+export function rotateDeskCard(state: DeckState, slotId: string): DeckState {
+  const existing = state.desk.find((s) => s.id === slotId);
+  if (!existing?.card) {
+    throw new Error(`No card at desk slot "${slotId}"`);
+  }
+
   const next = cloneState(state);
-  for (const pos of next.desk) {
-    if (pos.card !== null) continue;
-    const card = next.pile.shift();
-    if (!card) break;
-    pos.card = { ...card, faceUp: false };
+  const slot = next.desk.find((s) => s.id === slotId);
+  if (!slot?.card) {
+    throw new Error(`Desk slot "${slotId}" missing after clone`);
+  }
+  slot.card = {
+    ...slot.card,
+    orientation:
+      slot.card.orientation === "upright" ? "reversed" : "upright",
+  };
+  return next;
+}
+
+/**
+ * Fill empty desk slots from pile top, in desk order, by composing placeOnDesk.
+ * No bypass: same pile addressing and face-down place as free verbs.
+ */
+export function drawToPositions(state: DeckState): DeckState {
+  const emptyIds = state.desk.filter((s) => s.card === null).map((s) => s.id);
+  let next = state;
+  for (const id of emptyIds) {
+    if (next.pile.length === 0) break;
+    next = placeOnDesk(next, id);
   }
   return next;
 }
 
+/**
+ * Named-spread ritual: selectSpread layout, then place/draw into each empty role.
+ * Composes free verbs — does not invent cards.
+ */
+export function laySpread(state: DeckState, spread: SpreadDef): DeckState {
+  return drawToPositions(selectSpread(state, spread));
+}
+
+/** Flip a desk card face-up. Keeps defId and orientation; only faceUp changes. */
 export function openPosition(state: DeckState, positionId: string): DeckState {
+  const existing = state.desk.find((p) => p.id === positionId);
+  if (!existing?.card) {
+    throw new Error(`No card at desk slot "${positionId}"`);
+  }
+
   const next = cloneState(state);
   const pos = next.desk.find((p) => p.id === positionId);
   if (!pos?.card) {
-    throw new Error(`No card at position "${positionId}"`);
+    throw new Error(`Desk slot "${positionId}" missing after clone`);
   }
   pos.card = { ...pos.card, faceUp: true };
   return next;
 }
+
+/** Product verb alias: reveal = open face-down desk card. */
+export const reveal = openPosition;
+
+/** Product verb alias: open = openPosition. */
+export const open = openPosition;
 
 export function getDeckSnapshot(state: DeckState): {
   deckId: string;

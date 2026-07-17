@@ -59,9 +59,9 @@ Gap: free desk moves (return, draw bottom/middle into desk), full free-mode test
 - [x] **T5.1** Keep/extend shuffle ops (mix, cut, shift, rotate, seekerCut) on pile
 - [x] **T5.2** `draw` / `place`: pile → desk face-down (top default; bottom; index)
 - [x] **T5.3** `return`: desk → pile (top / bottom / index)
-- [ ] **T5.4** `rotate`: pile segment and/or single desk card
-- [ ] **T5.5** `reveal` / `open`: face-down → face-up; identity unchanged
-- [ ] **T5.6** Named-spread ritual = compose verbs (e.g. place three face-down into roles) — no bypass path
+- [x] **T5.4** `rotate`: pile segment and/or single desk card
+- [x] **T5.5** `reveal` / `open`: face-down → face-up; identity unchanged
+- [x] **T5.6** Named-spread ritual = compose verbs (e.g. place three face-down into roles) — no bypass path
 
 ---
 

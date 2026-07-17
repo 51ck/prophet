@@ -10,12 +10,16 @@ import {
   drawToPositions,
   getDeckSnapshot,
   insertIntoPile,
+  laySpread,
+  open,
   openPosition,
   peekDesk,
   placeOnDesk,
   resolvePileDrawIndex,
   resolvePileInsertIndex,
+  reveal,
   returnToPile,
+  rotateDeskCard,
   selectSpread,
 } from "../ritual/engine.ts";
 import type { CardInstance, PileAddress } from "../ritual/types.ts";
@@ -190,6 +194,127 @@ describe("ritual engine", () => {
     expect(() => returnToPile(state, "empty")).toThrow(/No card at desk slot/);
   });
 
+  test("rotateDeskCard flips orientation; second rotate restores", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "focus");
+    expect(peekDesk(state).find((s) => s.id === "focus")?.card?.orientation).toBe(
+      "upright",
+    );
+    state = rotateDeskCard(state, "focus");
+    expect(peekDesk(state).find((s) => s.id === "focus")?.card?.orientation).toBe(
+      "reversed",
+    );
+    expect(peekDesk(state).find((s) => s.id === "focus")?.card?.faceUp).toBe(false);
+    state = rotateDeskCard(state, "focus");
+    expect(peekDesk(state).find((s) => s.id === "focus")?.card?.orientation).toBe(
+      "upright",
+    );
+  });
+
+  test("rotateDeskCard rejects missing or empty slot", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    expect(() => rotateDeskCard(state, "ghost")).toThrow(/No card at desk slot/);
+    state = addFreeSlot(state, "empty");
+    expect(() => rotateDeskCard(state, "empty")).toThrow(/No card at desk slot/);
+  });
+
+  test("reveal flips face-up; defId and orientation unchanged", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "focus");
+    state = rotateDeskCard(state, "focus");
+    const before = peekDesk(state).find((s) => s.id === "focus")!.card!;
+    expect(before.faceUp).toBe(false);
+    expect(before.orientation).toBe("reversed");
+
+    const snapBefore = getDeckSnapshot(state).desk.find((t) => t.id === "focus");
+    expect(snapBefore?.faceUp).toBe(false);
+    expect(snapBefore?.defId).toBeNull();
+    expect(snapBefore?.orientation).toBeNull();
+
+    state = reveal(state, "focus");
+    const after = peekDesk(state).find((s) => s.id === "focus")!.card!;
+    expect(after).toEqual({
+      defId: before.defId,
+      orientation: "reversed",
+      faceUp: true,
+    });
+
+    const snapAfter = getDeckSnapshot(state).desk.find((t) => t.id === "focus");
+    expect(snapAfter?.faceUp).toBe(true);
+    expect(snapAfter?.defId).toBe(before.defId);
+    expect(snapAfter?.orientation).toBe("reversed");
+  });
+
+  test("open aliases openPosition; rejects missing or empty slot", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "a");
+    const id = peekDesk(state)[0]!.card!.defId;
+    state = open(state, "a");
+    expect(getDeckSnapshot(state).desk[0]?.defId).toBe(id);
+    expect(open).toBe(openPosition);
+    expect(reveal).toBe(openPosition);
+
+    state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    expect(() => reveal(state, "ghost")).toThrow(/No card at desk slot/);
+    state = addFreeSlot(state, "empty");
+    expect(() => openPosition(state, "empty")).toThrow(/No card at desk slot/);
+  });
+
+  test("laySpread three-roads composes layout + place; face-down; conserves; no invent", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const top3 = state.pile.slice(0, 3).map((c) => c.defId);
+    const allBefore = [
+      ...state.pile.map((c) => c.defId),
+      ...state.desk.flatMap((s) => (s.card ? [s.card.defId] : [])),
+    ].sort();
+
+    state = laySpread(state, THREE_ROADS);
+
+    expect(state.desk).toHaveLength(3);
+    expect(state.desk.map((s) => s.id)).toEqual([
+      "situation",
+      "counsel",
+      "path",
+    ]);
+    expect(state.desk.every((s) => s.kind === "spread")).toBe(true);
+    expect(state.pile).toHaveLength(75);
+    expect(state.desk.every((s) => s.card?.faceUp === false)).toBe(true);
+
+    const placed = peekDesk(state).map((s) => s.card!.defId);
+    expect(placed).toEqual(top3);
+    expect(
+      getDeckSnapshot(state).desk.every((t) => t.defId === null && !t.faceUp),
+    ).toBe(true);
+
+    const allAfter = [
+      ...state.pile.map((c) => c.defId),
+      ...peekDesk(state).map((s) => s.card!.defId),
+    ].sort();
+    expect(allAfter).toEqual(allBefore);
+  });
+
+  test("drawToPositions composes placeOnDesk; matches manual place loop", () => {
+    let composed = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    composed = selectSpread(composed, THREE_ROADS);
+    const expectedIds = composed.pile.slice(0, 3).map((c) => c.defId);
+    composed = drawToPositions(composed);
+
+    let manual = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    manual = selectSpread(manual, THREE_ROADS);
+    for (const id of ["situation", "counsel", "path"]) {
+      manual = placeOnDesk(manual, id);
+    }
+
+    expect(peekDesk(composed).map((s) => s.card)).toEqual(
+      peekDesk(manual).map((s) => s.card),
+    );
+    expect(peekDesk(composed).map((s) => s.card!.defId)).toEqual(expectedIds);
+    expect(composed.pile).toHaveLength(75);
+    expect(composed.pile.map((c) => c.defId)).toEqual(
+      manual.pile.map((c) => c.defId),
+    );
+  });
+
 });
 
 describe("shuffle ops", () => {
@@ -298,6 +423,17 @@ describe("shuffle ops", () => {
     let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
     state = applyShuffleOps(state, [{ type: "rotate" }]);
     expect(state.pile.every((c) => c.orientation === "reversed")).toBe(true);
+  });
+
+  test("rotate with from+count flips mid pile segment only", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = applyShuffleOps(state, [{ type: "rotate", from: 2, count: 3 }]);
+    expect(state.pile[0]?.orientation).toBe("upright");
+    expect(state.pile[1]?.orientation).toBe("upright");
+    expect(
+      state.pile.slice(2, 5).every((c) => c.orientation === "reversed"),
+    ).toBe(true);
+    expect(state.pile[5]?.orientation).toBe("upright");
   });
 
   test("composed ops conserve card set and leave desk untouched", () => {

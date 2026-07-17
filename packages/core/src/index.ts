@@ -11,14 +11,18 @@ export {
   drawToPositions,
   getDeckSnapshot,
   insertIntoPile,
+  laySpread,
   mixPile,
+  open,
   openPosition,
   peekDesk,
   peekTable,
   placeOnDesk,
   resolvePileDrawIndex,
+  reveal,
   returnToPile,
   resolvePileInsertIndex,
+  rotateDeskCard,
   selectSpread,
 } from "./ritual/engine.ts";
 export type {
