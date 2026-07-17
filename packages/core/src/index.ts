@@ -11,6 +11,7 @@ export {
   drawToPositions,
   getDeckSnapshot,
   insertIntoPile,
+  laySpread,
   mixPile,
   open,
   openPosition,

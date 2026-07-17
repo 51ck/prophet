@@ -334,16 +334,26 @@ export function rotateDeskCard(state: DeckState, slotId: string): DeckState {
   return next;
 }
 
-/** Draw from top of pile into empty desk slots in order. */
+/**
+ * Fill empty desk slots from pile top, in desk order, by composing placeOnDesk.
+ * No bypass: same pile addressing and face-down place as free verbs.
+ */
 export function drawToPositions(state: DeckState): DeckState {
-  const next = cloneState(state);
-  for (const pos of next.desk) {
-    if (pos.card !== null) continue;
-    const card = next.pile.shift();
-    if (!card) break;
-    pos.card = { ...card, faceUp: false };
+  const emptyIds = state.desk.filter((s) => s.card === null).map((s) => s.id);
+  let next = state;
+  for (const id of emptyIds) {
+    if (next.pile.length === 0) break;
+    next = placeOnDesk(next, id);
   }
   return next;
+}
+
+/**
+ * Named-spread ritual: selectSpread layout, then place/draw into each empty role.
+ * Composes free verbs — does not invent cards.
+ */
+export function laySpread(state: DeckState, spread: SpreadDef): DeckState {
+  return drawToPositions(selectSpread(state, spread));
 }
 
 /** Flip a desk card face-up. Keeps defId and orientation; only faceUp changes. */

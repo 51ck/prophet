@@ -10,6 +10,7 @@ import {
   drawToPositions,
   getDeckSnapshot,
   insertIntoPile,
+  laySpread,
   open,
   openPosition,
   peekDesk,
@@ -257,6 +258,61 @@ describe("ritual engine", () => {
     expect(() => reveal(state, "ghost")).toThrow(/No card at desk slot/);
     state = addFreeSlot(state, "empty");
     expect(() => openPosition(state, "empty")).toThrow(/No card at desk slot/);
+  });
+
+  test("laySpread three-roads composes layout + place; face-down; conserves; no invent", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const top3 = state.pile.slice(0, 3).map((c) => c.defId);
+    const allBefore = [
+      ...state.pile.map((c) => c.defId),
+      ...state.desk.flatMap((s) => (s.card ? [s.card.defId] : [])),
+    ].sort();
+
+    state = laySpread(state, THREE_ROADS);
+
+    expect(state.desk).toHaveLength(3);
+    expect(state.desk.map((s) => s.id)).toEqual([
+      "situation",
+      "counsel",
+      "path",
+    ]);
+    expect(state.desk.every((s) => s.kind === "spread")).toBe(true);
+    expect(state.pile).toHaveLength(75);
+    expect(state.desk.every((s) => s.card?.faceUp === false)).toBe(true);
+
+    const placed = peekDesk(state).map((s) => s.card!.defId);
+    expect(placed).toEqual(top3);
+    expect(
+      getDeckSnapshot(state).desk.every((t) => t.defId === null && !t.faceUp),
+    ).toBe(true);
+
+    const allAfter = [
+      ...state.pile.map((c) => c.defId),
+      ...peekDesk(state).map((s) => s.card!.defId),
+    ].sort();
+    expect(allAfter).toEqual(allBefore);
+  });
+
+  test("drawToPositions composes placeOnDesk; matches manual place loop", () => {
+    let composed = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    composed = selectSpread(composed, THREE_ROADS);
+    const expectedIds = composed.pile.slice(0, 3).map((c) => c.defId);
+    composed = drawToPositions(composed);
+
+    let manual = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    manual = selectSpread(manual, THREE_ROADS);
+    for (const id of ["situation", "counsel", "path"]) {
+      manual = placeOnDesk(manual, id);
+    }
+
+    expect(peekDesk(composed).map((s) => s.card)).toEqual(
+      peekDesk(manual).map((s) => s.card),
+    );
+    expect(peekDesk(composed).map((s) => s.card!.defId)).toEqual(expectedIds);
+    expect(composed.pile).toHaveLength(75);
+    expect(composed.pile.map((c) => c.defId)).toEqual(
+      manual.pile.map((c) => c.defId),
+    );
   });
 
 });
