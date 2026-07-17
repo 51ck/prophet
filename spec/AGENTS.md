@@ -43,6 +43,6 @@ Idea documents (not child DOX folders):
 - [memory.md](memory.md) — seeker memory lifecycle + fluency (introduce before path choice)
 - [agent.md](agent.md) — prophet role + conceptual capabilities
 - [spreads.md](spreads.md) — popular spreads catalog + offering rule; board T8
-- [telegram-ux.md](telegram-ux.md) — DM + Phase 1 locks; buttons for closed choices; formatting; soft profile hooks; group later
+- [telegram-ux.md](telegram-ux.md) — DM + Phase 1 locks; buttons vs free prose (N≤6); formatting; soft profile hooks; group later
 - [economics.md](economics.md) — sustainability intent; Stars deferred
 - [roadmap.md](roadmap.md) — phased path; monetization late

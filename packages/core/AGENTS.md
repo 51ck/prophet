@@ -10,6 +10,7 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 - Session state machine
 - Seeker memory store
 - Pythia agent + tool wiring
+- Closed “ask with options” verb (`askWithOptions`: prefer 2–3, max 6; optional skip; no channel chrome) — Pythia prefers it for closed simple asks; open intake / name+self stay free prose; never force-retry until seeker taps — free answer / decline always valid ([spec/telegram-ux.md](../../spec/telegram-ux.md))
 - Light Seer’s structured deck data for Phase 1
 
 ## Local Contracts

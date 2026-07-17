@@ -1,6 +1,7 @@
 import {
   createFileMemoryStore,
   startReading,
+  type AskWithOptions,
   type MemoryStore,
   type ReadingRuntime,
 } from "@prophet/core";
@@ -12,12 +13,20 @@ export type ChatMessage = {
 
 type PythiaAgent = Awaited<ReturnType<typeof startReading>>["agent"];
 
+/** Open closed-ask chrome until seeker taps or types over it. */
+export type PendingAsk = {
+  ask: AskWithOptions;
+  chatId: number;
+  messageId: number;
+};
+
 export type ActiveReading = {
   seekerId: string;
   sessionId: string;
   runtime: ReadingRuntime;
   agent: PythiaAgent;
   history: ChatMessage[];
+  pendingAsk?: PendingAsk;
 };
 
 export type SessionHub = {
@@ -25,6 +34,16 @@ export type SessionHub = {
   startFresh(seekerId: string): Promise<ActiveReading>;
   drop(seekerId: string): void;
 };
+
+/** Claim pending ask (typed reply or callback). Clears so free text never waits on a tap. */
+export function claimPendingAsk(
+  reading: Pick<ActiveReading, "pendingAsk">,
+): PendingAsk | undefined {
+  const pending = reading.pendingAsk;
+  if (!pending) return undefined;
+  reading.pendingAsk = undefined;
+  return pending;
+}
 
 export function createSessionHub(memoryStore: MemoryStore): SessionHub {
   const active = new Map<string, ActiveReading>();

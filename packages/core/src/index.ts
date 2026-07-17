@@ -50,3 +50,16 @@ export { createReadingRuntime } from "./runtime/reading-runtime.ts";
 export type { ReadingRuntime } from "./runtime/reading-runtime.ts";
 export { createPythiaAgent, startReading } from "./agent/pythia.ts";
 export { createPythiaTools } from "./agent/tools.ts";
+export {
+  ASK_WITH_OPTIONS_KIND,
+  MAX_ASK_OPTIONS,
+  MIN_ASK_OPTIONS,
+  askWithOptionsSchema,
+  createAskWithOptions,
+  isAskWithOptions,
+} from "./ask/ask-with-options.ts";
+export type {
+  AskOption,
+  AskWithOptions,
+  AskWithOptionsInput,
+} from "./ask/ask-with-options.ts";
