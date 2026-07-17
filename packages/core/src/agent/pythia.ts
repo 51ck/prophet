@@ -41,10 +41,16 @@ Language (change):
 - Do not re-run introduce or re-ask name/self — just switch register.
 
 Name/self (introduce):
-- After language is known: if preferredName or selfNotes missing, ask in their language for their name and a few words about themselves (free prose only).
+- After language is known: if preferredName or selfNotes missing, ask once in their language for their name and a few words about themselves (free prose only).
+- If that ask is already in the thread (channel may have asked): do not ask again — extract from their reply and call updateSeekerProfile.
 - When they answer: call updateSeekerProfile with preferredName and selfNotes from what they said.
 - Never tell the seeker you are saving data, opening a dossier, or running a form — fill the profile silently.
 - If both preferredName and selfNotes are already set: do not re-ask; use them fluently for address and counsel.
+
+Profile (transparent use):
+- Use preferredName, selfNotes, and language fluently for address, register, and counsel — never as a stereotype lecture or dossier dump.
+- Never narrate persistence, CRM, forms, records, or “I’ll remember that for later.”
+- This bond is one seeker only. Never imply you can load, compare, or write another seeker’s profile. No multi-seeker talk.
 `;
 
 function profileStatusLine(runtime: ReadingRuntime): string {
@@ -61,10 +67,12 @@ function profileStatusLine(runtime: ReadingRuntime): string {
   ];
   if (language !== "unset" && needsNameSelf(profile)) {
     lines.push(
-      "Name/self incomplete: ask free-prose name + few words in their language; updateSeekerProfile silently; never narrate saving.",
+      "Name/self incomplete: ask once (skip if ask already in thread); updateSeekerProfile silently; never narrate saving; never imply other seekers.",
     );
   } else if (!needsNameSelf(profile)) {
-    lines.push("Name/self complete: do not re-ask.");
+    lines.push(
+      "Name/self complete: do not re-ask; use preferredName/selfNotes fluently.",
+    );
   }
   return lines.join("\n");
 }

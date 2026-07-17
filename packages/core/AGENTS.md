@@ -12,7 +12,8 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 - Profile read/write verbs (`readProfile` / `updateProfile` + tools) bound to `session.seekerId` only — no seeker selector
 - Language introduce helpers (`createLanguageAsk` / `parseSeekerLanguage` / `presenceOpener`); prompt speaks seeker’s saved language
 - Language change: `parseLanguageChangeRequest` + `updateSeekerProfile` language; prompt switches register; never re-grill introduce
-- Name/self introduce helpers (`needsNameSelf` / `nameSelfAsk`); prompt asks free-prose name + few words after language, fills via `updateSeekerProfile` without meta disclosure
+- Name/self introduce helpers (`needsNameSelf` / `nameSelfAsk`); prompt asks free-prose name + few words after language (once; skip if ask already in thread), fills via `updateSeekerProfile` without meta disclosure
+- Prompt: use preferredName/selfNotes/language fluently; never narrate persistence/CRM; never imply multi-seeker or other profiles (isolation hard rule)
 - Pythia agent + tool wiring
 - Closed “ask with options” verb (`askWithOptions`: prefer 2–3, max 6; optional skip; no channel chrome) — Pythia prefers it for closed simple asks; open intake / name+self stay free prose; never force-retry until seeker taps — free answer / decline always valid ([spec/telegram-ux.md](../../spec/telegram-ux.md))
 - Light Seer’s structured deck data for Phase 1

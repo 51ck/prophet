@@ -111,7 +111,7 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 - [x] **T3.11** `/start` / first turn: if no language, ask ru|en (T1 buttons); persist; continue in that language
 - [x] **T3.12** After language: ask name + few words about seeker; write profile from answers **without** meta disclosure
 - [x] **T3.13** Language change on seeker request: persist + switch register for later turns
-- [ ] **T3.14** Prompt/character: transparent profile use; never narrate saving; never imply access to other seekers
+- [x] **T3.14** Prompt/character: transparent profile use; never narrate saving; never imply access to other seekers
 
 ---
 
