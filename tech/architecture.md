@@ -116,6 +116,7 @@ Map from [agent.md](../spec/agent.md):
 | Close session | `closeSession` |
 | Refactor memories | `refactorSeekerMemory` |
 | Defer / refuse | Agent + `endWithoutRitual` |
+| Closed ask (options) | `askWithOptions` (channel-agnostic; adapter chrome) |
 
 ## Deck content
 

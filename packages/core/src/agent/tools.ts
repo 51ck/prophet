@@ -1,5 +1,10 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
+import {
+  MAX_ASK_OPTIONS,
+  MIN_ASK_OPTIONS,
+  createAskWithOptions,
+} from "../ask/ask-with-options.ts";
 import type { ReadingRuntime } from "../runtime/reading-runtime.ts";
 import type { ShuffleOp } from "../ritual/types.ts";
 
@@ -157,6 +162,26 @@ export function createPythiaTools(runtime: ReadingRuntime) {
     },
   });
 
+  const askWithOptions = createTool({
+    id: "askWithOptions",
+    description:
+      "Closed ask: 2–6 short options the seeker can pick. Not for open intake or free-prose questions. Adapter may render chrome (e.g. buttons); typed reply stays valid. allowSkip enables skip/decline chrome.",
+    inputSchema: z.object({
+      options: z
+        .array(
+          z.object({
+            id: z.string().min(1),
+            label: z.string().min(1),
+          }),
+        )
+        .min(MIN_ASK_OPTIONS)
+        .max(MAX_ASK_OPTIONS),
+      allowSkip: z.boolean().optional(),
+    }),
+    execute: async ({ options, allowSkip }) =>
+      createAskWithOptions({ options, allowSkip }),
+  });
+
   return {
     lockQuestion,
     confirmDeck,
@@ -170,5 +195,6 @@ export function createPythiaTools(runtime: ReadingRuntime) {
     closeSession,
     refactorSeekerMemory,
     endWithoutRitual,
+    askWithOptions,
   };
 }

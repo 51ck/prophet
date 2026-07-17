@@ -10,6 +10,7 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 - Session state machine
 - Seeker memory store
 - Pythia agent + tool wiring
+- Closed “ask with options” verb (`askWithOptions`: 2…N≤6 options, optional skip; no channel chrome)
 - Light Seer’s structured deck data for Phase 1
 
 ## Local Contracts
