@@ -42,7 +42,7 @@ export function parseSeekerLanguage(text: string): SeekerLanguage | undefined {
   return undefined;
 }
 
-/** Presence opener after language is known (name/self ask is later). */
+/** Presence opener when language + name/self are ready for path. */
 export function presenceOpener(language: SeekerLanguage): string {
   if (language === "ru") {
     return "Я Пифия. Скажи, что не удаётся решить обычными средствами — найдём верный вопрос и прочитаем.";

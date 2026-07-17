@@ -65,6 +65,7 @@ export {
   parseSeekerLanguage,
   presenceOpener,
 } from "./profile/language.ts";
+export { nameSelfAsk, needsNameSelf } from "./profile/name-self.ts";
 export {
   ASK_WITH_OPTIONS_KIND,
   MAX_ASK_OPTIONS,

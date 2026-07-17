@@ -10,6 +10,7 @@ Telegram channel adapter for Pythia. Owns bot I/O only; calls `@prophet/core`.
 - Mapping Telegram user id → core seeker/session
 - `/start`, `/new`, text turns → Pythia `agent.generate`
 - Introduce language gate: if seeker has no saved `language`, ask ru|en via T1 `askWithOptions` chrome before agent turns; persist with `updateProfile`; skip when already set
+- Introduce name/self nudge: after language, if `preferredName` or `selfNotes` missing, ask free-prose name + few words in that language; agent fills via `updateSeekerProfile` (no meta disclosure); skip when both set
 - Inline keyboard chrome for core `askWithOptions` (callback → seeker turn)
 
 ## Local Contracts
@@ -21,6 +22,7 @@ Telegram channel adapter for Pythia. Owns bot I/O only; calls `@prophet/core`.
 - On Telegram entity/parse reject (`isTelegramParseError`): resend original chunk as plain text (no `parse_mode`); other errors rethrow
 - When generate yields `askWithOptions`: show inline keyboard; callback or free text feeds seeker turn (typed always claims pending — no force-retry until tap); typed decline phrases map to skip when `allowSkip`; expire/replace markup after answer so stale taps cannot double-submit
 - No saved language → ask ru|en (T1 keyboard) before agent; choice persisted via `runtime.updateProfile`; returning seekers with language skip the ask
+- After language, incomplete name/self → free-prose ask in that language (adapter nudge); profile write stays on agent tools; complete name+self skips re-ask
 - Formatting reference for agents: [docs/formatting.md](docs/formatting.md) (links Bot API formatting + rich messages)
 - Follow [tech/architecture.md](../../tech/architecture.md)
 
@@ -36,7 +38,7 @@ Before T2 send-path work, read [docs/formatting.md](docs/formatting.md).
 ## Verification
 
 - `bun run typecheck` in this package
-- `bun test packages/telegram` (format converter + parse-error fallback + ask keyboard/callback parse + free-text clears pending / typed decline + language gate)
+- `bun test packages/telegram` (format converter + parse-error fallback + ask keyboard/callback parse + free-text clears pending / typed decline + language gate + name/self introduce)
 - Manual: DM bot `/start`, complete a short reading
 
 ## Child DOX Index

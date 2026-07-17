@@ -17,6 +17,10 @@ import {
   savedLanguage,
 } from "./language-gate.ts";
 import {
+  introduceNameSelfAsk,
+  profileNeedsNameSelf,
+} from "./name-self-gate.ts";
+import {
   claimPendingAsk,
   type ActiveReading,
   type PendingAsk,
@@ -137,6 +141,19 @@ async function askLanguageIfNeeded(
   return true;
 }
 
+/** Nudge name + few words when profile incomplete; skip when already set. */
+async function askNameSelfIfNeeded(
+  ctx: Context,
+  reading: ActiveReading,
+  language: SeekerLanguage,
+): Promise<boolean> {
+  if (!profileNeedsNameSelf(reading.runtime.readProfile())) return false;
+  const ask = introduceNameSelfAsk(language);
+  reading.history.push({ role: "assistant", content: ask });
+  await reply(ctx, ask);
+  return true;
+}
+
 async function sendPresence(
   ctx: Context,
   reading: ActiveReading,
@@ -145,6 +162,16 @@ async function sendPresence(
   const opener = presenceOpener(language);
   reading.history.push({ role: "assistant", content: opener });
   await reply(ctx, opener);
+}
+
+/** After language: name/self nudge, else path-ready presence. */
+async function continueAfterLanguage(
+  ctx: Context,
+  reading: ActiveReading,
+  language: SeekerLanguage,
+): Promise<void> {
+  if (await askNameSelfIfNeeded(ctx, reading, language)) return;
+  await sendPresence(ctx, reading, language);
 }
 
 async function runSeekerTurn(
@@ -169,7 +196,7 @@ async function runSeekerTurn(
     }
     await reading.runtime.updateProfile({ language });
     reading.history.push({ role: "user", content: turnText });
-    await sendPresence(ctx, reading, language);
+    await continueAfterLanguage(ctx, reading, language);
     return;
   }
 
@@ -225,7 +252,7 @@ export function createBot(hub: SessionHub): Bot {
     if (await askLanguageIfNeeded(ctx, reading)) return;
 
     const language = savedLanguage(reading.runtime.readProfile())!;
-    await sendPresence(ctx, reading, language);
+    await continueAfterLanguage(ctx, reading, language);
   });
 
   bot.command("new", async (ctx) => {
@@ -239,6 +266,7 @@ export function createBot(hub: SessionHub): Bot {
     if (await askLanguageIfNeeded(ctx, reading)) return;
 
     const language = savedLanguage(reading.runtime.readProfile())!;
+    if (await askNameSelfIfNeeded(ctx, reading, language)) return;
     const fresh =
       language === "ru"
         ? "Новая сессия. Какой вопрос хочешь решить эзотерически?"
