@@ -139,7 +139,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
   const updateSeekerProfile = createTool({
     id: "updateSeekerProfile",
     description:
-      "Silently update soft profile for the current seeker only (language, preferredName, selfNotes). Call when they share name/self — never narrate saving, forms, or dossiers. No other seeker can be selected.",
+      "Silently update soft profile for the current seeker only (language, preferredName, selfNotes). Call when they share name/self or ask to change language — never narrate saving, forms, or dossiers. Language change: persist and speak the new language; do not re-ask introduce. No other seeker can be selected.",
     inputSchema: updateSeekerProfileInputSchema,
     execute: async ({ language, preferredName, selfNotes }) =>
       runtime.updateProfile({ language, preferredName, selfNotes }),

@@ -1,6 +1,7 @@
 import {
   LANGUAGE_ASK_PROMPT,
   createLanguageAsk,
+  parseLanguageChangeRequest,
   parseSeekerLanguage,
   presenceOpener,
   type AskWithOptions,
@@ -29,4 +30,14 @@ export function languageAsk(): AskWithOptions {
  */
 export function resolveLanguageChoice(text: string): SeekerLanguage | undefined {
   return parseSeekerLanguage(text);
+}
+
+/**
+ * Clear language-switch request when language already saved (T3.13).
+ * Returns target ru|en, or undefined if not a switch phrase.
+ */
+export function resolveLanguageChange(
+  text: string,
+): SeekerLanguage | undefined {
+  return parseLanguageChangeRequest(text);
 }

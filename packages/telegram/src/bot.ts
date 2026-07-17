@@ -13,6 +13,7 @@ import {
   LANGUAGE_ASK_PROMPT,
   languageAsk,
   presenceOpener,
+  resolveLanguageChange,
   resolveLanguageChoice,
   savedLanguage,
 } from "./language-gate.ts";
@@ -188,7 +189,8 @@ async function runSeekerTurn(
   const pending = await clearPendingKeyboard(bot, reading);
   const turnText = normalizeTypedAskReply(pending?.ask, text);
 
-  if (!savedLanguage(reading.runtime.readProfile())) {
+  const currentLanguage = savedLanguage(reading.runtime.readProfile());
+  if (!currentLanguage) {
     const language = resolveLanguageChoice(turnText);
     if (!language) {
       await askLanguageIfNeeded(ctx, reading);
@@ -198,6 +200,12 @@ async function runSeekerTurn(
     reading.history.push({ role: "user", content: turnText });
     await continueAfterLanguage(ctx, reading, language);
     return;
+  }
+
+  // Clear switch request: persist + new register next; never re-grill introduce.
+  const switchTo = resolveLanguageChange(turnText);
+  if (switchTo && switchTo !== currentLanguage) {
+    await reading.runtime.updateProfile({ language: switchTo });
   }
 
   reading.history.push({ role: "user", content: turnText });

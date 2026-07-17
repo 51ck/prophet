@@ -4,6 +4,7 @@ import {
   LANGUAGE_ASK_PROMPT,
   languageAsk,
   presenceOpener,
+  resolveLanguageChange,
   resolveLanguageChoice,
   savedLanguage,
 } from "./language-gate.ts";
@@ -25,6 +26,13 @@ describe("language gate", () => {
     expect(resolveLanguageChoice("Русский")).toBe("ru");
     expect(resolveLanguageChoice("English")).toBe("en");
     expect(resolveLanguageChoice("maybe later")).toBeUndefined();
+  });
+
+  test("resolveLanguageChange maps switch phrases only", () => {
+    expect(resolveLanguageChange("switch to English")).toBe("en");
+    expect(resolveLanguageChange("перейди на русский")).toBe("ru");
+    expect(resolveLanguageChange("English")).toBeUndefined();
+    expect(resolveLanguageChange("maybe later")).toBeUndefined();
   });
 
   test("presenceOpener matches language", () => {

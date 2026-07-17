@@ -42,6 +42,49 @@ export function parseSeekerLanguage(text: string): SeekerLanguage | undefined {
   return undefined;
 }
 
+/**
+ * Clear seeker request to switch register (ru↔en).
+ * Intent phrases only — not bare introduce labels or biography prose.
+ */
+export function parseLanguageChangeRequest(
+  text: string,
+): SeekerLanguage | undefined {
+  const t = text.trim().toLowerCase().replace(/\s+/g, " ");
+  if (!t) return undefined;
+
+  const wantsEn =
+    /\b(switch|change)\b.{0,20}\b(to\s+)?english\b/.test(t) ||
+    /^(please\s+)?(speak|talk|reply|answer|write)\s+(in\s+)?english\b/.test(
+      t,
+    ) ||
+    /^in english\b/.test(t) ||
+    /^english please$/.test(t) ||
+    /\blet'?s speak english\b/.test(t) ||
+    /перейди на английск/.test(t) ||
+    /давай на английск/.test(t) ||
+    /говори по[- ]?английск/.test(t) ||
+    t.startsWith("на английск");
+
+  const wantsRu =
+    /\b(switch|change)\b.{0,20}\b(to\s+)?russian\b/.test(t) ||
+    /^(please\s+)?(speak|talk|reply|answer|write)\s+(in\s+)?russian\b/.test(
+      t,
+    ) ||
+    /^in russian\b/.test(t) ||
+    /^russian please$/.test(t) ||
+    /\blet'?s speak russian\b/.test(t) ||
+    /перейди на русск/.test(t) ||
+    /давай на русск/.test(t) ||
+    /говори по[- ]?русски/.test(t) ||
+    t.startsWith("на русском") ||
+    t === "по-русски" ||
+    t === "по русски";
+
+  if (wantsEn && !wantsRu) return "en";
+  if (wantsRu && !wantsEn) return "ru";
+  return undefined;
+}
+
 /** Presence opener when language + name/self are ready for path. */
 export function presenceOpener(language: SeekerLanguage): string {
   if (language === "ru") {
