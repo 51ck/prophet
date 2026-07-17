@@ -258,6 +258,35 @@ export function insertIntoPile(
   return next;
 }
 
+/**
+ * Draw one card from the pile (PileAddress) and place it face-down on the desk.
+ * Fills an existing empty slot (spread or free), or creates a free slot if id is new.
+ * Default address is top. Throws if the slot already holds a card.
+ */
+export function placeOnDesk(
+  state: DeckState,
+  slotId: string,
+  address: PileAddress = { kind: "top" },
+  role = "free",
+): DeckState {
+  const existing = state.desk.find((s) => s.id === slotId);
+  if (existing && existing.card !== null) {
+    throw new Error(`Desk slot "${slotId}" already has a card`);
+  }
+
+  const { state: drawn, card } = drawFromPile(state, address);
+  const next = existing ? drawn : addFreeSlot(drawn, slotId, role);
+  const slot = next.desk.find((s) => s.id === slotId);
+  if (!slot) {
+    throw new Error(`Desk slot "${slotId}" missing after place`);
+  }
+  slot.card = { ...card, faceUp: false };
+  return next;
+}
+
+/** Product verb alias: draw = place from pile onto desk face-down. */
+export const draw = placeOnDesk;
+
 /** Draw from top of pile into empty desk slots in order. */
 export function drawToPositions(state: DeckState): DeckState {
   const next = cloneState(state);
