@@ -38,6 +38,15 @@ export type DeckState = {
   desk: DeskSlot[];
 };
 
+/**
+ * First-class pile position for draw/insert.
+ * Index 0 = top; last index = bottom for draw; insert at `bottom` appends.
+ */
+export type PileAddress =
+  | { kind: "top" }
+  | { kind: "bottom" }
+  | { kind: "index"; index: number };
+
 export type ShuffleOp =
   | { type: "mix" }
   | { type: "cut"; at?: number }

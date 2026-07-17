@@ -4,6 +4,7 @@ import type {
   DeckState,
   DeskSlot,
   Orientation,
+  PileAddress,
   ShuffleOp,
   SpreadDef,
 } from "./types.ts";
@@ -157,6 +158,99 @@ export function addFreeSlot(
     throw new Error(`Desk already has slot "${id}"`);
   }
   next.desk.push({ id, role, kind: "free", card: null });
+  return next;
+}
+
+/**
+ * Resolve where to remove a card. Index 0 = top.
+ * Throws if pile empty or index out of range.
+ */
+export function resolvePileDrawIndex(
+  address: PileAddress,
+  pileLength: number,
+): number {
+  if (pileLength <= 0) {
+    throw new Error("Cannot draw from empty pile");
+  }
+  switch (address.kind) {
+    case "top":
+      return 0;
+    case "bottom":
+      return pileLength - 1;
+    case "index": {
+      const i = Math.floor(address.index);
+      if (!Number.isFinite(i) || i < 0 || i >= pileLength) {
+        throw new Error(
+          `Pile draw index ${address.index} out of range for length ${pileLength}`,
+        );
+      }
+      return i;
+    }
+    default: {
+      const _exhaustive: never = address;
+      return _exhaustive;
+    }
+  }
+}
+
+/**
+ * Resolve where to insert a card. Index 0 = top; `bottom` = append (length).
+ * Throws if index out of range `[0, pileLength]`.
+ */
+export function resolvePileInsertIndex(
+  address: PileAddress,
+  pileLength: number,
+): number {
+  switch (address.kind) {
+    case "top":
+      return 0;
+    case "bottom":
+      return pileLength;
+    case "index": {
+      const i = Math.floor(address.index);
+      if (!Number.isFinite(i) || i < 0 || i > pileLength) {
+        throw new Error(
+          `Pile insert index ${address.index} out of range for length ${pileLength}`,
+        );
+      }
+      return i;
+    }
+    default: {
+      const _exhaustive: never = address;
+      return _exhaustive;
+    }
+  }
+}
+
+/**
+ * Remove one card from the pile at address. Does not touch desk.
+ * Default address is top (same as physical draw).
+ */
+export function drawFromPile(
+  state: DeckState,
+  address: PileAddress = { kind: "top" },
+): { state: DeckState; card: CardInstance } {
+  const next = cloneState(state);
+  const i = resolvePileDrawIndex(address, next.pile.length);
+  const card = next.pile.splice(i, 1)[0];
+  if (!card) {
+    throw new Error("Cannot draw from empty pile");
+  }
+  return { state: next, card };
+}
+
+/**
+ * Insert a card into the pile at address. Does not touch desk.
+ * Default address is top.
+ */
+export function insertIntoPile(
+  state: DeckState,
+  card: CardInstance,
+  address: PileAddress = { kind: "top" },
+): DeckState {
+  const next = cloneState(state);
+  const i = resolvePileInsertIndex(address, next.pile.length);
+  next.pile.splice(i, 0, { ...card });
   return next;
 }
 

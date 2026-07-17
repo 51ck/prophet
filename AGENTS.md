@@ -79,6 +79,7 @@ Default section order:
 When the user requests a durable behavior change, record it here or in the relevant child AGENTS.md
 
 - **In-repo tickets:** Build work is tracked on `tech/*-tasks.md` boards under [tech/tickets.md](tech/tickets.md). Agents take one open `T<n>.<m>` slice, mark `[x]` when done, ref ID in commit. Spec stays idea/roadmap; boards hold tickets. GitHub Issues optional glue only.
+- **Two-agent ticket loop:** One agent takes **one** open ticket and implements it (branch + commit). A second agent reviews; then either opens a PR, or returns the task to the implementer with concrete fix notes.
 
 ## Child DOX Index
 

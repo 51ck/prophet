@@ -62,6 +62,8 @@ No separate status database. Board checkboxes are status.
 
 Do not start a second open slice in the same turn unless the user explicitly batches them.
 
+**Implementer / reviewer:** one agent implements one slice (branch + commit); a second reviews, then opens a PR or returns concrete fix notes — see root [AGENTS.md](../AGENTS.md) User Preferences.
+
 ## Human / agent rules
 
 - Spec open questions stay in `spec/` until locked; then a board slice implements the lock
