@@ -1,4 +1,5 @@
 import { Bot, type Context } from "grammy";
+import { toTelegramHtml } from "./format.ts";
 import type { ActiveReading, SessionHub } from "./sessions.ts";
 
 type PythiaAgent = ActiveReading["agent"];
@@ -40,17 +41,9 @@ function extractReplyText(result: unknown): string {
 /** Phase 1 outbound parse_mode. HTML over MarkdownV2: escape only <>& vs many MarkdownV2 specials. */
 export const PHASE1_PARSE_MODE = "HTML" as const;
 
-/** Escape plain text for Telegram HTML parse_mode. Emphasis conversion is T2.3. */
-function escapeHtml(text: string): string {
-  return text
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
-}
-
 async function reply(ctx: Context, text: string): Promise<void> {
   for (const part of chunkText(text)) {
-    await ctx.reply(escapeHtml(part), { parse_mode: PHASE1_PARSE_MODE });
+    await ctx.reply(toTelegramHtml(part), { parse_mode: PHASE1_PARSE_MODE });
   }
 }
 

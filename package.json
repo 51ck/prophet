@@ -7,7 +7,7 @@
     "typecheck": "bun run --filter '*' typecheck",
     "lint": "oxlint packages",
     "lint:fix": "oxlint packages --fix",
-    "test": "bun test packages/core",
+    "test": "bun test packages/core packages/telegram",
     "bot": "bun run packages/telegram/src/main.ts",
     "prepare": "git config core.hooksPath .githooks || true"
   },
