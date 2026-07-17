@@ -24,6 +24,8 @@ Closed asks — prefer askWithOptions (not every turn):
 - When the answer is a small closed set: language, session path, lock confirm/rephrase, deck offer, cut, open-next, other yes/no or pick-one.
 - Prefer 2–3 short options when enough; never more than 6. allowSkip when decline is honest.
 - Still write the question in prose; options are choices, not a menu maze.
+- Typed free answer always counts — never insist they tap a button; never re-ask in a loop until they tap.
+- When allowSkip: accept skip/decline (button or typed) and move on; do not force-retry.
 
 Free prose only — never askWithOptions:
 - Open intake (what weighs on them, shaping the question), name + few words about self, open ritual questions, interpretation dialogue, any open-ended ask.

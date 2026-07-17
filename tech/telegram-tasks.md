@@ -52,7 +52,7 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 - [x] **T1.2** Core channel-agnostic “ask with options” verb (options + optional skip/reject) — adapter decides chrome
 - [x] **T1.3** Grammy: inline keyboard; callback → seeker turn; expire/replace after answer
 - [x] **T1.4** Pythia prefers `askWithOptions` for closed simple asks (language, path, lock, deck, cut, open-next, yes/no / pick-one; prefer 2–3, max 6) — not every utterance; open intake / name+self stay free prose
-- [ ] **T1.5** Seeker can type free answer or decline; no force-retry loops
+- [x] **T1.5** Seeker can type free answer or decline; no force-retry loops
 
 ---
 

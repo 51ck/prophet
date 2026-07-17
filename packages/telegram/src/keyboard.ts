@@ -45,3 +45,39 @@ export function resolveAskChoice(
   const opt = ask.options[parsed.index];
   return opt ? opt.label : null;
 }
+
+/** Natural typed declines (en/ru). Matched after trim + lower + collapse space. */
+const TYPED_DECLINE_PHRASES = new Set([
+  "skip",
+  "decline",
+  "pass",
+  "no thanks",
+  "no thank you",
+  "prefer not",
+  "prefer not to",
+  "i'd rather not",
+  "id rather not",
+  "not now",
+  "пропустить",
+  "пропуск",
+  "не хочу",
+  "потом",
+  "отказ",
+]);
+
+export function isTypedDecline(text: string): boolean {
+  const key = text.trim().toLowerCase().replace(/\s+/g, " ");
+  return TYPED_DECLINE_PHRASES.has(key);
+}
+
+/**
+ * Free text always accepted as the seeker turn.
+ * When pending ask allows skip, map natural decline phrases to skip text.
+ */
+export function normalizeTypedAskReply(
+  ask: AskWithOptions | undefined,
+  text: string,
+): string {
+  if (ask?.allowSkip && isTypedDecline(text)) return SKIP_SEEKER_TEXT;
+  return text;
+}

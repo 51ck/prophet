@@ -165,7 +165,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
   const askWithOptions = createTool({
     id: "askWithOptions",
     description:
-      "Closed ask: 2–6 short options (prefer 2–3 when enough). Use for language, path, lock, deck, cut, open-next, yes/no / pick-one — not open intake, name/self, or free-prose questions. Adapter may render chrome; typed reply stays valid. allowSkip enables skip/decline chrome.",
+      "Closed ask: 2–6 short options (prefer 2–3 when enough). Use for language, path, lock, deck, cut, open-next, yes/no / pick-one — not open intake, name/self, or free-prose questions. Adapter may render chrome; typed free answer or decline always valid — never force-retry until they tap. allowSkip enables skip/decline chrome.",
     inputSchema: z.object({
       options: z
         .array(

@@ -35,6 +35,16 @@ export type SessionHub = {
   drop(seekerId: string): void;
 };
 
+/** Claim pending ask (typed reply or callback). Clears so free text never waits on a tap. */
+export function claimPendingAsk(
+  reading: Pick<ActiveReading, "pendingAsk">,
+): PendingAsk | undefined {
+  const pending = reading.pendingAsk;
+  if (!pending) return undefined;
+  reading.pendingAsk = undefined;
+  return pending;
+}
+
 export function createSessionHub(memoryStore: MemoryStore): SessionHub {
   const active = new Map<string, ActiveReading>();
 

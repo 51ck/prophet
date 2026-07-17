@@ -4,10 +4,16 @@ import { extractAskWithOptions } from "./ask.ts";
 import { isTelegramParseError, toTelegramHtml } from "./format.ts";
 import {
   buildAskKeyboard,
+  normalizeTypedAskReply,
   parseAskCallback,
   resolveAskChoice,
 } from "./keyboard.ts";
-import type { ActiveReading, SessionHub } from "./sessions.ts";
+import {
+  claimPendingAsk,
+  type ActiveReading,
+  type PendingAsk,
+  type SessionHub,
+} from "./sessions.ts";
 
 type PythiaAgent = ActiveReading["agent"];
 
@@ -88,10 +94,9 @@ async function reply(
 async function clearPendingKeyboard(
   bot: Bot,
   reading: ActiveReading,
-): Promise<void> {
-  const pending = reading.pendingAsk;
-  if (!pending) return;
-  reading.pendingAsk = undefined;
+): Promise<PendingAsk | undefined> {
+  const pending = claimPendingAsk(reading);
+  if (!pending) return undefined;
   try {
     await bot.api.editMessageReplyMarkup(pending.chatId, pending.messageId, {
       reply_markup: { inline_keyboard: [] },
@@ -100,6 +105,7 @@ async function clearPendingKeyboard(
     // Message may already lack markup or be too old — ignore.
     console.warn("clear pending keyboard failed", err);
   }
+  return pending;
 }
 
 async function runSeekerTurn(
@@ -112,9 +118,11 @@ async function runSeekerTurn(
   await ctx.replyWithChatAction("typing");
 
   const reading = await hub.getOrStart(seekerId);
-  await clearPendingKeyboard(bot, reading);
+  // Typed reply always claims pending ask — never force-retry until they tap.
+  const pending = await clearPendingKeyboard(bot, reading);
+  const turnText = normalizeTypedAskReply(pending?.ask, text);
 
-  reading.history.push({ role: "user", content: text });
+  reading.history.push({ role: "user", content: turnText });
 
   const result = await reading.agent.generate(
     reading.history.map((m) => ({
@@ -225,7 +233,7 @@ export function createBot(hub: SessionHub): Bot {
     }
 
     // Claim before generate so stale taps cannot double-submit.
-    reading.pendingAsk = undefined;
+    claimPendingAsk(reading);
     await ctx.answerCallbackQuery();
     try {
       await ctx.editMessageReplyMarkup({

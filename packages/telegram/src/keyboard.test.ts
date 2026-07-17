@@ -4,6 +4,8 @@ import {
   SKIP_CALLBACK,
   SKIP_SEEKER_TEXT,
   buildAskKeyboard,
+  isTypedDecline,
+  normalizeTypedAskReply,
   parseAskCallback,
   resolveAskChoice,
 } from "./keyboard.ts";
@@ -75,5 +77,37 @@ describe("resolveAskChoice", () => {
       allowSkip: false,
     });
     expect(resolveAskChoice(noSkip, { kind: "skip" })).toBeNull();
+  });
+});
+
+describe("normalizeTypedAskReply", () => {
+  const withSkip = createAskWithOptions({
+    options: [
+      { id: "y", label: "Yes" },
+      { id: "n", label: "No" },
+    ],
+    allowSkip: true,
+  });
+  const noSkip = createAskWithOptions({
+    options: withSkip.options,
+    allowSkip: false,
+  });
+
+  test("maps typed decline to skip when allowSkip", () => {
+    expect(isTypedDecline("  Prefer not  ")).toBe(true);
+    expect(normalizeTypedAskReply(withSkip, "no thanks")).toBe(
+      SKIP_SEEKER_TEXT,
+    );
+    expect(normalizeTypedAskReply(withSkip, "пропустить")).toBe(
+      SKIP_SEEKER_TEXT,
+    );
+  });
+
+  test("passes free answer through; no force-retry on button", () => {
+    expect(normalizeTypedAskReply(withSkip, "Card of the Day please")).toBe(
+      "Card of the Day please",
+    );
+    expect(normalizeTypedAskReply(noSkip, "skip")).toBe("skip");
+    expect(normalizeTypedAskReply(undefined, "anything")).toBe("anything");
   });
 });
