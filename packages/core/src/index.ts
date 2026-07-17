@@ -17,6 +17,7 @@ export {
   peekTable,
   placeOnDesk,
   resolvePileDrawIndex,
+  returnToPile,
   resolvePileInsertIndex,
   selectSpread,
 } from "./ritual/engine.ts";

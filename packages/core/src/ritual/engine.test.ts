@@ -15,6 +15,7 @@ import {
   placeOnDesk,
   resolvePileDrawIndex,
   resolvePileInsertIndex,
+  returnToPile,
   selectSpread,
 } from "../ritual/engine.ts";
 import type { CardInstance, PileAddress } from "../ritual/types.ts";
@@ -147,6 +148,46 @@ describe("ritual engine", () => {
     state = draw(state, "a");
     expect(peekDesk(state)[0]?.card?.defId).toBe(topId);
     expect(() => placeOnDesk(state, "a")).toThrow(/already has a card/);
+  });
+
+  test("returnToPile top; leaves slot empty; conserves count", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = selectSpread(state, THREE_ROADS);
+    const topId = state.pile[0]!.defId;
+    state = placeOnDesk(state, "situation");
+    state = returnToPile(state, "situation");
+    expect(state.pile).toHaveLength(78);
+    expect(state.pile[0]?.defId).toBe(topId);
+    expect(state.desk.find((s) => s.id === "situation")?.card).toBeNull();
+    expect(state.desk).toHaveLength(3);
+  });
+
+  test("returnToPile bottom / index; resets face-down", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const a = state.pile[0]!.defId;
+    const b = state.pile[1]!.defId;
+    state = placeOnDesk(state, "a");
+    state = placeOnDesk(state, "b");
+    state = openPosition(state, "a");
+    expect(peekDesk(state).find((s) => s.id === "a")?.card?.faceUp).toBe(true);
+
+    state = returnToPile(state, "a", { kind: "bottom" });
+    expect(state.pile).toHaveLength(77);
+    expect(state.pile[76]?.defId).toBe(a);
+    expect(state.pile[76]?.faceUp).toBe(false);
+    expect(state.desk.find((s) => s.id === "a")?.card).toBeNull();
+
+    state = returnToPile(state, "b", { kind: "index", index: 10 });
+    expect(state.pile).toHaveLength(78);
+    expect(state.pile[10]?.defId).toBe(b);
+    expect(state.desk.find((s) => s.id === "b")?.card).toBeNull();
+  });
+
+  test("returnToPile rejects missing or empty slot", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    expect(() => returnToPile(state, "ghost")).toThrow(/No card at desk slot/);
+    state = addFreeSlot(state, "empty");
+    expect(() => returnToPile(state, "empty")).toThrow(/No card at desk slot/);
   });
 
 });
