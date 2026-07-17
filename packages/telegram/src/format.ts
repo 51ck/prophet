@@ -1,6 +1,7 @@
 /**
- * Phase 1 Telegram HTML helpers (T2.3).
+ * Phase 1 Telegram HTML helpers (T2.3–T2.4).
  * Convert light LLM markdown emphasis → tags, escape the rest.
+ * Detect Telegram entity/parse rejects for plain-text fallback.
  * @see docs/formatting.md
  */
 
@@ -10,6 +11,31 @@ export function escapeHtml(text: string): string {
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
+}
+
+function telegramErrorBlob(err: unknown): string {
+  if (err == null || typeof err !== "object") return "";
+  const parts: string[] = [];
+  if (
+    "description" in err &&
+    typeof (err as { description: unknown }).description === "string"
+  ) {
+    parts.push((err as { description: string }).description);
+  }
+  if (err instanceof Error) parts.push(err.message);
+  return parts.join("\n").toLowerCase();
+}
+
+/**
+ * True when Telegram rejected the message for entity/parse_mode errors.
+ * Other API/network errors stay false so callers can rethrow.
+ */
+export function isTelegramParseError(err: unknown): boolean {
+  const blob = telegramErrorBlob(err);
+  return (
+    blob.includes("can't parse entities") ||
+    blob.includes("cant parse entities")
+  );
 }
 
 const PLACEHOLDER = "\u0000";

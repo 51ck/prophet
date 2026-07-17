@@ -1,5 +1,5 @@
 import { Bot, type Context } from "grammy";
-import { toTelegramHtml } from "./format.ts";
+import { isTelegramParseError, toTelegramHtml } from "./format.ts";
 import type { ActiveReading, SessionHub } from "./sessions.ts";
 
 type PythiaAgent = ActiveReading["agent"];
@@ -43,7 +43,15 @@ export const PHASE1_PARSE_MODE = "HTML" as const;
 
 async function reply(ctx: Context, text: string): Promise<void> {
   for (const part of chunkText(text)) {
-    await ctx.reply(toTelegramHtml(part), { parse_mode: PHASE1_PARSE_MODE });
+    const html = toTelegramHtml(part);
+    try {
+      await ctx.reply(html, { parse_mode: PHASE1_PARSE_MODE });
+    } catch (err) {
+      if (!isTelegramParseError(err)) throw err;
+      console.warn("telegram HTML parse rejected; resending plain text");
+      // Original chunk, no parse_mode — avoid half-broken markup tags.
+      await ctx.reply(part);
+    }
   }
 }
 

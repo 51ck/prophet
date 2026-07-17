@@ -64,5 +64,5 @@ Phase 1 DM readings stay on classic `sendMessage` + HTML until a product ticket 
 1. Never send raw LLM markdown with `*` as Telegram markup without conversion
 2. Always set `parse_mode` to `PHASE1_PARSE_MODE` on outbound text
 3. Escape user/model text for HTML before/while converting emphasis
-4. On Telegram “can't parse entities” → resend plain text (no crash)
+4. On Telegram “can't parse entities” → `isTelegramParseError` → resend original chunk plain (no `parse_mode`; no crash)
 5. Keep ceremonial prose short; avoid tables/lists that fight DM HTML
