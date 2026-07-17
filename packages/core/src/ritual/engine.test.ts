@@ -5,12 +5,14 @@ import {
   addFreeSlot,
   applyShuffleOps,
   createDeckState,
+  draw,
   drawFromPile,
   drawToPositions,
   getDeckSnapshot,
   insertIntoPile,
   openPosition,
   peekDesk,
+  placeOnDesk,
   resolvePileDrawIndex,
   resolvePileInsertIndex,
   selectSpread,
@@ -91,6 +93,60 @@ describe("ritual engine", () => {
     const id = peekDesk(state)[0]?.card?.defId;
     state = openPosition(state, "alone");
     expect(getDeckSnapshot(state).desk[0]?.defId).toBe(id);
+  });
+
+  test("placeOnDesk top into empty spread slot, face-down, counts", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = selectSpread(state, THREE_ROADS);
+    const topId = state.pile[0]!.defId;
+    state = placeOnDesk(state, "situation");
+    expect(state.pile).toHaveLength(77);
+    expect(state.desk.filter((s) => s.card !== null)).toHaveLength(1);
+    expect(peekDesk(state).find((s) => s.id === "situation")?.card).toEqual({
+      defId: topId,
+      orientation: "upright",
+      faceUp: false,
+    });
+    expect(getDeckSnapshot(state).desk.find((s) => s.id === "situation")).toMatchObject({
+      faceUp: false,
+      defId: null,
+    });
+  });
+
+  test("placeOnDesk bottom / index; creates free slot when needed", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const bottomId = state.pile[77]!.defId;
+    const midId = state.pile[40]!.defId;
+
+    state = placeOnDesk(state, "from-bottom", { kind: "bottom" }, "trial");
+    expect(state.pile).toHaveLength(77);
+    expect(state.desk).toHaveLength(1);
+    expect(state.desk[0]).toMatchObject({
+      id: "from-bottom",
+      role: "trial",
+      kind: "free",
+    });
+    expect(peekDesk(state)[0]?.card?.defId).toBe(bottomId);
+    expect(peekDesk(state)[0]?.card?.faceUp).toBe(false);
+    expect(getDeckSnapshot(state).desk[0]?.defId).toBeNull();
+
+    state = placeOnDesk(state, "from-mid", { kind: "index", index: 40 });
+    expect(state.pile).toHaveLength(76);
+    expect(state.desk).toHaveLength(2);
+    expect(peekDesk(state).find((s) => s.id === "from-mid")?.card?.defId).toBe(
+      midId,
+    );
+    expect(
+      getDeckSnapshot(state).desk.every((s) => s.defId === null),
+    ).toBe(true);
+  });
+
+  test("draw alias defaults to top; rejects occupied slot", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const topId = state.pile[0]!.defId;
+    state = draw(state, "a");
+    expect(peekDesk(state)[0]?.card?.defId).toBe(topId);
+    expect(() => placeOnDesk(state, "a")).toThrow(/already has a card/);
   });
 
 });
