@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { escapeHtml, toTelegramHtml } from "./format.ts";
+import {
+  escapeHtml,
+  isTelegramParseError,
+  toTelegramHtml,
+} from "./format.ts";
 
 describe("escapeHtml", () => {
   test("escapes <>&", () => {
@@ -36,5 +40,38 @@ describe("toTelegramHtml", () => {
 
   test("does not treat unmatched single star as markup", () => {
     expect(toTelegramHtml("rate * 2")).toBe("rate * 2");
+  });
+});
+
+describe("isTelegramParseError", () => {
+  test("detects Grammy-style can't parse entities description", () => {
+    expect(
+      isTelegramParseError({
+        description:
+          "Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 12",
+        error_code: 400,
+      }),
+    ).toBe(true);
+  });
+
+  test("detects parse error in Error.message", () => {
+    expect(
+      isTelegramParseError(
+        new Error(
+          "Call to 'sendMessage' failed! (400: Bad Request: can't parse entities: Unsupported start tag)",
+        ),
+      ),
+    ).toBe(true);
+  });
+
+  test("does not treat unrelated API errors as parse failures", () => {
+    expect(
+      isTelegramParseError({
+        description: "Forbidden: bot was blocked by the user",
+        error_code: 403,
+      }),
+    ).toBe(false);
+    expect(isTelegramParseError(new Error("network timeout"))).toBe(false);
+    expect(isTelegramParseError(null)).toBe(false);
   });
 });
