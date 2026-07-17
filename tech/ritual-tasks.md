@@ -10,7 +10,8 @@ Session ritual must run on a real virtual deck/desk. Prophet tools mutate that s
 
 - `DeckState`: pile + **desk** (`DeskSlot` with `kind: "spread" | "free"`); Light Seer’s 78
 - `addFreeSlot` for placements off a named spread; `selectSpread` lays spread-kind slots
-- Shuffle ops: mix, cut, shift, rotate, seekerCut
+- Shuffle ops: mix, cut, shift, rotate, seekerCut (pile; tested)
+- Pile addressing: top / bottom / index draw + insert helpers
 - Spread select + draw into empty slots + openPosition
 - Snapshot hides face-down `defId`; `peekDesk` for tests only
 - Partial tests in `packages/core/src/ritual/engine.test.ts`
@@ -55,7 +56,7 @@ Gap: free desk moves (return, draw bottom/middle into desk), full free-mode test
 
 **Tasks:**
 
-- [ ] **T5.1** Keep/extend shuffle ops (mix, cut, shift, rotate, seekerCut) on pile
+- [x] **T5.1** Keep/extend shuffle ops (mix, cut, shift, rotate, seekerCut) on pile
 - [ ] **T5.2** `draw` / `place`: pile → desk face-down (top default; bottom; index)
 - [ ] **T5.3** `return`: desk → pile (top / bottom / index)
 - [ ] **T5.4** `rotate`: pile segment and/or single desk card

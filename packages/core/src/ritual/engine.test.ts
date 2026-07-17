@@ -25,18 +25,6 @@ describe("ritual engine", () => {
     expect(LIGHT_SEERS_CARDS).toHaveLength(78);
   });
 
-  test("mix changes order with seeded rng", () => {
-    let i = 0;
-    const seq = [0.9, 0.1, 0.5, 0.2, 0.8, 0.3, 0.7, 0.4, 0.6];
-    const random = () => seq[i++ % seq.length] ?? 0.5;
-    const state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
-    const mixed = applyShuffleOps(state, [{ type: "mix" }], random);
-    const sameOrder = mixed.pile.every(
-      (c, idx) => c.defId === state.pile[idx]?.defId,
-    );
-    expect(sameOrder).toBe(false);
-  });
-
   test("selectSpread lays spread-kind empty slots on desk", () => {
     let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
     state = selectSpread(state, THREE_ROADS);
@@ -105,13 +93,141 @@ describe("ritual engine", () => {
     expect(getDeckSnapshot(state).desk[0]?.defId).toBe(id);
   });
 
-  test("rotate flips orientation on prefix", () => {
+});
+
+describe("shuffle ops", () => {
+  const ids = (pile: { defId: string }[]) => pile.map((c) => c.defId);
+  const sortedIds = (pile: { defId: string }[]) => [...ids(pile)].sort();
+
+  test("mix changes order, conserves identity, leaves desk alone", () => {
+    let i = 0;
+    const seq = [0.9, 0.1, 0.5, 0.2, 0.8, 0.3, 0.7, 0.4, 0.6];
+    const random = () => seq[i++ % seq.length] ?? 0.5;
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = addFreeSlot(state, "watch");
+    const mixed = applyShuffleOps(state, [{ type: "mix" }], random);
+    expect(ids(mixed.pile)).not.toEqual(ids(state.pile));
+    expect(sortedIds(mixed.pile)).toEqual(sortedIds(state.pile));
+    expect(mixed.desk).toEqual(state.desk);
+    expect(mixed.pile.every((c) => c.orientation === "upright")).toBe(true);
+  });
+
+  test("cut at index restacks: bottom of cut becomes top", () => {
+    const state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const at = 10;
+    const expected = [
+      ...ids(state.pile).slice(at),
+      ...ids(state.pile).slice(0, at),
+    ];
+    const cut = applyShuffleOps(state, [{ type: "cut", at }]);
+    expect(ids(cut.pile)).toEqual(expected);
+    expect(cut.pile).toHaveLength(78);
+  });
+
+  test("cut without at uses rng index", () => {
+    const state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    // random() * 78 → floor → 20
+    const cut = applyShuffleOps(state, [{ type: "cut" }], () => 20 / 78);
+    const expected = [
+      ...ids(state.pile).slice(20),
+      ...ids(state.pile).slice(0, 20),
+    ];
+    expect(ids(cut.pile)).toEqual(expected);
+  });
+
+  test("seekerCut uses depth fraction in [0,1]", () => {
+    const state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const at = Math.floor(0.5 * 78);
+    const cut = applyShuffleOps(state, [{ type: "seekerCut", at: 0.5 }]);
+    expect(ids(cut.pile)).toEqual([
+      ...ids(state.pile).slice(at),
+      ...ids(state.pile).slice(0, at),
+    ]);
+  });
+
+  test("seekerCut clamps fraction outside [0,1]", () => {
+    const state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const over = applyShuffleOps(state, [{ type: "seekerCut", at: 2 }]);
+    const under = applyShuffleOps(state, [{ type: "seekerCut", at: -1 }]);
+    // at=1 → cut index = length → no-op; at=0 → no-op
+    expect(ids(over.pile)).toEqual(ids(state.pile));
+    expect(ids(under.pile)).toEqual(ids(state.pile));
+  });
+
+  test("shift moves a contiguous block", () => {
+    const state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const before = ids(state.pile);
+    // take indices 1..2, insert at to=3 in remaining → [A,D,E,B,C,...]
+    const shifted = applyShuffleOps(state, [
+      { type: "shift", from: 1, count: 2, to: 3 },
+    ]);
+    const block = before.slice(1, 3);
+    const rest = [...before.slice(0, 1), ...before.slice(3)];
+    const expected = [...rest.slice(0, 3), ...block, ...rest.slice(3)];
+    expect(ids(shifted.pile)).toEqual(expected);
+    expect(sortedIds(shifted.pile)).toEqual(sortedIds(state.pile));
+  });
+
+  test("shift no-ops on invalid from/count", () => {
+    const state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const a = applyShuffleOps(state, [
+      { type: "shift", from: -1, count: 2, to: 0 },
+    ]);
+    const b = applyShuffleOps(state, [
+      { type: "shift", from: 0, count: 0, to: 5 },
+    ]);
+    const c = applyShuffleOps(state, [
+      { type: "shift", from: 78, count: 1, to: 0 },
+    ]);
+    expect(ids(a.pile)).toEqual(ids(state.pile));
+    expect(ids(b.pile)).toEqual(ids(state.pile));
+    expect(ids(c.pile)).toEqual(ids(state.pile));
+  });
+
+  test("rotate flips prefix orientation; second rotate restores", () => {
     let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
     state = applyShuffleOps(state, [{ type: "rotate", count: 3 }]);
-    expect(state.pile.slice(0, 3).every((c) => c.orientation === "reversed")).toBe(
-      true,
-    );
+    expect(
+      state.pile.slice(0, 3).every((c) => c.orientation === "reversed"),
+    ).toBe(true);
     expect(state.pile[3]?.orientation).toBe("upright");
+    state = applyShuffleOps(state, [{ type: "rotate", count: 3 }]);
+    expect(
+      state.pile.slice(0, 3).every((c) => c.orientation === "upright"),
+    ).toBe(true);
+  });
+
+  test("rotate without count flips whole pile", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = applyShuffleOps(state, [{ type: "rotate" }]);
+    expect(state.pile.every((c) => c.orientation === "reversed")).toBe(true);
+  });
+
+  test("composed ops conserve card set and leave desk untouched", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = addFreeSlot(state, "side");
+    const beforeDesk = state.desk;
+    const beforeIds = sortedIds(state.pile);
+    let i = 0;
+    const seq = [0.2, 0.8, 0.4, 0.6, 0.1, 0.9, 0.3, 0.7, 0.5];
+    const random = () => seq[i++ % seq.length] ?? 0.5;
+    const out = applyShuffleOps(
+      state,
+      [
+        { type: "mix" },
+        { type: "cut", at: 17 },
+        { type: "shift", from: 5, count: 4, to: 40 },
+        { type: "seekerCut", at: 0.25 },
+        { type: "rotate", count: 2 },
+      ],
+      random,
+    );
+    expect(sortedIds(out.pile)).toEqual(beforeIds);
+    expect(out.pile).toHaveLength(78);
+    expect(out.desk).toEqual(beforeDesk);
+    expect(out.pile[0]?.orientation).toBe("reversed");
+    expect(out.pile[1]?.orientation).toBe("reversed");
+    expect(out.pile[2]?.orientation).toBe("upright");
   });
 });
 
