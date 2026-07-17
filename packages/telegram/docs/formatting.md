@@ -19,7 +19,7 @@ Re-check those pages when Telegram ships API changes. Do not treat this file as 
 - Not legacy `Markdown`
 - **Rich Messages** (`sendRichMessage`, Rich HTML / Rich Markdown, block streaming) are a **separate API surface** — out of scope for T2.1–T2.5; revisit later if product wants streamed rich replies
 
-T2 pipeline: choose mode (done) → always pass `parse_mode` → convert/sanitize LLM text → plain-text fallback on API parse fail → prompt for light emphasis only. Board: [tech/telegram-tasks.md](../../tech/telegram-tasks.md) (T2).
+T2 pipeline: choose mode (done) → always pass `parse_mode` → convert/sanitize LLM text (`toTelegramHtml` in `src/format.ts`) → plain-text fallback on API parse fail → prompt for light emphasis only. Board: [tech/telegram-tasks.md](../../tech/telegram-tasks.md) (T2).
 
 ## Classic HTML (`parse_mode: HTML`) — what agents need
 
