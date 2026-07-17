@@ -8,7 +8,7 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 
 - Deck state and shuffle/draw/open mechanics — pile + desk; pile addressing (top / bottom / index); free verbs per [tech/ritual-tasks.md](../../tech/ritual-tasks.md)
 - Session state machine
-- Seeker memory store
+- Seeker memory store — `SeekerMemory` keyed by seeker id; Phase 1 profile fields `language` (`ru`|`en`), `preferredName`, `selfNotes` plus continuity `notes` / `pastDeckIds`
 - Pythia agent + tool wiring
 - Closed “ask with options” verb (`askWithOptions`: prefer 2–3, max 6; optional skip; no channel chrome) — Pythia prefers it for closed simple asks; open intake / name+self stay free prose; never force-retry until seeker taps — free answer / decline always valid ([spec/telegram-ux.md](../../spec/telegram-ux.md))
 - Light Seer’s structured deck data for Phase 1

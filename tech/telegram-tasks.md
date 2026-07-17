@@ -106,7 +106,7 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 **Tasks:**
 
 - [x] **T3.8** Spec lock: introduce order (lang → name/self); transparent fill; profile isolation — done in memory/telegram-ux/agent + this board
-- [ ] **T3.9** Memory shape: `language` (ru|en) + preferred name + self notes; keyed strictly by seeker id
+- [x] **T3.9** Memory shape: `language` (ru|en) + preferred name + self notes; keyed strictly by seeker id
 - [ ] **T3.10** Core: profile read/write verbs bound to **current seeker only** — no tool to select/load another profile
 - [ ] **T3.11** `/start` / first turn: if no language, ask ru|en (T1 buttons); persist; continue in that language
 - [ ] **T3.12** After language: ask name + few words about seeker; write profile from answers **without** meta disclosure

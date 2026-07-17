@@ -45,7 +45,11 @@ export {
 } from "./session/session.ts";
 export type { ReadingSession, SessionPhase } from "./session/session.ts";
 export { createFileMemoryStore } from "./memory/store.ts";
-export type { MemoryStore, SeekerMemory } from "./memory/store.ts";
+export type {
+  MemoryStore,
+  SeekerLanguage,
+  SeekerMemory,
+} from "./memory/store.ts";
 export { createReadingRuntime } from "./runtime/reading-runtime.ts";
 export type { ReadingRuntime } from "./runtime/reading-runtime.ts";
 export { createPythiaAgent, startReading } from "./agent/pythia.ts";
