@@ -9,6 +9,7 @@ Telegram channel adapter for Pythia. Owns bot I/O only; calls `@prophet/core`.
 - Grammy bot (DM first)
 - Mapping Telegram user id → core seeker/session
 - `/start`, `/new`, text turns → Pythia `agent.generate`
+- Inline keyboard chrome for core `askWithOptions` (callback → seeker turn)
 
 ## Local Contracts
 
@@ -17,6 +18,7 @@ Telegram channel adapter for Pythia. Owns bot I/O only; calls `@prophet/core`.
 - Phase 1 outbound `parse_mode`: **HTML** (`PHASE1_PARSE_MODE`) — not MarkdownV2
 - Outbound `reply()` runs `toTelegramHtml` (`src/format.ts`): light `*`/`_`/`**`/`__` → `<b>`/`<i>`, then escape remaining `<>&`
 - On Telegram entity/parse reject (`isTelegramParseError`): resend original chunk as plain text (no `parse_mode`); other errors rethrow
+- When generate yields `askWithOptions`: show inline keyboard; callback (or free text) feeds seeker turn; expire/replace markup after answer so stale taps cannot double-submit
 - Formatting reference for agents: [docs/formatting.md](docs/formatting.md) (links Bot API formatting + rich messages)
 - Follow [tech/architecture.md](../../tech/architecture.md)
 
@@ -32,7 +34,7 @@ Before T2 send-path work, read [docs/formatting.md](docs/formatting.md).
 ## Verification
 
 - `bun run typecheck` in this package
-- `bun test packages/telegram` (format converter + parse-error fallback decision)
+- `bun test packages/telegram` (format converter + parse-error fallback + ask keyboard/callback parse)
 - Manual: DM bot `/start`, complete a short reading
 
 ## Child DOX Index

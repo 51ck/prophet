@@ -1,6 +1,7 @@
 import {
   createFileMemoryStore,
   startReading,
+  type AskWithOptions,
   type MemoryStore,
   type ReadingRuntime,
 } from "@prophet/core";
@@ -12,12 +13,20 @@ export type ChatMessage = {
 
 type PythiaAgent = Awaited<ReturnType<typeof startReading>>["agent"];
 
+/** Open closed-ask chrome until seeker taps or types over it. */
+export type PendingAsk = {
+  ask: AskWithOptions;
+  chatId: number;
+  messageId: number;
+};
+
 export type ActiveReading = {
   seekerId: string;
   sessionId: string;
   runtime: ReadingRuntime;
   agent: PythiaAgent;
   history: ChatMessage[];
+  pendingAsk?: PendingAsk;
 };
 
 export type SessionHub = {

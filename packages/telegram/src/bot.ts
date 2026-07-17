@@ -1,5 +1,12 @@
 import { Bot, type Context } from "grammy";
+import type { InlineKeyboard } from "grammy";
+import { extractAskWithOptions } from "./ask.ts";
 import { isTelegramParseError, toTelegramHtml } from "./format.ts";
+import {
+  buildAskKeyboard,
+  parseAskCallback,
+  resolveAskChoice,
+} from "./keyboard.ts";
 import type { ActiveReading, SessionHub } from "./sessions.ts";
 
 type PythiaAgent = ActiveReading["agent"];
@@ -41,17 +48,101 @@ function extractReplyText(result: unknown): string {
 /** Phase 1 outbound parse_mode. HTML over MarkdownV2: escape only <>& vs many MarkdownV2 specials. */
 export const PHASE1_PARSE_MODE = "HTML" as const;
 
-async function reply(ctx: Context, text: string): Promise<void> {
-  for (const part of chunkText(text)) {
+type ReplyExtra = {
+  reply_markup?: InlineKeyboard;
+};
+
+/** Send HTML (with parse fallback). Returns last Message when markup attached. */
+async function reply(
+  ctx: Context,
+  text: string,
+  extra?: ReplyExtra,
+): Promise<{ message_id: number; chat: { id: number } } | undefined> {
+  const parts = chunkText(text);
+  let last:
+    | { message_id: number; chat: { id: number } }
+    | undefined;
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i]!;
+    const isLast = i === parts.length - 1;
+    const markup =
+      isLast && extra?.reply_markup
+        ? { reply_markup: extra.reply_markup }
+        : {};
     const html = toTelegramHtml(part);
     try {
-      await ctx.reply(html, { parse_mode: PHASE1_PARSE_MODE });
+      last = await ctx.reply(html, {
+        parse_mode: PHASE1_PARSE_MODE,
+        ...markup,
+      });
     } catch (err) {
       if (!isTelegramParseError(err)) throw err;
       console.warn("telegram HTML parse rejected; resending plain text");
       // Original chunk, no parse_mode — avoid half-broken markup tags.
-      await ctx.reply(part);
+      last = await ctx.reply(part, markup);
     }
+  }
+  return last;
+}
+
+async function clearPendingKeyboard(
+  bot: Bot,
+  reading: ActiveReading,
+): Promise<void> {
+  const pending = reading.pendingAsk;
+  if (!pending) return;
+  reading.pendingAsk = undefined;
+  try {
+    await bot.api.editMessageReplyMarkup(pending.chatId, pending.messageId, {
+      reply_markup: { inline_keyboard: [] },
+    });
+  } catch (err) {
+    // Message may already lack markup or be too old — ignore.
+    console.warn("clear pending keyboard failed", err);
+  }
+}
+
+async function runSeekerTurn(
+  ctx: Context,
+  hub: SessionHub,
+  bot: Bot,
+  seekerId: string,
+  text: string,
+): Promise<void> {
+  await ctx.replyWithChatAction("typing");
+
+  const reading = await hub.getOrStart(seekerId);
+  await clearPendingKeyboard(bot, reading);
+
+  reading.history.push({ role: "user", content: text });
+
+  const result = await reading.agent.generate(
+    reading.history.map((m) => ({
+      role: m.role,
+      content: m.content,
+    })) as Parameters<PythiaAgent["generate"]>[0],
+  );
+  const answer = extractReplyText(result);
+  reading.history.push({ role: "assistant", content: answer });
+
+  const ask = extractAskWithOptions(result);
+  if (ask) {
+    const sent = await reply(ctx, answer, {
+      reply_markup: buildAskKeyboard(ask),
+    });
+    if (sent) {
+      reading.pendingAsk = {
+        ask,
+        chatId: sent.chat.id,
+        messageId: sent.message_id,
+      };
+    }
+  } else {
+    await reply(ctx, answer);
+  }
+
+  if (reading.runtime.session.phase === "ended") {
+    hub.drop(seekerId);
   }
 }
 
@@ -92,6 +183,69 @@ export function createBot(hub: SessionHub): Bot {
     );
   });
 
+  bot.on("callback_query:data", async (ctx) => {
+    const data = ctx.callbackQuery.data;
+    const parsed = parseAskCallback(data);
+    if (!parsed) {
+      await ctx.answerCallbackQuery();
+      return;
+    }
+
+    if (ctx.chat?.type !== "private") {
+      await ctx.answerCallbackQuery({
+        text: "Write me in a private chat for a reading.",
+      });
+      return;
+    }
+
+    const seekerId = String(ctx.from?.id ?? "");
+    if (!seekerId) {
+      await ctx.answerCallbackQuery();
+      return;
+    }
+
+    const reading = await hub.getOrStart(seekerId);
+    const pending = reading.pendingAsk;
+    if (!pending) {
+      await ctx.answerCallbackQuery({ text: "That choice has passed." });
+      try {
+        await ctx.editMessageReplyMarkup({
+          reply_markup: { inline_keyboard: [] },
+        });
+      } catch {
+        // ignore
+      }
+      return;
+    }
+
+    const choice = resolveAskChoice(pending.ask, parsed);
+    if (!choice) {
+      await ctx.answerCallbackQuery({ text: "That choice has passed." });
+      return;
+    }
+
+    // Claim before generate so stale taps cannot double-submit.
+    reading.pendingAsk = undefined;
+    await ctx.answerCallbackQuery();
+    try {
+      await ctx.editMessageReplyMarkup({
+        reply_markup: { inline_keyboard: [] },
+      });
+    } catch (err) {
+      console.warn("expire ask keyboard failed", err);
+    }
+
+    try {
+      await runSeekerTurn(ctx, hub, bot, seekerId, choice);
+    } catch (err) {
+      console.error("pythia callback turn failed", err);
+      await reply(
+        ctx,
+        "Something snagged in the ritual path. Send /new to begin again, or try once more.",
+      );
+    }
+  });
+
   bot.on("message:text", async (ctx) => {
     if (ctx.chat.type !== "private") {
       return;
@@ -106,26 +260,8 @@ export function createBot(hub: SessionHub): Bot {
     const text = ctx.message.text.trim();
     if (!text) return;
 
-    await ctx.replyWithChatAction("typing");
-
     try {
-      const reading = await hub.getOrStart(seekerId);
-      reading.history.push({ role: "user", content: text });
-
-      const result = await reading.agent.generate(
-        reading.history.map((m) => ({
-          role: m.role,
-          content: m.content,
-        })) as Parameters<PythiaAgent["generate"]>[0],
-      );
-      const answer = extractReplyText(result);
-      reading.history.push({ role: "assistant", content: answer });
-
-      await reply(ctx, answer);
-
-      if (reading.runtime.session.phase === "ended") {
-        hub.drop(seekerId);
-      }
+      await runSeekerTurn(ctx, hub, bot, seekerId, text);
     } catch (err) {
       console.error("pythia turn failed", err);
       await reply(
