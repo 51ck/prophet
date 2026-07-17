@@ -5,12 +5,17 @@ import {
   addFreeSlot,
   applyShuffleOps,
   createDeckState,
+  drawFromPile,
   drawToPositions,
   getDeckSnapshot,
+  insertIntoPile,
   openPosition,
   peekDesk,
+  resolvePileDrawIndex,
+  resolvePileInsertIndex,
   selectSpread,
 } from "../ritual/engine.ts";
+import type { CardInstance, PileAddress } from "../ritual/types.ts";
 
 describe("ritual engine", () => {
   test("creates 78-card Light Seer's pile with empty desk", () => {
@@ -107,5 +112,127 @@ describe("ritual engine", () => {
       true,
     );
     expect(state.pile[3]?.orientation).toBe("upright");
+  });
+});
+
+describe("pile addressing", () => {
+  const card = (defId: string): CardInstance => ({
+    defId,
+    orientation: "upright",
+    faceUp: false,
+  });
+
+  test("resolve draw: top=0, bottom=last, index in range", () => {
+    expect(resolvePileDrawIndex({ kind: "top" }, 5)).toBe(0);
+    expect(resolvePileDrawIndex({ kind: "bottom" }, 5)).toBe(4);
+    expect(resolvePileDrawIndex({ kind: "index", index: 2 }, 5)).toBe(2);
+    expect(resolvePileDrawIndex({ kind: "index", index: 2.9 }, 5)).toBe(2);
+  });
+
+  test("resolve insert: top=0, bottom=append, index in [0,len]", () => {
+    expect(resolvePileInsertIndex({ kind: "top" }, 5)).toBe(0);
+    expect(resolvePileInsertIndex({ kind: "bottom" }, 5)).toBe(5);
+    expect(resolvePileInsertIndex({ kind: "index", index: 0 }, 5)).toBe(0);
+    expect(resolvePileInsertIndex({ kind: "index", index: 5 }, 5)).toBe(5);
+    expect(resolvePileInsertIndex({ kind: "index", index: 3 }, 5)).toBe(3);
+  });
+
+  test("resolve draw rejects empty pile and out-of-range index", () => {
+    expect(() => resolvePileDrawIndex({ kind: "top" }, 0)).toThrow(/empty/);
+    expect(() => resolvePileDrawIndex({ kind: "index", index: -1 }, 3)).toThrow(
+      /out of range/,
+    );
+    expect(() => resolvePileDrawIndex({ kind: "index", index: 3 }, 3)).toThrow(
+      /out of range/,
+    );
+  });
+
+  test("resolve insert rejects out-of-range index", () => {
+    expect(() => resolvePileInsertIndex({ kind: "index", index: -1 }, 3)).toThrow(
+      /out of range/,
+    );
+    expect(() => resolvePileInsertIndex({ kind: "index", index: 4 }, 3)).toThrow(
+      /out of range/,
+    );
+  });
+
+  test("drawFromPile top / bottom / middle index", () => {
+    const state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const topId = state.pile[0]!.defId;
+    const bottomId = state.pile[77]!.defId;
+    const midId = state.pile[40]!.defId;
+    const afterMid = state.pile[41]!.defId;
+
+    const fromTop = drawFromPile(state, { kind: "top" });
+    expect(fromTop.card.defId).toBe(topId);
+    expect(fromTop.state.pile).toHaveLength(77);
+    expect(fromTop.state.desk).toEqual(state.desk);
+
+    const fromBottom = drawFromPile(state, { kind: "bottom" });
+    expect(fromBottom.card.defId).toBe(bottomId);
+    expect(fromBottom.state.pile).toHaveLength(77);
+
+    const fromMid = drawFromPile(state, { kind: "index", index: 40 });
+    expect(fromMid.card.defId).toBe(midId);
+    expect(fromMid.state.pile).toHaveLength(77);
+    expect(fromMid.state.pile[40]!.defId).toBe(afterMid);
+  });
+
+  test("drawFromPile defaults to top", () => {
+    const state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const topId = state.pile[0]!.defId;
+    const { card: drawn } = drawFromPile(state);
+    expect(drawn.defId).toBe(topId);
+  });
+
+  test("insertIntoPile top / bottom / index", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const marker = card("test-marker");
+    const originalAt10 = state.pile[10]?.defId;
+
+    state = insertIntoPile(state, marker, { kind: "top" });
+    expect(state.pile).toHaveLength(79);
+    expect(state.pile[0]?.defId).toBe("test-marker");
+
+    state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = insertIntoPile(state, marker, { kind: "bottom" });
+    expect(state.pile).toHaveLength(79);
+    expect(state.pile[78]?.defId).toBe("test-marker");
+
+    state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = insertIntoPile(state, marker, { kind: "index", index: 10 });
+    expect(state.pile).toHaveLength(79);
+    expect(state.pile[10]?.defId).toBe("test-marker");
+    expect(state.pile[11]?.defId).toBe(originalAt10);
+  });
+
+  test("draw then insert at address conserves count and identity", () => {
+    const state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const addresses: PileAddress[] = [
+      { kind: "top" },
+      { kind: "bottom" },
+      { kind: "index", index: 25 },
+    ];
+    for (const address of addresses) {
+      const before = state.pile.map((c) => c.defId);
+      const { state: drawn, card: c } = drawFromPile(state, address);
+      expect(drawn.pile).toHaveLength(77);
+      const restored = insertIntoPile(drawn, c, address);
+      expect(restored.pile).toHaveLength(78);
+      if (address.kind === "top" || address.kind === "bottom") {
+        expect(restored.pile.map((x) => x.defId)).toEqual(before);
+      } else {
+        expect(restored.pile[address.index]?.defId).toBe(c.defId);
+      }
+    }
+  });
+
+  test("drawFromPile on empty pile throws", () => {
+    const state = {
+      deckId: "empty",
+      pile: [] as CardInstance[],
+      desk: [],
+    };
+    expect(() => drawFromPile(state, { kind: "top" })).toThrow(/empty/);
   });
 });

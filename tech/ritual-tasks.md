@@ -15,7 +15,7 @@ Session ritual must run on a real virtual deck/desk. Prophet tools mutate that s
 - Snapshot hides face-down `defId`; `peekDesk` for tests only
 - Partial tests in `packages/core/src/ritual/engine.test.ts`
 
-Gap: pile top/bottom/index addressing (T4.3), free desk moves (return, draw bottom/middle), full free-mode test scenarios, tools wired to the full verb set.
+Gap: free desk moves (return, draw bottom/middle into desk), full free-mode test scenarios, tools wired to the full verb set.
 
 ## Themes
 
@@ -41,7 +41,7 @@ Gap: pile top/bottom/index addressing (T4.3), free desk moves (return, draw bott
 
 - [x] **T4.1** Spec lock: free-mode mental model; verbs; secrecy — done in deck-and-ritual + agent
 - [x] **T4.2** Desk model: free place slots and/or generalize table so cards can sit off a named spread
-- [ ] **T4.3** Pile addressing: top, bottom, and middle/index as first-class draw/insert targets
+- [x] **T4.3** Pile addressing: top, bottom, and middle/index as first-class draw/insert targets
 
 ---
 
