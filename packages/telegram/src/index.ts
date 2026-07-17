@@ -1,4 +1,4 @@
-export { createBot } from "./bot.ts";
+export { createBot, PHASE1_PARSE_MODE } from "./bot.ts";
 export {
   createDefaultMemoryStore,
   createSessionHub,

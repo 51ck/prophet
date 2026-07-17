@@ -37,6 +37,9 @@ function extractReplyText(result: unknown): string {
   return "The cards are quiet for a moment — try again.";
 }
 
+/** Phase 1 outbound parse_mode. HTML over MarkdownV2: escape only <>& vs many MarkdownV2 specials. Apply in T2.2+. */
+export const PHASE1_PARSE_MODE = "HTML" as const;
+
 async function reply(ctx: Context, text: string): Promise<void> {
   for (const part of chunkText(text)) {
     await ctx.reply(part);
