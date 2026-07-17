@@ -1,5 +1,9 @@
 import { LIGHT_SEERS_CARDS, LIGHT_SEERS_DECK_ID } from "../deck/light-seers.ts";
-import type { MemoryStore, SeekerMemory } from "../memory/store.ts";
+import type {
+  MemoryStore,
+  SeekerLanguage,
+  SeekerMemory,
+} from "../memory/store.ts";
 import {
   THREE_ROADS,
   applyShuffleOps,
@@ -22,6 +26,19 @@ const spreads: Record<string, SpreadDef> = {
   [THREE_ROADS.id]: THREE_ROADS,
 };
 
+/** Phase 1 soft profile — always the runtime session seeker. */
+export type SeekerProfile = {
+  language?: SeekerLanguage;
+  preferredName?: string;
+  selfNotes?: string;
+};
+
+export type SeekerProfilePatch = {
+  language?: SeekerLanguage;
+  preferredName?: string;
+  selfNotes?: string;
+};
+
 export type ReadingRuntime = {
   session: ReadingSession;
   deck: DeckState | null;
@@ -35,6 +52,10 @@ export type ReadingRuntime = {
   open(positionId: string): ReturnType<typeof getDeckSnapshot>;
   snapshot(): ReturnType<typeof getDeckSnapshot> | { empty: true };
   close(): void;
+  /** Profile for `session.seekerId` only — no other seeker selector. */
+  readProfile(): SeekerProfile;
+  /** Patch profile for `session.seekerId` only — no other seeker selector. */
+  updateProfile(patch: SeekerProfilePatch): Promise<SeekerProfile>;
   saveMemory(notes?: string[], pastDeckId?: string): Promise<SeekerMemory>;
   refactorMemory(notes: string[]): Promise<SeekerMemory>;
   endWithoutRitual(): void;
@@ -128,6 +149,27 @@ export function createReadingRuntime(opts: {
       if (session.phase === "closing") {
         session = transition(session, "refactor");
       }
+    },
+
+    readProfile() {
+      return {
+        ...(memory.language ? { language: memory.language } : {}),
+        ...(memory.preferredName ? { preferredName: memory.preferredName } : {}),
+        ...(memory.selfNotes ? { selfNotes: memory.selfNotes } : {}),
+      };
+    },
+
+    async updateProfile(patch) {
+      memory = await memoryStore.save(session.seekerId, {
+        ...(patch.language !== undefined ? { language: patch.language } : {}),
+        ...(patch.preferredName !== undefined
+          ? { preferredName: patch.preferredName }
+          : {}),
+        ...(patch.selfNotes !== undefined
+          ? { selfNotes: patch.selfNotes }
+          : {}),
+      });
+      return runtime.readProfile();
     },
 
     async saveMemory(notes, pastDeckId) {

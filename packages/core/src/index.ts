@@ -51,7 +51,11 @@ export type {
   SeekerMemory,
 } from "./memory/store.ts";
 export { createReadingRuntime } from "./runtime/reading-runtime.ts";
-export type { ReadingRuntime } from "./runtime/reading-runtime.ts";
+export type {
+  ReadingRuntime,
+  SeekerProfile,
+  SeekerProfilePatch,
+} from "./runtime/reading-runtime.ts";
 export { createPythiaAgent, startReading } from "./agent/pythia.ts";
 export { createPythiaTools } from "./agent/tools.ts";
 export {

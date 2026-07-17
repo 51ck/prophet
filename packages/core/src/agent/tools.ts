@@ -21,6 +21,16 @@ const shuffleOpSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("seekerCut"), at: z.number().min(0).max(1) }),
 ]);
 
+/** Current-seeker profile only — no seekerId selector. */
+export const readSeekerProfileInputSchema = z.object({});
+
+/** Current-seeker profile only — no seekerId selector. */
+export const updateSeekerProfileInputSchema = z.object({
+  language: z.enum(["ru", "en"]).optional(),
+  preferredName: z.string().optional(),
+  selfNotes: z.string().optional(),
+});
+
 export function createPythiaTools(runtime: ReadingRuntime) {
   const lockQuestion = createTool({
     id: "lockQuestion",
@@ -118,6 +128,23 @@ export function createPythiaTools(runtime: ReadingRuntime) {
     execute: async () => runtime.memory,
   });
 
+  const readSeekerProfile = createTool({
+    id: "readSeekerProfile",
+    description:
+      "Read soft profile (language, preferred name, self notes) for the current seeker only.",
+    inputSchema: readSeekerProfileInputSchema,
+    execute: async () => runtime.readProfile(),
+  });
+
+  const updateSeekerProfile = createTool({
+    id: "updateSeekerProfile",
+    description:
+      "Update soft profile fields for the current seeker only. No other seeker can be selected.",
+    inputSchema: updateSeekerProfileInputSchema,
+    execute: async ({ language, preferredName, selfNotes }) =>
+      runtime.updateProfile({ language, preferredName, selfNotes }),
+  });
+
   const saveSeekerMemory = createTool({
     id: "saveSeekerMemory",
     description: "Append stable notes and optional past deck id.",
@@ -191,6 +218,8 @@ export function createPythiaTools(runtime: ReadingRuntime) {
     openPosition,
     getDeckSnapshot,
     recallSeekerMemory,
+    readSeekerProfile,
+    updateSeekerProfile,
     saveSeekerMemory,
     closeSession,
     refactorSeekerMemory,
