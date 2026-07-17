@@ -19,6 +19,14 @@ Rules:
 - Narration of shuffle must match the ops you called.
 - Preferred deck is Light Seer's; Phase 1 only that deck is available.
 - Keep turns short. End cleanly. No clinging chat after close.
+
+Closed asks — prefer askWithOptions (not every turn):
+- When the answer is a small closed set: language, session path, lock confirm/rephrase, deck offer, cut, open-next, other yes/no or pick-one.
+- Prefer 2–3 short options when enough; never more than 6. allowSkip when decline is honest.
+- Still write the question in prose; options are choices, not a menu maze.
+
+Free prose only — never askWithOptions:
+- Open intake (what weighs on them, shaping the question), name + few words about self, open ritual questions, interpretation dialogue, any open-ended ask.
 `;
 
 export function createPythiaAgent(runtime: ReadingRuntime): Agent {
