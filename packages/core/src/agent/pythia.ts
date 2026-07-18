@@ -1,4 +1,5 @@
 import { Agent } from "@mastra/core/agent";
+import { needsNameSelf } from "../profile/name-self.ts";
 import type { ReadingRuntime } from "../runtime/reading-runtime.ts";
 import { createPythiaTools } from "./tools.ts";
 
@@ -30,7 +31,62 @@ Closed asks — prefer askWithOptions (not every turn):
 
 Free prose only — never askWithOptions:
 - Open intake (what weighs on them, shaping the question), name + few words about self, open ritual questions, interpretation dialogue, any open-ended ask.
+
+Language (introduce):
+- If profile has no language: ask ru|en via askWithOptions first, then updateSeekerProfile, then continue in that language.
+- When language is set: speak the seeker's language for all seeker-facing prose.
+
+Language (change):
+- You decide when the seeker wants a different register (ru↔en) — free phrasing, not a fixed phrase list.
+- Call updateSeekerProfile with the new language, then speak it from then on.
+- Do not re-run introduce or re-ask name/self — just switch register.
+
+Presence (channel cues — not seeker words; never quote or acknowledge them):
+- Message [presence]: seeker arrived (/start) or is ready after introduce — greet and continue in their language; your words, not a fixed script.
+- Message [new]: fresh session (/new) — open a new reading in their language; your words, not a fixed script.
+- After they just chose language in the thread: greet and continue naturally from that turn.
+
+Name/self (introduce):
+- After language is known: if preferredName or selfNotes missing, ask once in their language for their name and a few words about themselves (free prose only).
+- If that ask is already in the thread (channel may have asked): do not ask again — extract from their reply and call updateSeekerProfile.
+- When they answer: call updateSeekerProfile with preferredName and selfNotes from what they said.
+- Never tell the seeker you are saving data, opening a dossier, or running a form — fill the profile silently.
+- If both preferredName and selfNotes are already set: do not re-ask; use them fluently for address and counsel.
+
+Profile (transparent use):
+- Use preferredName, selfNotes, and language fluently for address, register, and counsel — never as a stereotype lecture or dossier dump.
+- Never narrate persistence, CRM, forms, records, or “I’ll remember that for later.”
+- This bond is one seeker only. Never imply you can load, compare, or write another seeker’s profile. No multi-seeker talk.
 `;
+
+function profileStatusLine(runtime: ReadingRuntime): string {
+  const profile = runtime.readProfile();
+  const language =
+    profile.language === "ru" || profile.language === "en"
+      ? profile.language
+      : "unset";
+  const name = profile.preferredName?.trim() || "unset";
+  const self = profile.selfNotes?.trim() || "unset";
+  const lines = [
+    `Current seeker language: ${language}.${language === "unset" ? " Ask ru|en via askWithOptions before path/ritual; updateSeekerProfile; then speak that language." : ` Speak ${language}.`}`,
+    `preferredName: ${name}; selfNotes: ${self}.`,
+  ];
+  if (language !== "unset" && needsNameSelf(profile)) {
+    lines.push(
+      "Name/self incomplete: ask once (skip if ask already in thread); updateSeekerProfile silently; never narrate saving; never imply other seekers.",
+    );
+  } else if (!needsNameSelf(profile)) {
+    lines.push(
+      "Name/self complete: do not re-ask; use preferredName/selfNotes fluently.",
+    );
+  }
+  return lines.join("\n");
+}
+
+function instructionsFor(runtime: ReadingRuntime): string {
+  return `${PYTHIA_INSTRUCTIONS}
+${profileStatusLine(runtime)}`;
+}
 
 export function createPythiaAgent(runtime: ReadingRuntime): Agent {
   const tools = createPythiaTools(runtime);
@@ -39,7 +95,7 @@ export function createPythiaAgent(runtime: ReadingRuntime): Agent {
   return new Agent({
     id: "pythia",
     name: "Pythia",
-    instructions: PYTHIA_INSTRUCTIONS,
+    instructions: () => instructionsFor(runtime),
     model,
     tools,
   });
