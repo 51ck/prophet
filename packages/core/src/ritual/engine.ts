@@ -120,6 +120,59 @@ export function applyShuffleOps(
   return ops.reduce((s, op) => applyShuffleOp(s, op, random), state);
 }
 
+export const CARD_OF_DAY: SpreadDef = {
+  id: "card-of-day",
+  name: "Card of the Day",
+  positions: [
+    { id: "focus", role: "Focus — daily atmosphere or one piece of counsel" },
+  ],
+};
+
+export const SINGLE_FOCUS: SpreadDef = {
+  id: "single-focus",
+  name: "Single Focus",
+  positions: [{ id: "focus", role: "Focus — the hinge of the question" }],
+};
+
+export const YES_NO: SpreadDef = {
+  id: "yes-no",
+  name: "Yes / No",
+  positions: [
+    { id: "answer", role: "Answer — the direct yes/no lean" },
+    { id: "nuance", role: "Nuance — what colors or complicates the answer" },
+    { id: "advice", role: "Advice — what to hold or do with it" },
+  ],
+};
+
+export const TWO_POLES: SpreadDef = {
+  id: "two-poles",
+  name: "Two Poles",
+  positions: [
+    { id: "pole-a", role: "Pole A — one side of the either/or" },
+    { id: "pole-b", role: "Pole B — the other side" },
+  ],
+};
+
+export const PAST_PRESENT_FUTURE: SpreadDef = {
+  id: "past-present-future",
+  name: "Past — Present — Future",
+  positions: [
+    { id: "past", role: "Past — what led here" },
+    { id: "present", role: "Present — how it sits now" },
+    { id: "future", role: "Future — unfolding to watch" },
+  ],
+};
+
+export const THOUGHTS_FEELINGS_ACTIONS: SpreadDef = {
+  id: "thoughts-feelings-actions",
+  name: "Thoughts — Feelings — Actions",
+  positions: [
+    { id: "thoughts", role: "Thoughts — mind / what is held" },
+    { id: "feelings", role: "Feelings — heart / what is felt" },
+    { id: "actions", role: "Actions — behavior / what is done" },
+  ],
+};
+
 export const THREE_ROADS: SpreadDef = {
   id: "three-roads",
   name: "Three Roads",
@@ -130,10 +183,81 @@ export const THREE_ROADS: SpreadDef = {
   ],
 };
 
-export const SINGLE_FOCUS: SpreadDef = {
-  id: "single-focus",
-  name: "Single Focus",
-  positions: [{ id: "focus", role: "Focus — the hinge of the question" }],
+export const RELATIONSHIP: SpreadDef = {
+  id: "relationship",
+  name: "Relationship",
+  positions: [
+    { id: "self-thoughts", role: "Seeker — thoughts about the bond" },
+    { id: "self-feelings", role: "Seeker — feelings" },
+    { id: "self-actions", role: "Seeker — behavior / what they do" },
+    { id: "other-thoughts", role: "Other — thoughts" },
+    { id: "other-feelings", role: "Other — feelings" },
+    { id: "other-actions", role: "Other — behavior" },
+    { id: "outlook", role: "Outlook — where the union is headed" },
+  ],
+};
+
+export const WORK_FINANCE: SpreadDef = {
+  id: "work-finance",
+  name: "Work & Finances",
+  positions: [
+    { id: "situation", role: "Current work/money situation" },
+    { id: "strength", role: "Strength or resource to lean on" },
+    { id: "obstacle", role: "Obstacle or risk" },
+    { id: "opportunity", role: "Opportunity or growth" },
+    { id: "money", role: "Money / material thread" },
+    { id: "counsel", role: "Counsel — what to do next" },
+  ],
+};
+
+export const CHOICE: SpreadDef = {
+  id: "choice",
+  name: "Choice",
+  positions: [
+    { id: "hinge", role: "The choice itself — what is at stake" },
+    { id: "path-a-near", role: "Path A — near consequence" },
+    { id: "path-a-far", role: "Path A — farther unfolding" },
+    { id: "path-b-near", role: "Path B — near consequence" },
+    { id: "path-b-far", role: "Path B — farther unfolding" },
+    { id: "hidden", role: "What is easy to miss" },
+    { id: "counsel", role: "Counsel — how to choose" },
+  ],
+};
+
+export const CELTIC_CROSS: SpreadDef = {
+  id: "celtic-cross",
+  name: "Celtic Cross",
+  positions: [
+    { id: "present", role: "Heart of the matter — present" },
+    { id: "cross", role: "Crossing influence — challenge or catalyst" },
+    { id: "foundation", role: "Foundation — root / basis" },
+    { id: "recent-past", role: "Recent past — what is fading" },
+    { id: "crown", role: "Crown — possible best / conscious aim" },
+    { id: "near-future", role: "Near future — what approaches" },
+    { id: "self", role: "Self — how the seeker stands in this" },
+    { id: "environment", role: "Environment — others / setting" },
+    { id: "hopes-fears", role: "Hopes and fears" },
+    { id: "outcome", role: "Outcome — most likely resolution if the path continues" },
+  ],
+};
+
+export const TWELVE_HOUSES: SpreadDef = {
+  id: "twelve-houses",
+  name: "Twelve Houses",
+  positions: [
+    { id: "house-1", role: "Self / vitality" },
+    { id: "house-2", role: "Money / resources" },
+    { id: "house-3", role: "Mind / communication / siblings" },
+    { id: "house-4", role: "Home / roots / family" },
+    { id: "house-5", role: "Pleasure / romance / creation" },
+    { id: "house-6", role: "Work / health / daily duty" },
+    { id: "house-7", role: "Partnerships" },
+    { id: "house-8", role: "Shared resources / deep change" },
+    { id: "house-9", role: "Belief / travel / learning" },
+    { id: "house-10", role: "Career / public standing" },
+    { id: "house-11", role: "Friends / community / hopes" },
+    { id: "house-12", role: "Hidden / rest / release" },
+  ],
 };
 
 /** Named spread replaces the desk layout (spread-kind empty slots). */

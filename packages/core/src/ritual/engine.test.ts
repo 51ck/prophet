@@ -1,7 +1,18 @@
 import { describe, expect, test } from "bun:test";
 import { LIGHT_SEERS_CARDS, LIGHT_SEERS_DECK_ID } from "../deck/light-seers.ts";
 import {
+  CARD_OF_DAY,
+  CELTIC_CROSS,
+  CHOICE,
+  PAST_PRESENT_FUTURE,
+  RELATIONSHIP,
+  SINGLE_FOCUS,
   THREE_ROADS,
+  THOUGHTS_FEELINGS_ACTIONS,
+  TWELVE_HOUSES,
+  TWO_POLES,
+  WORK_FINANCE,
+  YES_NO,
   addFreeSlot,
   applyShuffleOps,
   createDeckState,
@@ -22,7 +33,23 @@ import {
   rotateDeskCard,
   selectSpread,
 } from "../ritual/engine.ts";
-import type { CardInstance, PileAddress } from "../ritual/types.ts";
+import type { CardInstance, PileAddress, SpreadDef } from "../ritual/types.ts";
+
+/** All catalog spreads registered T8.2–T8.5. */
+const CATALOG_SPREADS: SpreadDef[] = [
+  CARD_OF_DAY,
+  SINGLE_FOCUS,
+  YES_NO,
+  TWO_POLES,
+  PAST_PRESENT_FUTURE,
+  THOUGHTS_FEELINGS_ACTIONS,
+  THREE_ROADS,
+  RELATIONSHIP,
+  WORK_FINANCE,
+  CHOICE,
+  CELTIC_CROSS,
+  TWELVE_HOUSES,
+];
 
 describe("ritual engine", () => {
   test("creates 78-card Light Seer's pile with empty desk", () => {
@@ -68,6 +95,52 @@ describe("ritual engine", () => {
       "path",
     ]);
     expect(state.desk.every((s) => s.kind === "spread")).toBe(true);
+  });
+
+  describe("catalog spreads (T8.6)", () => {
+    test.each(CATALOG_SPREADS.map((s) => [s.id, s] as const))(
+      "selectSpread %s → correct desk slot count/ids/kinds",
+      (_id, spread) => {
+        let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+        state = selectSpread(state, spread);
+
+        expect(state.desk).toHaveLength(spread.positions.length);
+        expect(state.desk.map((slot) => slot.id)).toEqual(
+          spread.positions.map((p) => p.id),
+        );
+        expect(state.desk.map((slot) => slot.role)).toEqual(
+          spread.positions.map((p) => p.role),
+        );
+        expect(state.desk.every((slot) => slot.kind === "spread")).toBe(true);
+        expect(state.desk.every((slot) => slot.card === null)).toBe(true);
+        expect(state.pile).toHaveLength(78);
+      },
+    );
+
+    test("selectSpread replaces prior spread layout (clears cards + slots)", () => {
+      let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+      state = selectSpread(state, THREE_ROADS);
+      state = placeOnDesk(state, "situation");
+      state = placeOnDesk(state, "counsel");
+      expect(state.desk.filter((s) => s.card !== null)).toHaveLength(2);
+      expect(state.pile).toHaveLength(76);
+
+      state = selectSpread(state, TWELVE_HOUSES);
+      expect(state.desk).toHaveLength(12);
+      expect(state.desk.map((s) => s.id)).toEqual(
+        TWELVE_HOUSES.positions.map((p) => p.id),
+      );
+      expect(state.desk.every((s) => s.kind === "spread")).toBe(true);
+      expect(state.desk.every((s) => s.card === null)).toBe(true);
+      // Cards on prior desk were dropped from desk layout; pile unchanged.
+      expect(state.pile).toHaveLength(76);
+
+      state = selectSpread(state, YES_NO);
+      expect(state.desk).toHaveLength(3);
+      expect(state.desk.map((s) => s.id)).toEqual(["answer", "nuance", "advice"]);
+      expect(state.desk.every((s) => s.kind === "spread")).toBe(true);
+      expect(state.desk.every((s) => s.card === null)).toBe(true);
+    });
   });
 
   test("draw and open reveal only when opened", () => {

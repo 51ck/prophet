@@ -127,11 +127,11 @@ Gap: none for T7 — session ritual composes selectSpread layout + place fills (
 **Tasks:**
 
 - [x] **T8.1** Spec lock: ids, position roles, offering rule — done in spreads.md
-- [ ] **T8.2** Core defs: all simple spreads as fixed `SpreadDef` (`yes-no` = 3 slots) + register in runtime map
-- [ ] **T8.3** Core defs: thematic (`relationship`, `work-finance`, `choice`)
-- [ ] **T8.4** Core defs: `celtic-cross` (10)
-- [ ] **T8.5** Core defs: `twelve-houses` (12)
-- [ ] **T8.6** Tests: each spread → correct desk slot count/ids/kinds; selectSpread replaces layout
+- [x] **T8.2** Core defs: all simple spreads as fixed `SpreadDef` (`yes-no` = 3 slots) + register in runtime map
+- [x] **T8.3** Core defs: thematic (`relationship`, `work-finance`, `choice`)
+- [x] **T8.4** Core defs: `celtic-cross` (10)
+- [x] **T8.5** Core defs: `twelve-houses` (12)
+- [x] **T8.6** Tests: each spread → correct desk slot count/ids/kinds; selectSpread replaces layout
 - [ ] **T8.7** Pythia prompt + offer logic: prefer fewer; `card-of-day` only on day path; sharp hinge → `single-focus`; spread after Commit
 
 ---

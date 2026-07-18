@@ -5,7 +5,18 @@ import type {
   SeekerMemory,
 } from "../memory/store.ts";
 import {
+  CARD_OF_DAY,
+  CELTIC_CROSS,
+  CHOICE,
+  PAST_PRESENT_FUTURE,
+  RELATIONSHIP,
+  SINGLE_FOCUS,
   THREE_ROADS,
+  THOUGHTS_FEELINGS_ACTIONS,
+  TWELVE_HOUSES,
+  TWO_POLES,
+  WORK_FINANCE,
+  YES_NO,
   applyShuffleOps,
   createDeckState,
   getDeckSnapshot,
@@ -30,7 +41,18 @@ import {
 } from "../session/session.ts";
 
 const spreads: Record<string, SpreadDef> = {
+  [CARD_OF_DAY.id]: CARD_OF_DAY,
+  [SINGLE_FOCUS.id]: SINGLE_FOCUS,
+  [YES_NO.id]: YES_NO,
+  [TWO_POLES.id]: TWO_POLES,
+  [PAST_PRESENT_FUTURE.id]: PAST_PRESENT_FUTURE,
+  [THOUGHTS_FEELINGS_ACTIONS.id]: THOUGHTS_FEELINGS_ACTIONS,
   [THREE_ROADS.id]: THREE_ROADS,
+  [RELATIONSHIP.id]: RELATIONSHIP,
+  [WORK_FINANCE.id]: WORK_FINANCE,
+  [CHOICE.id]: CHOICE,
+  [CELTIC_CROSS.id]: CELTIC_CROSS,
+  [TWELVE_HOUSES.id]: TWELVE_HOUSES,
 };
 
 /** Phase 1 soft profile — always the runtime session seeker. */
