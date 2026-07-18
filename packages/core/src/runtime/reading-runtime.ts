@@ -6,11 +6,14 @@ import type {
 } from "../memory/store.ts";
 import {
   CARD_OF_DAY,
+  CHOICE,
   PAST_PRESENT_FUTURE,
+  RELATIONSHIP,
   SINGLE_FOCUS,
   THREE_ROADS,
   THOUGHTS_FEELINGS_ACTIONS,
   TWO_POLES,
+  WORK_FINANCE,
   YES_NO,
   applyShuffleOps,
   createDeckState,
@@ -43,6 +46,9 @@ const spreads: Record<string, SpreadDef> = {
   [PAST_PRESENT_FUTURE.id]: PAST_PRESENT_FUTURE,
   [THOUGHTS_FEELINGS_ACTIONS.id]: THOUGHTS_FEELINGS_ACTIONS,
   [THREE_ROADS.id]: THREE_ROADS,
+  [RELATIONSHIP.id]: RELATIONSHIP,
+  [WORK_FINANCE.id]: WORK_FINANCE,
+  [CHOICE.id]: CHOICE,
 };
 
 /** Phase 1 soft profile — always the runtime session seeker. */

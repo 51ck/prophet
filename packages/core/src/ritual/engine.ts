@@ -183,6 +183,47 @@ export const THREE_ROADS: SpreadDef = {
   ],
 };
 
+export const RELATIONSHIP: SpreadDef = {
+  id: "relationship",
+  name: "Relationship",
+  positions: [
+    { id: "self-thoughts", role: "Seeker — thoughts about the bond" },
+    { id: "self-feelings", role: "Seeker — feelings" },
+    { id: "self-actions", role: "Seeker — behavior / what they do" },
+    { id: "other-thoughts", role: "Other — thoughts" },
+    { id: "other-feelings", role: "Other — feelings" },
+    { id: "other-actions", role: "Other — behavior" },
+    { id: "outlook", role: "Outlook — where the union is headed" },
+  ],
+};
+
+export const WORK_FINANCE: SpreadDef = {
+  id: "work-finance",
+  name: "Work & Finances",
+  positions: [
+    { id: "situation", role: "Current work/money situation" },
+    { id: "strength", role: "Strength or resource to lean on" },
+    { id: "obstacle", role: "Obstacle or risk" },
+    { id: "opportunity", role: "Opportunity or growth" },
+    { id: "money", role: "Money / material thread" },
+    { id: "counsel", role: "Counsel — what to do next" },
+  ],
+};
+
+export const CHOICE: SpreadDef = {
+  id: "choice",
+  name: "Choice",
+  positions: [
+    { id: "hinge", role: "The choice itself — what is at stake" },
+    { id: "path-a-near", role: "Path A — near consequence" },
+    { id: "path-a-far", role: "Path A — farther unfolding" },
+    { id: "path-b-near", role: "Path B — near consequence" },
+    { id: "path-b-far", role: "Path B — farther unfolding" },
+    { id: "hidden", role: "What is easy to miss" },
+    { id: "counsel", role: "Counsel — how to choose" },
+  ],
+};
+
 /** Named spread replaces the desk layout (spread-kind empty slots). */
 export function selectSpread(state: DeckState, spread: SpreadDef): DeckState {
   const next = cloneState(state);
