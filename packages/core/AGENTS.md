@@ -22,6 +22,7 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 ## Local Contracts
 
 - Must not invent card outcomes; tools mutate real deck state only
+- Ritual/deck Mastra tool results use secrecy-safe `getDeckSnapshot` only — never raw `DeckState` / `peekDesk`; face-down `defId` + orientation stay hidden
 - Follow [tech/architecture.md](../../tech/architecture.md) and [spec/](../../spec/AGENTS.md)
 - No channel adapters in this package
 

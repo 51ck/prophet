@@ -16,7 +16,7 @@ Session ritual must run on a real virtual deck/desk. Prophet tools mutate that s
 - Snapshot hides face-down `defId`; `peekDesk` for tests only
 - Partial tests in `packages/core/src/ritual/engine.test.ts`
 
-Gap: session ritual still leans on drawToPositions convenience; T7.2–T7.4 (secrecy polish, prompt, composed session path) open.
+Gap: session ritual still leans on drawToPositions convenience; T7.3–T7.4 (prompt, composed session path) open.
 
 ## Themes
 
@@ -100,7 +100,7 @@ Gap: session ritual still leans on drawToPositions convenience; T7.2–T7.4 (sec
 **Tasks:**
 
 - [x] **T7.1** Wire Mastra tools to new engine verbs (replace or extend drawToPositions-only path)
-- [ ] **T7.2** Tool results use secrecy-safe snapshot only
+- [x] **T7.2** Tool results use secrecy-safe snapshot only
 - [ ] **T7.3** Pythia prompt: narrate only ops actually called; never claim knowledge of face-down cards
 - [ ] **T7.4** Reading runtime: session ritual uses composed verbs (spread as layout + places)
 

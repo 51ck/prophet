@@ -33,6 +33,14 @@ const pileAddressSchema = z.discriminatedUnion("kind", [
 
 const defaultPileAddress = { kind: "top" as const };
 
+/**
+ * Prophet-facing deck view only — never raw DeckState / peek.
+ * Face-down slots keep defId + orientation hidden (T6.3 / T7.2).
+ */
+function secrecySafeSnapshot(runtime: ReadingRuntime) {
+  return runtime.snapshot();
+}
+
 /** Current-seeker profile only — no seekerId selector. */
 export const readSeekerProfileInputSchema = z.object({});
 
@@ -85,7 +93,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
       return {
         phase: runtime.session.phase,
         spreadId: runtime.session.spreadId,
-        snapshot: runtime.snapshot(),
+        snapshot: secrecySafeSnapshot(runtime),
       };
     },
   });
@@ -99,7 +107,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
     }),
     execute: async ({ ops }) => {
       runtime.shuffle(ops as ShuffleOp[]);
-      return { ok: true, pileCount: runtime.deck?.pile.length ?? 0 };
+      return { snapshot: secrecySafeSnapshot(runtime) };
     },
   });
 
@@ -113,6 +121,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
       role: z.string().optional(),
     }),
     execute: async ({ slotId, address, role }) => {
+      // place/return/rotate/open already return getDeckSnapshot (secrecy-safe).
       const snapshot = runtime.place(
         slotId,
         (address ?? defaultPileAddress) as PileAddress,
@@ -129,7 +138,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
     inputSchema: z.object({}),
     execute: async () => {
       runtime.draw();
-      return { snapshot: runtime.snapshot() };
+      return { snapshot: secrecySafeSnapshot(runtime) };
     },
   });
 
@@ -181,7 +190,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
     description:
       "Inspect desk: face-up cards show identity; face-down hide identity. Never peeks face-down defId.",
     inputSchema: z.object({}),
-    execute: async () => runtime.snapshot(),
+    execute: async () => secrecySafeSnapshot(runtime),
   });
 
   const recallSeekerMemory = createTool({

@@ -121,6 +121,8 @@ Map from [agent.md](../spec/agent.md):
 | Defer / refuse | Agent + `endWithoutRitual` |
 | Closed ask (options) | `askWithOptions` (channel-agnostic; adapter chrome) |
 
+Ritual/deck tool results return secrecy-safe snapshots only (`getDeckSnapshot` shape): face-down slots hide `defId` + orientation; pile identities never included. `peekDesk` is tests/trusted-only — not a Mastra tool.
+
 ## Deck content
 
 - Phase 1: structured Light Seer’s body in `packages/core` derived from [spec](../spec/decks/light-seers.md)
