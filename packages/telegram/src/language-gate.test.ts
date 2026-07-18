@@ -2,9 +2,9 @@ import { describe, expect, test } from "bun:test";
 import { isLanguageAsk } from "@prophet/core";
 import {
   LANGUAGE_ASK_PROMPT,
+  decideLanguageGate,
   languageAsk,
-  presenceOpener,
-  resolveLanguageChange,
+  languagePromptAlreadyInHistory,
   resolveLanguageChoice,
   savedLanguage,
 } from "./language-gate.ts";
@@ -28,15 +28,50 @@ describe("language gate", () => {
     expect(resolveLanguageChoice("maybe later")).toBeUndefined();
   });
 
-  test("resolveLanguageChange maps switch phrases only", () => {
-    expect(resolveLanguageChange("switch to English")).toBe("en");
-    expect(resolveLanguageChange("перейди на русский")).toBe("ru");
-    expect(resolveLanguageChange("English")).toBeUndefined();
-    expect(resolveLanguageChange("maybe later")).toBeUndefined();
+  test("decideLanguageGate accepts mapped choice", () => {
+    expect(
+      decideLanguageGate({
+        turnText: "English",
+        pendingAsk: languageAsk(),
+        alreadyPromptedInHistory: true,
+      }),
+    ).toEqual({ action: "accept", language: "en" });
   });
 
-  test("presenceOpener matches language", () => {
-    expect(presenceOpener("en")).toMatch(/Pythia/);
-    expect(presenceOpener("ru")).toMatch(/Пифия/);
+  test("decideLanguageGate restores pending on invalid reply", () => {
+    expect(
+      decideLanguageGate({
+        turnText: "hello",
+        pendingAsk: languageAsk(),
+        alreadyPromptedInHistory: true,
+      }),
+    ).toEqual({ action: "restore-pending" });
+  });
+
+  test("decideLanguageGate reoffers when prompted but pending lost", () => {
+    expect(
+      decideLanguageGate({
+        turnText: "hello",
+        alreadyPromptedInHistory: true,
+      }),
+    ).toEqual({ action: "reoffer" });
+  });
+
+  test("decideLanguageGate asks on first invalid turn", () => {
+    expect(
+      decideLanguageGate({
+        turnText: "hello",
+        alreadyPromptedInHistory: false,
+      }),
+    ).toEqual({ action: "ask" });
+  });
+
+  test("languagePromptAlreadyInHistory detects bilingual cue", () => {
+    expect(languagePromptAlreadyInHistory([])).toBe(false);
+    expect(
+      languagePromptAlreadyInHistory([
+        { role: "assistant", content: LANGUAGE_ASK_PROMPT },
+      ]),
+    ).toBe(true);
   });
 });

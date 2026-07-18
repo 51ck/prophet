@@ -62,9 +62,7 @@ export {
   LANGUAGE_ASK_PROMPT,
   createLanguageAsk,
   isLanguageAsk,
-  parseLanguageChangeRequest,
   parseSeekerLanguage,
-  presenceOpener,
 } from "./profile/language.ts";
 export { nameSelfAsk, needsNameSelf } from "./profile/name-self.ts";
 export {

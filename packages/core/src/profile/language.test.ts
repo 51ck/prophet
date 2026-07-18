@@ -3,9 +3,7 @@ import {
   LANGUAGE_ASK_PROMPT,
   createLanguageAsk,
   isLanguageAsk,
-  parseLanguageChangeRequest,
   parseSeekerLanguage,
-  presenceOpener,
 } from "./language.ts";
 import { createAskWithOptions } from "../ask/ask-with-options.ts";
 
@@ -61,29 +59,8 @@ describe("parseSeekerLanguage", () => {
   });
 });
 
-describe("parseLanguageChangeRequest", () => {
-  test("maps clear switch phrases", () => {
-    expect(parseLanguageChangeRequest("switch to English")).toBe("en");
-    expect(parseLanguageChangeRequest("speak russian")).toBe("ru");
-    expect(parseLanguageChangeRequest("in english")).toBe("en");
-    expect(parseLanguageChangeRequest("давай на русском")).toBe("ru");
-    expect(parseLanguageChangeRequest("говори по-английски")).toBe("en");
-    expect(parseLanguageChangeRequest("перейди на русский")).toBe("ru");
-  });
-
-  test("rejects bare labels and ordinary prose", () => {
-    expect(parseLanguageChangeRequest("English")).toBeUndefined();
-    expect(parseLanguageChangeRequest("Русский")).toBeUndefined();
-    expect(parseLanguageChangeRequest("I am Russian")).toBeUndefined();
-    expect(parseLanguageChangeRequest("I speak russian at home")).toBeUndefined();
-    expect(parseLanguageChangeRequest("hello")).toBeUndefined();
-  });
-});
-
-describe("presenceOpener", () => {
-  test("returns language-specific presence", () => {
-    expect(presenceOpener("en")).toContain("Pythia");
-    expect(presenceOpener("ru")).toContain("Пифия");
+describe("LANGUAGE_ASK_PROMPT", () => {
+  test("is bilingual introduce cue", () => {
     expect(LANGUAGE_ASK_PROMPT).toContain("language");
   });
 });

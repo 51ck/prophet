@@ -126,4 +126,23 @@ describe("file memory store", () => {
     expect(next.selfNotes).toBe("night worker");
     expect(next.notes).toEqual(["n1"]);
   });
+
+  test("trims preferredName/selfNotes; drops whitespace-only", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "prophet-mem-"));
+    const store = createFileMemoryStore(dir);
+
+    const saved = await store.save("seeker-a", {
+      preferredName: "  Anya  ",
+      selfNotes: "  nights  ",
+    });
+    expect(saved.preferredName).toBe("Anya");
+    expect(saved.selfNotes).toBe("nights");
+
+    const blank = await store.save("seeker-a", {
+      preferredName: "   ",
+      selfNotes: "\t",
+    });
+    expect(blank.preferredName).toBeUndefined();
+    expect(blank.selfNotes).toBeUndefined();
+  });
 });

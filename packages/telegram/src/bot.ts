@@ -11,10 +11,9 @@ import {
 } from "./keyboard.ts";
 import {
   LANGUAGE_ASK_PROMPT,
+  decideLanguageGate,
   languageAsk,
-  presenceOpener,
-  resolveLanguageChange,
-  resolveLanguageChoice,
+  languagePromptAlreadyInHistory,
   savedLanguage,
 } from "./language-gate.ts";
 import {
@@ -121,17 +120,38 @@ async function clearPendingKeyboard(
   return pending;
 }
 
-/** Ask ru|en with T1 buttons; skip when language already saved. */
-async function askLanguageIfNeeded(
+/** Restore language keyboard on the original message after an invalid typed reply. */
+async function restoreLanguageAsk(
+  bot: Bot,
+  reading: ActiveReading,
+  pending: PendingAsk,
+): Promise<void> {
+  reading.pendingAsk = pending;
+  try {
+    await bot.api.editMessageReplyMarkup(pending.chatId, pending.messageId, {
+      reply_markup: buildAskKeyboard(pending.ask),
+    });
+  } catch (err) {
+    console.warn("restore language keyboard failed", err);
+  }
+}
+
+/**
+ * Offer ru|en with T1 buttons.
+ * `pushHistory` false when re-offering after a bad reply (no duplicate prompt in thread).
+ */
+async function offerLanguageAsk(
   ctx: Context,
   reading: ActiveReading,
-): Promise<boolean> {
-  if (savedLanguage(reading.runtime.readProfile())) return false;
+  opts?: { pushHistory?: boolean },
+): Promise<void> {
   const ask = languageAsk();
   const sent = await reply(ctx, LANGUAGE_ASK_PROMPT, {
     reply_markup: buildAskKeyboard(ask),
   });
-  reading.history.push({ role: "assistant", content: LANGUAGE_ASK_PROMPT });
+  if (opts?.pushHistory !== false) {
+    reading.history.push({ role: "assistant", content: LANGUAGE_ASK_PROMPT });
+  }
   if (sent) {
     reading.pendingAsk = {
       ask,
@@ -139,6 +159,15 @@ async function askLanguageIfNeeded(
       messageId: sent.message_id,
     };
   }
+}
+
+/** Ask ru|en with T1 buttons; skip when language already saved. */
+async function askLanguageIfNeeded(
+  ctx: Context,
+  reading: ActiveReading,
+): Promise<boolean> {
+  if (savedLanguage(reading.runtime.readProfile())) return false;
+  await offerLanguageAsk(ctx, reading);
   return true;
 }
 
@@ -155,66 +184,31 @@ async function askNameSelfIfNeeded(
   return true;
 }
 
-async function sendPresence(
+type ChannelCue = "presence" | "new";
+
+/** Run Pythia generate and send reply. Channel cues are not stored in history. */
+async function deliverAgentReply(
   ctx: Context,
   reading: ActiveReading,
-  language: SeekerLanguage,
-): Promise<void> {
-  const opener = presenceOpener(language);
-  reading.history.push({ role: "assistant", content: opener });
-  await reply(ctx, opener);
-}
-
-/** After language: name/self nudge, else path-ready presence. */
-async function continueAfterLanguage(
-  ctx: Context,
-  reading: ActiveReading,
-  language: SeekerLanguage,
-): Promise<void> {
-  if (await askNameSelfIfNeeded(ctx, reading, language)) return;
-  await sendPresence(ctx, reading, language);
-}
-
-async function runSeekerTurn(
-  ctx: Context,
   hub: SessionHub,
-  bot: Bot,
   seekerId: string,
-  text: string,
+  opts?: { channelCue?: ChannelCue },
 ): Promise<void> {
   await ctx.replyWithChatAction("typing");
 
-  const reading = await hub.getOrStart(seekerId);
-  // Typed reply always claims pending ask — never force-retry until they tap.
-  const pending = await clearPendingKeyboard(bot, reading);
-  const turnText = normalizeTypedAskReply(pending?.ask, text);
-
-  const currentLanguage = savedLanguage(reading.runtime.readProfile());
-  if (!currentLanguage) {
-    const language = resolveLanguageChoice(turnText);
-    if (!language) {
-      await askLanguageIfNeeded(ctx, reading);
-      return;
-    }
-    await reading.runtime.updateProfile({ language });
-    reading.history.push({ role: "user", content: turnText });
-    await continueAfterLanguage(ctx, reading, language);
-    return;
-  }
-
-  // Clear switch request: persist + new register next; never re-grill introduce.
-  const switchTo = resolveLanguageChange(turnText);
-  if (switchTo && switchTo !== currentLanguage) {
-    await reading.runtime.updateProfile({ language: switchTo });
-  }
-
-  reading.history.push({ role: "user", content: turnText });
-
-  const result = await reading.agent.generate(
+  const messages: Array<{ role: "user" | "assistant"; content: string }> =
     reading.history.map((m) => ({
       role: m.role,
       content: m.content,
-    })) as Parameters<PythiaAgent["generate"]>[0],
+    }));
+  if (opts?.channelCue === "presence") {
+    messages.push({ role: "user", content: "[presence]" });
+  } else if (opts?.channelCue === "new") {
+    messages.push({ role: "user", content: "[new]" });
+  }
+
+  const result = await reading.agent.generate(
+    messages as Parameters<PythiaAgent["generate"]>[0],
   );
   const answer = extractReplyText(result);
   reading.history.push({ role: "assistant", content: answer });
@@ -240,6 +234,70 @@ async function runSeekerTurn(
   }
 }
 
+/**
+ * After language known: name/self nudge, else let Pythia speak.
+ * `afterLanguageChoice`: history already has their ru|en reply — no channel cue.
+ */
+async function continueAfterLanguage(
+  ctx: Context,
+  reading: ActiveReading,
+  hub: SessionHub,
+  seekerId: string,
+  language: SeekerLanguage,
+  opts?: { afterLanguageChoice?: boolean },
+): Promise<void> {
+  if (await askNameSelfIfNeeded(ctx, reading, language)) return;
+  await deliverAgentReply(ctx, reading, hub, seekerId, {
+    channelCue: opts?.afterLanguageChoice ? undefined : "presence",
+  });
+}
+
+async function runSeekerTurn(
+  ctx: Context,
+  hub: SessionHub,
+  bot: Bot,
+  seekerId: string,
+  text: string,
+): Promise<void> {
+  const reading = await hub.getOrStart(seekerId);
+  // Typed reply always claims pending ask — never force-retry until they tap.
+  const pending = await clearPendingKeyboard(bot, reading);
+  const turnText = normalizeTypedAskReply(pending?.ask, text);
+
+  const currentLanguage = savedLanguage(reading.runtime.readProfile());
+  if (!currentLanguage) {
+    const decision = decideLanguageGate({
+      turnText,
+      pendingAsk: pending?.ask,
+      alreadyPromptedInHistory: languagePromptAlreadyInHistory(reading.history),
+    });
+    if (decision.action === "accept") {
+      const { language } = decision;
+      await reading.runtime.updateProfile({ language });
+      reading.history.push({ role: "user", content: turnText });
+      await continueAfterLanguage(ctx, reading, hub, seekerId, language, {
+        afterLanguageChoice: true,
+      });
+      return;
+    }
+    if (decision.action === "restore-pending" && pending) {
+      await restoreLanguageAsk(bot, reading, pending);
+      return;
+    }
+    if (decision.action === "ask") {
+      await offerLanguageAsk(ctx, reading);
+      return;
+    }
+    // reoffer, or restore-pending without pending handle
+    await offerLanguageAsk(ctx, reading, { pushHistory: false });
+    return;
+  }
+
+  // Language change is agent-owned via updateSeekerProfile — no phrase parse here.
+  reading.history.push({ role: "user", content: turnText });
+  await deliverAgentReply(ctx, reading, hub, seekerId);
+}
+
 export function createBot(hub: SessionHub): Bot {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {
@@ -260,7 +318,7 @@ export function createBot(hub: SessionHub): Bot {
     if (await askLanguageIfNeeded(ctx, reading)) return;
 
     const language = savedLanguage(reading.runtime.readProfile())!;
-    await continueAfterLanguage(ctx, reading, language);
+    await continueAfterLanguage(ctx, reading, hub, seekerId, language);
   });
 
   bot.command("new", async (ctx) => {
@@ -275,12 +333,9 @@ export function createBot(hub: SessionHub): Bot {
 
     const language = savedLanguage(reading.runtime.readProfile())!;
     if (await askNameSelfIfNeeded(ctx, reading, language)) return;
-    const fresh =
-      language === "ru"
-        ? "Новая сессия. Какой вопрос хочешь решить эзотерически?"
-        : "Fresh session. What question do you want answered esoterically?";
-    reading.history.push({ role: "assistant", content: fresh });
-    await reply(ctx, fresh);
+    await deliverAgentReply(ctx, reading, hub, seekerId, {
+      channelCue: "new",
+    });
   });
 
   bot.on("callback_query:data", async (ctx) => {

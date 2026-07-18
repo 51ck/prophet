@@ -8,10 +8,11 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 
 - Deck state and shuffle/draw/open mechanics — pile + desk; pile addressing (top / bottom / index); free verbs per [tech/ritual-tasks.md](../../tech/ritual-tasks.md)
 - Session state machine
-- Seeker memory store — `SeekerMemory` keyed by seeker id; Phase 1 profile fields `language` (`ru`|`en`), `preferredName`, `selfNotes` plus continuity `notes` / `pastDeckIds`
+- Seeker memory store — `SeekerMemory` keyed by seeker id; Phase 1 profile fields `language` (`ru`|`en`), `preferredName`, `selfNotes` plus continuity `notes` / `pastDeckIds`; normalize trims name/self and drops whitespace-only
 - Profile read/write verbs (`readProfile` / `updateProfile` + tools) bound to `session.seekerId` only — no seeker selector
-- Language introduce helpers (`createLanguageAsk` / `parseSeekerLanguage` / `presenceOpener`); prompt speaks seeker’s saved language
-- Language change: `parseLanguageChangeRequest` + `updateSeekerProfile` language; prompt switches register; never re-grill introduce
+- Language introduce helpers (`createLanguageAsk` / `parseSeekerLanguage` for ru|en button/typed choice only); prompt speaks seeker’s saved language
+- Language change: agent decides intent and calls `updateSeekerProfile` language — no phrase parser; prompt switches register; never re-grill introduce
+- Presence / fresh session: agent speaks (channel cues `[presence]` / `[new]`); no hardcoded opener scripts
 - Name/self introduce helpers (`needsNameSelf` / `nameSelfAsk`); prompt asks free-prose name + few words after language (once; skip if ask already in thread), fills via `updateSeekerProfile` without meta disclosure
 - Prompt: use preferredName/selfNotes/language fluently; never narrate persistence/CRM; never imply multi-seeker or other profiles (isolation hard rule)
 - Pythia agent + tool wiring

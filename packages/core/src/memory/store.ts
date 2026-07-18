@@ -33,15 +33,15 @@ function emptyMemory(seekerId: string): SeekerMemory {
 function normalizeMemory(seekerId: string, raw: Partial<SeekerMemory>): SeekerMemory {
   const language =
     raw.language === "ru" || raw.language === "en" ? raw.language : undefined;
+  const preferredName =
+    typeof raw.preferredName === "string" ? raw.preferredName.trim() : "";
+  const selfNotes =
+    typeof raw.selfNotes === "string" ? raw.selfNotes.trim() : "";
   return {
     seekerId,
     ...(language ? { language } : {}),
-    ...(typeof raw.preferredName === "string" && raw.preferredName.length > 0
-      ? { preferredName: raw.preferredName }
-      : {}),
-    ...(typeof raw.selfNotes === "string" && raw.selfNotes.length > 0
-      ? { selfNotes: raw.selfNotes }
-      : {}),
+    ...(preferredName ? { preferredName } : {}),
+    ...(selfNotes ? { selfNotes } : {}),
     notes: Array.isArray(raw.notes) ? raw.notes : [],
     pastDeckIds: Array.isArray(raw.pastDeckIds) ? raw.pastDeckIds : [],
     updatedAt:
