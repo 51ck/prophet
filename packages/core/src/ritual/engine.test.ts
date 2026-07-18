@@ -471,6 +471,164 @@ describe("free-mode scenarios (T6.1)", () => {
   });
 });
 
+/** Multiset of in-play card identities (defId + orientation), sorted. */
+function allIdentities(state: {
+  pile: { defId: string; orientation: string }[];
+  desk: { card: { defId: string; orientation: string } | null }[];
+}): string[] {
+  return [
+    ...state.pile.map((c) => `${c.defId}:${c.orientation}`),
+    ...state.desk.flatMap((s) =>
+      s.card ? [`${s.card.defId}:${s.card.orientation}`] : [],
+    ),
+  ].sort();
+}
+
+function cardCount(state: {
+  pile: unknown[];
+  desk: { card: unknown | null }[];
+}): number {
+  return (
+    state.pile.length + state.desk.filter((s) => s.card !== null).length
+  );
+}
+
+describe("invariants (T6.2)", () => {
+  test("card-count conservation across place, reveal, return, rotate, shuffle", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const n = LIGHT_SEERS_CARDS.length;
+    expect(cardCount(state)).toBe(n);
+    expect(allDefIds(state)).toHaveLength(n);
+    expect(new Set(allDefIds(state)).size).toBe(n);
+
+    state = placeOnDesk(state, "a");
+    state = placeOnDesk(state, "b", { kind: "bottom" });
+    state = placeOnDesk(state, "c", { kind: "index", index: 10 });
+    expect(cardCount(state)).toBe(n);
+    expect(state.pile).toHaveLength(n - 3);
+    expect(allDefIds(state)).toHaveLength(n);
+    expect(new Set(allDefIds(state)).size).toBe(n);
+
+    state = reveal(state, "a");
+    state = rotateDeskCard(state, "b");
+    expect(cardCount(state)).toBe(n);
+
+    state = returnToPile(state, "c", { kind: "index", index: 5 });
+    expect(cardCount(state)).toBe(n);
+    expect(state.pile).toHaveLength(n - 2);
+    expect(state.desk.find((s) => s.id === "c")?.card).toBeNull();
+
+    const random = seqRandom([0.3, 0.7, 0.1, 0.9, 0.4, 0.6, 0.2, 0.8]);
+    state = applyShuffleOps(
+      state,
+      [
+        { type: "mix" },
+        { type: "cut", at: 15 },
+        { type: "rotate", from: 0, count: 5 },
+      ],
+      random,
+    );
+    expect(cardCount(state)).toBe(n);
+    expect(allDefIds(state)).toHaveLength(n);
+    expect(new Set(allDefIds(state)).size).toBe(n);
+
+    state = returnToPile(state, "a", { kind: "bottom" });
+    state = returnToPile(state, "b");
+    expect(cardCount(state)).toBe(n);
+    expect(state.pile).toHaveLength(n);
+    expect(new Set(state.pile.map((c) => c.defId)).size).toBe(n);
+  });
+
+  test("reveal keeps defId and orientation; only faceUp flips", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "focus");
+    const before = peekDesk(state).find((s) => s.id === "focus")!.card!;
+    expect(before.faceUp).toBe(false);
+
+    state = reveal(state, "focus");
+    const after = peekDesk(state).find((s) => s.id === "focus")!.card!;
+    expect(after.defId).toBe(before.defId);
+    expect(after.orientation).toBe(before.orientation);
+    expect(after.faceUp).toBe(true);
+    expect(cardCount(state)).toBe(78);
+  });
+
+  test("place/draw does not change identity of the drawn card", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const top = { ...state.pile[0]! };
+    const bottom = { ...state.pile[77]! };
+    const mid = { ...state.pile[40]! };
+
+    state = placeOnDesk(state, "top");
+    expect(peekDesk(state).find((s) => s.id === "top")!.card).toEqual({
+      ...top,
+      faceUp: false,
+    });
+
+    state = draw(state, "bottom", { kind: "bottom" });
+    expect(peekDesk(state).find((s) => s.id === "bottom")!.card).toEqual({
+      ...bottom,
+      faceUp: false,
+    });
+
+    // Top draw shifts index 40 → 39; bottom draw leaves that slot alone.
+    const midNow = state.pile[39]!;
+    expect(midNow.defId).toBe(mid.defId);
+    state = placeOnDesk(state, "mid", { kind: "index", index: 39 });
+    expect(peekDesk(state).find((s) => s.id === "mid")!.card).toEqual({
+      ...midNow,
+      faceUp: false,
+    });
+    expect(cardCount(state)).toBe(78);
+  });
+
+  test("return keeps defId and orientation; face goes down", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "x");
+    state = reveal(state, "x");
+    state = rotateDeskCard(state, "x");
+    const onDesk = peekDesk(state).find((s) => s.id === "x")!.card!;
+    expect(onDesk.faceUp).toBe(true);
+    expect(onDesk.orientation).toBe("reversed");
+
+    state = returnToPile(state, "x", { kind: "top" });
+    expect(state.desk.find((s) => s.id === "x")?.card).toBeNull();
+    expect(state.pile[0]).toEqual({
+      defId: onDesk.defId,
+      orientation: onDesk.orientation,
+      faceUp: false,
+    });
+    expect(cardCount(state)).toBe(78);
+  });
+
+  test("move/reveal never silently swaps identities across the deck", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const before = allIdentities(state);
+
+    state = placeOnDesk(state, "left");
+    state = placeOnDesk(state, "right", { kind: "bottom" });
+    expect(allIdentities(state)).toEqual(before);
+
+    const leftBefore = peekDesk(state).find((s) => s.id === "left")!.card!;
+    const rightBefore = peekDesk(state).find((s) => s.id === "right")!.card!;
+
+    state = reveal(state, "left");
+    state = reveal(state, "right");
+    expect(allIdentities(state)).toEqual(before);
+    expect(peekDesk(state).find((s) => s.id === "left")!.card!.defId).toBe(
+      leftBefore.defId,
+    );
+    expect(peekDesk(state).find((s) => s.id === "right")!.card!.defId).toBe(
+      rightBefore.defId,
+    );
+
+    state = returnToPile(state, "left", { kind: "index", index: 20 });
+    state = returnToPile(state, "right", { kind: "bottom" });
+    expect(allIdentities(state)).toEqual(before);
+    expect(cardCount(state)).toBe(78);
+  });
+});
+
 describe("shuffle ops", () => {
   const ids = (pile: { defId: string }[]) => pile.map((c) => c.defId);
   const sortedIds = (pile: { defId: string }[]) => [...ids(pile)].sort();
