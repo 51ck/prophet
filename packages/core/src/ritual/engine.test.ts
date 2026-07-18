@@ -314,7 +314,414 @@ describe("ritual engine", () => {
       manual.pile.map((c) => c.defId),
     );
   });
+});
 
+/** All defIds in play (pile + occupied desk), sorted — conservation helper. */
+function allDefIds(state: {
+  pile: { defId: string }[];
+  desk: { card: { defId: string } | null }[];
+}): string[] {
+  return [
+    ...state.pile.map((c) => c.defId),
+    ...state.desk.flatMap((s) => (s.card ? [s.card.defId] : [])),
+  ].sort();
+}
+
+function seqRandom(seq: number[]): () => number {
+  let i = 0;
+  return () => seq[i++ % seq.length] ?? 0.5;
+}
+
+describe("free-mode scenarios (T6.1)", () => {
+  test("1: shuffle → place → reveal → return → draw again → reveal", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const before = allDefIds(state);
+    const random = seqRandom([0.9, 0.1, 0.5, 0.2, 0.8, 0.3, 0.7, 0.4, 0.6]);
+
+    state = applyShuffleOps(state, [{ type: "mix" }], random);
+    expect(state.pile).toHaveLength(78);
+
+    state = placeOnDesk(state, "focus");
+    expect(state.pile).toHaveLength(77);
+    const firstPeek = peekDesk(state).find((s) => s.id === "focus")!.card!;
+    expect(firstPeek.faceUp).toBe(false);
+    expect(getDeckSnapshot(state).desk[0]?.defId).toBeNull();
+
+    state = reveal(state, "focus");
+    expect(getDeckSnapshot(state).desk[0]?.defId).toBe(firstPeek.defId);
+
+    state = returnToPile(state, "focus");
+    expect(state.pile).toHaveLength(78);
+    expect(state.desk.find((s) => s.id === "focus")?.card).toBeNull();
+
+    state = draw(state, "focus");
+    expect(state.pile).toHaveLength(77);
+    const secondPeek = peekDesk(state).find((s) => s.id === "focus")!.card!;
+    expect(secondPeek.faceUp).toBe(false);
+    expect(getDeckSnapshot(state).desk[0]?.defId).toBeNull();
+
+    state = reveal(state, "focus");
+    expect(getDeckSnapshot(state).desk[0]?.defId).toBe(secondPeek.defId);
+    expect(allDefIds(state)).toEqual(before);
+  });
+
+  test("2: draw from bottom of pile → reveal", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const bottomId = state.pile[77]!.defId;
+
+    state = draw(state, "from-bottom", { kind: "bottom" });
+    expect(state.pile).toHaveLength(77);
+    expect(peekDesk(state)[0]?.card?.defId).toBe(bottomId);
+    expect(peekDesk(state)[0]?.card?.faceUp).toBe(false);
+    expect(getDeckSnapshot(state).desk[0]?.defId).toBeNull();
+
+    state = reveal(state, "from-bottom");
+    expect(getDeckSnapshot(state).desk[0]).toMatchObject({
+      faceUp: true,
+      defId: bottomId,
+    });
+  });
+
+  test("3: place three → return middle → reshuffle → place from middle of pile", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const before = allDefIds(state);
+    const placed = state.pile.slice(0, 3).map((c) => c.defId);
+
+    state = placeOnDesk(state, "left");
+    state = placeOnDesk(state, "mid");
+    state = placeOnDesk(state, "right");
+    expect(state.pile).toHaveLength(75);
+    expect(peekDesk(state).map((s) => s.card!.defId)).toEqual(placed);
+
+    state = returnToPile(state, "mid");
+    expect(state.pile).toHaveLength(76);
+    expect(state.desk.find((s) => s.id === "mid")?.card).toBeNull();
+    expect(peekDesk(state).find((s) => s.id === "left")?.card?.defId).toBe(
+      placed[0],
+    );
+    expect(peekDesk(state).find((s) => s.id === "right")?.card?.defId).toBe(
+      placed[2],
+    );
+
+    const random = seqRandom([0.2, 0.8, 0.4, 0.6, 0.1, 0.9, 0.3, 0.7, 0.5]);
+    const pileBeforeMix = state.pile.map((c) => c.defId).sort();
+    state = applyShuffleOps(state, [{ type: "mix" }], random);
+    expect(state.pile.map((c) => c.defId).sort()).toEqual(pileBeforeMix);
+    expect(state.pile).toHaveLength(76);
+
+    const midIndex = 30;
+    const midId = state.pile[midIndex]!.defId;
+    state = placeOnDesk(state, "mid", { kind: "index", index: midIndex });
+    expect(state.pile).toHaveLength(75);
+    expect(peekDesk(state).find((s) => s.id === "mid")?.card?.defId).toBe(midId);
+    expect(
+      getDeckSnapshot(state).desk.find((t) => t.id === "mid")?.defId,
+    ).toBeNull();
+    expect(allDefIds(state)).toEqual(before);
+  });
+
+  test("4: face-down snapshot defId null until reveal; then matches peek", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "secret");
+
+    const peek = peekDesk(state).find((s) => s.id === "secret")!.card!;
+    expect(peek.faceUp).toBe(false);
+    expect(peek.defId).toBeTruthy();
+
+    const snapDown = getDeckSnapshot(state).desk.find((t) => t.id === "secret");
+    expect(snapDown?.faceUp).toBe(false);
+    expect(snapDown?.defId).toBeNull();
+    expect(snapDown?.orientation).toBeNull();
+
+    state = reveal(state, "secret");
+    const snapUp = getDeckSnapshot(state).desk.find((t) => t.id === "secret");
+    expect(snapUp?.faceUp).toBe(true);
+    expect(snapUp?.defId).toBe(peek.defId);
+    expect(snapUp?.orientation).toBe(peek.orientation);
+  });
+
+  test("5: return + reshuffle does not invent cards; pile count conserved", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const before = allDefIds(state);
+    expect(before).toHaveLength(78);
+
+    state = placeOnDesk(state, "a");
+    state = placeOnDesk(state, "b");
+    expect(state.pile).toHaveLength(76);
+    expect(allDefIds(state)).toEqual(before);
+
+    state = returnToPile(state, "a", { kind: "bottom" });
+    state = returnToPile(state, "b", { kind: "index", index: 12 });
+    expect(state.pile).toHaveLength(78);
+    expect(allDefIds(state)).toEqual(before);
+
+    const random = seqRandom([0.15, 0.85, 0.35, 0.65, 0.05, 0.95, 0.45, 0.55]);
+    state = applyShuffleOps(
+      state,
+      [
+        { type: "mix" },
+        { type: "cut", at: 22 },
+        { type: "seekerCut", at: 0.4 },
+      ],
+      random,
+    );
+    expect(state.pile).toHaveLength(78);
+    expect(allDefIds(state)).toEqual(before);
+    expect(new Set(state.pile.map((c) => c.defId)).size).toBe(78);
+  });
+});
+
+/** Multiset of in-play card identities (defId + orientation), sorted. */
+function allIdentities(state: {
+  pile: { defId: string; orientation: string }[];
+  desk: { card: { defId: string; orientation: string } | null }[];
+}): string[] {
+  return [
+    ...state.pile.map((c) => `${c.defId}:${c.orientation}`),
+    ...state.desk.flatMap((s) =>
+      s.card ? [`${s.card.defId}:${s.card.orientation}`] : [],
+    ),
+  ].sort();
+}
+
+function cardCount(state: {
+  pile: unknown[];
+  desk: { card: unknown | null }[];
+}): number {
+  return (
+    state.pile.length + state.desk.filter((s) => s.card !== null).length
+  );
+}
+
+describe("invariants (T6.2)", () => {
+  test("card-count conservation across place, reveal, return, rotate, shuffle", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const n = LIGHT_SEERS_CARDS.length;
+    expect(cardCount(state)).toBe(n);
+    expect(allDefIds(state)).toHaveLength(n);
+    expect(new Set(allDefIds(state)).size).toBe(n);
+
+    state = placeOnDesk(state, "a");
+    state = placeOnDesk(state, "b", { kind: "bottom" });
+    state = placeOnDesk(state, "c", { kind: "index", index: 10 });
+    expect(cardCount(state)).toBe(n);
+    expect(state.pile).toHaveLength(n - 3);
+    expect(allDefIds(state)).toHaveLength(n);
+    expect(new Set(allDefIds(state)).size).toBe(n);
+
+    state = reveal(state, "a");
+    state = rotateDeskCard(state, "b");
+    expect(cardCount(state)).toBe(n);
+
+    state = returnToPile(state, "c", { kind: "index", index: 5 });
+    expect(cardCount(state)).toBe(n);
+    expect(state.pile).toHaveLength(n - 2);
+    expect(state.desk.find((s) => s.id === "c")?.card).toBeNull();
+
+    const random = seqRandom([0.3, 0.7, 0.1, 0.9, 0.4, 0.6, 0.2, 0.8]);
+    state = applyShuffleOps(
+      state,
+      [
+        { type: "mix" },
+        { type: "cut", at: 15 },
+        { type: "rotate", from: 0, count: 5 },
+      ],
+      random,
+    );
+    expect(cardCount(state)).toBe(n);
+    expect(allDefIds(state)).toHaveLength(n);
+    expect(new Set(allDefIds(state)).size).toBe(n);
+
+    state = returnToPile(state, "a", { kind: "bottom" });
+    state = returnToPile(state, "b");
+    expect(cardCount(state)).toBe(n);
+    expect(state.pile).toHaveLength(n);
+    expect(new Set(state.pile.map((c) => c.defId)).size).toBe(n);
+  });
+
+  test("reveal keeps defId and orientation; only faceUp flips", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "focus");
+    const before = peekDesk(state).find((s) => s.id === "focus")!.card!;
+    expect(before.faceUp).toBe(false);
+
+    state = reveal(state, "focus");
+    const after = peekDesk(state).find((s) => s.id === "focus")!.card!;
+    expect(after.defId).toBe(before.defId);
+    expect(after.orientation).toBe(before.orientation);
+    expect(after.faceUp).toBe(true);
+    expect(cardCount(state)).toBe(78);
+  });
+
+  test("place/draw does not change identity of the drawn card", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const top = { ...state.pile[0]! };
+    const bottom = { ...state.pile[77]! };
+    const mid = { ...state.pile[40]! };
+
+    state = placeOnDesk(state, "top");
+    expect(peekDesk(state).find((s) => s.id === "top")!.card).toEqual({
+      ...top,
+      faceUp: false,
+    });
+
+    state = draw(state, "bottom", { kind: "bottom" });
+    expect(peekDesk(state).find((s) => s.id === "bottom")!.card).toEqual({
+      ...bottom,
+      faceUp: false,
+    });
+
+    // Top draw shifts index 40 → 39; bottom draw leaves that slot alone.
+    const midNow = state.pile[39]!;
+    expect(midNow.defId).toBe(mid.defId);
+    state = placeOnDesk(state, "mid", { kind: "index", index: 39 });
+    expect(peekDesk(state).find((s) => s.id === "mid")!.card).toEqual({
+      ...midNow,
+      faceUp: false,
+    });
+    expect(cardCount(state)).toBe(78);
+  });
+
+  test("return keeps defId and orientation; face goes down", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "x");
+    state = reveal(state, "x");
+    state = rotateDeskCard(state, "x");
+    const onDesk = peekDesk(state).find((s) => s.id === "x")!.card!;
+    expect(onDesk.faceUp).toBe(true);
+    expect(onDesk.orientation).toBe("reversed");
+
+    state = returnToPile(state, "x", { kind: "top" });
+    expect(state.desk.find((s) => s.id === "x")?.card).toBeNull();
+    expect(state.pile[0]).toEqual({
+      defId: onDesk.defId,
+      orientation: onDesk.orientation,
+      faceUp: false,
+    });
+    expect(cardCount(state)).toBe(78);
+  });
+
+  test("move/reveal never silently swaps identities across the deck", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const before = allIdentities(state);
+
+    state = placeOnDesk(state, "left");
+    state = placeOnDesk(state, "right", { kind: "bottom" });
+    expect(allIdentities(state)).toEqual(before);
+
+    const leftBefore = peekDesk(state).find((s) => s.id === "left")!.card!;
+    const rightBefore = peekDesk(state).find((s) => s.id === "right")!.card!;
+
+    state = reveal(state, "left");
+    state = reveal(state, "right");
+    expect(allIdentities(state)).toEqual(before);
+    expect(peekDesk(state).find((s) => s.id === "left")!.card!.defId).toBe(
+      leftBefore.defId,
+    );
+    expect(peekDesk(state).find((s) => s.id === "right")!.card!.defId).toBe(
+      rightBefore.defId,
+    );
+
+    state = returnToPile(state, "left", { kind: "index", index: 20 });
+    state = returnToPile(state, "right", { kind: "bottom" });
+    expect(allIdentities(state)).toEqual(before);
+    expect(cardCount(state)).toBe(78);
+  });
+});
+
+describe("snapshot secrecy (T6.3)", () => {
+  test("prophet snapshot hides face-down defId and orientation; peek still sees them", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "a");
+    state = placeOnDesk(state, "b", { kind: "bottom" });
+    state = rotateDeskCard(state, "b");
+
+    const peekA = peekDesk(state).find((s) => s.id === "a")!.card!;
+    const peekB = peekDesk(state).find((s) => s.id === "b")!.card!;
+    expect(peekA.faceUp).toBe(false);
+    expect(peekB.faceUp).toBe(false);
+    expect(peekA.defId).toBeTruthy();
+    expect(peekB.orientation).toBe("reversed");
+
+    const snap = getDeckSnapshot(state);
+    expect(snap.desk).toHaveLength(2);
+    for (const slot of snap.desk) {
+      expect(slot.faceUp).toBe(false);
+      expect(slot.defId).toBeNull();
+      expect(slot.orientation).toBeNull();
+    }
+    expect(JSON.stringify(snap)).not.toContain(peekA.defId);
+    expect(JSON.stringify(snap)).not.toContain(peekB.defId);
+  });
+
+  test("mixed desk: only face-up slots expose identity in snapshot", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "down");
+    state = placeOnDesk(state, "up", { kind: "bottom" });
+    state = reveal(state, "up");
+
+    const peekDown = peekDesk(state).find((s) => s.id === "down")!.card!;
+    const peekUp = peekDesk(state).find((s) => s.id === "up")!.card!;
+
+    const snap = getDeckSnapshot(state);
+    expect(snap.desk.find((t) => t.id === "down")).toMatchObject({
+      faceUp: false,
+      defId: null,
+      orientation: null,
+    });
+    expect(snap.desk.find((t) => t.id === "up")).toMatchObject({
+      faceUp: true,
+      defId: peekUp.defId,
+      orientation: peekUp.orientation,
+    });
+
+    const encoded = JSON.stringify(snap);
+    expect(encoded).not.toContain(peekDown.defId);
+    expect(encoded).toContain(peekUp.defId);
+  });
+
+  test("snapshot exposes pileCount only — never pile card identities", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const topId = state.pile[0]!.defId;
+    const midId = state.pile[40]!.defId;
+    state = placeOnDesk(state, "focus");
+
+    const snap = getDeckSnapshot(state);
+    expect(snap.pileCount).toBe(77);
+    expect(snap).not.toHaveProperty("pile");
+    expect(Object.keys(snap).sort()).toEqual(["deckId", "desk", "pileCount"]);
+
+    const encoded = JSON.stringify(snap);
+    expect(encoded).not.toContain(topId);
+    expect(encoded).not.toContain(midId);
+    expect(encoded).not.toContain(peekDesk(state).find((s) => s.id === "focus")!.card!.defId);
+  });
+
+  test("empty desk slots stay null in snapshot; reveal then matches peek", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = selectSpread(state, THREE_ROADS);
+    let snap = getDeckSnapshot(state);
+    expect(snap.desk.every((t) => t.defId === null && !t.faceUp && t.orientation === null)).toBe(
+      true,
+    );
+
+    state = placeOnDesk(state, "situation");
+    const hidden = peekDesk(state).find((s) => s.id === "situation")!.card!;
+    snap = getDeckSnapshot(state);
+    expect(snap.desk.find((t) => t.id === "situation")).toMatchObject({
+      faceUp: false,
+      defId: null,
+      orientation: null,
+    });
+
+    state = reveal(state, "situation");
+    snap = getDeckSnapshot(state);
+    expect(snap.desk.find((t) => t.id === "situation")).toMatchObject({
+      faceUp: true,
+      defId: hidden.defId,
+      orientation: hidden.orientation,
+    });
+  });
 });
 
 describe("shuffle ops", () => {
