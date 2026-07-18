@@ -629,6 +629,101 @@ describe("invariants (T6.2)", () => {
   });
 });
 
+describe("snapshot secrecy (T6.3)", () => {
+  test("prophet snapshot hides face-down defId and orientation; peek still sees them", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "a");
+    state = placeOnDesk(state, "b", { kind: "bottom" });
+    state = rotateDeskCard(state, "b");
+
+    const peekA = peekDesk(state).find((s) => s.id === "a")!.card!;
+    const peekB = peekDesk(state).find((s) => s.id === "b")!.card!;
+    expect(peekA.faceUp).toBe(false);
+    expect(peekB.faceUp).toBe(false);
+    expect(peekA.defId).toBeTruthy();
+    expect(peekB.orientation).toBe("reversed");
+
+    const snap = getDeckSnapshot(state);
+    expect(snap.desk).toHaveLength(2);
+    for (const slot of snap.desk) {
+      expect(slot.faceUp).toBe(false);
+      expect(slot.defId).toBeNull();
+      expect(slot.orientation).toBeNull();
+    }
+    expect(JSON.stringify(snap)).not.toContain(peekA.defId);
+    expect(JSON.stringify(snap)).not.toContain(peekB.defId);
+  });
+
+  test("mixed desk: only face-up slots expose identity in snapshot", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = placeOnDesk(state, "down");
+    state = placeOnDesk(state, "up", { kind: "bottom" });
+    state = reveal(state, "up");
+
+    const peekDown = peekDesk(state).find((s) => s.id === "down")!.card!;
+    const peekUp = peekDesk(state).find((s) => s.id === "up")!.card!;
+
+    const snap = getDeckSnapshot(state);
+    expect(snap.desk.find((t) => t.id === "down")).toMatchObject({
+      faceUp: false,
+      defId: null,
+      orientation: null,
+    });
+    expect(snap.desk.find((t) => t.id === "up")).toMatchObject({
+      faceUp: true,
+      defId: peekUp.defId,
+      orientation: peekUp.orientation,
+    });
+
+    const encoded = JSON.stringify(snap);
+    expect(encoded).not.toContain(peekDown.defId);
+    expect(encoded).toContain(peekUp.defId);
+  });
+
+  test("snapshot exposes pileCount only — never pile card identities", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    const topId = state.pile[0]!.defId;
+    const midId = state.pile[40]!.defId;
+    state = placeOnDesk(state, "focus");
+
+    const snap = getDeckSnapshot(state);
+    expect(snap.pileCount).toBe(77);
+    expect(snap).not.toHaveProperty("pile");
+    expect(Object.keys(snap).sort()).toEqual(["deckId", "desk", "pileCount"]);
+
+    const encoded = JSON.stringify(snap);
+    expect(encoded).not.toContain(topId);
+    expect(encoded).not.toContain(midId);
+    expect(encoded).not.toContain(peekDesk(state).find((s) => s.id === "focus")!.card!.defId);
+  });
+
+  test("empty desk slots stay null in snapshot; reveal then matches peek", () => {
+    let state = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+    state = selectSpread(state, THREE_ROADS);
+    let snap = getDeckSnapshot(state);
+    expect(snap.desk.every((t) => t.defId === null && !t.faceUp && t.orientation === null)).toBe(
+      true,
+    );
+
+    state = placeOnDesk(state, "situation");
+    const hidden = peekDesk(state).find((s) => s.id === "situation")!.card!;
+    snap = getDeckSnapshot(state);
+    expect(snap.desk.find((t) => t.id === "situation")).toMatchObject({
+      faceUp: false,
+      defId: null,
+      orientation: null,
+    });
+
+    state = reveal(state, "situation");
+    snap = getDeckSnapshot(state);
+    expect(snap.desk.find((t) => t.id === "situation")).toMatchObject({
+      faceUp: true,
+      defId: hidden.defId,
+      orientation: hidden.orientation,
+    });
+  });
+});
+
 describe("shuffle ops", () => {
   const ids = (pile: { defId: string }[]) => pile.map((c) => c.defId);
   const sortedIds = (pile: { defId: string }[]) => [...ids(pile)].sort();
