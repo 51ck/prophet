@@ -83,7 +83,7 @@ Gap: free desk moves (return, draw bottom/middle into desk), full free-mode test
 
 **Tasks:**
 
-- [ ] **T6.1** Expand `engine.test.ts` (or sibling) for scenarios 1–5 above
+- [x] **T6.1** Expand `engine.test.ts` (or sibling) for scenarios 1–5 above
 - [ ] **T6.2** Invariant tests: card-count conservation; no silent identity change on move/reveal
 - [ ] **T6.3** Snapshot secrecy tests: prophet-facing view hides face-down; peek not exported to agent tools
 
