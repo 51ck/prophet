@@ -6,7 +6,7 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 
 ## Ownership
 
-- Deck state and shuffle/draw/open mechanics — pile + desk; pile addressing (top / bottom / index); free verbs per [tech/ritual-tasks.md](../../tech/ritual-tasks.md)
+- Deck state and shuffle/draw/open mechanics — pile + desk; pile addressing (top / bottom / index); free verbs per [tech/ritual-tasks.md](../../tech/ritual-tasks.md); Mastra tools: `shuffle`, `draw`, `drawToPositions`, `returnToPile`, `rotate`, `openPosition`, `getDeckSnapshot`
 - Session state machine
 - Seeker memory store — `SeekerMemory` keyed by seeker id; Phase 1 profile fields `language` (`ru`|`en`), `preferredName`, `selfNotes` plus continuity `notes` / `pastDeckIds`; normalize trims name/self and drops whitespace-only
 - Profile read/write verbs (`readProfile` / `updateProfile` + tools) bound to `session.seekerId` only — no seeker selector

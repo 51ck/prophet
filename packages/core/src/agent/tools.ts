@@ -6,7 +6,7 @@ import {
   createAskWithOptions,
 } from "../ask/ask-with-options.ts";
 import type { ReadingRuntime } from "../runtime/reading-runtime.ts";
-import type { ShuffleOp } from "../ritual/types.ts";
+import type { PileAddress, ShuffleOp } from "../ritual/types.ts";
 
 const shuffleOpSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("mix") }),
@@ -20,6 +20,18 @@ const shuffleOpSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("rotate"), count: z.number().int().positive().optional() }),
   z.object({ type: z.literal("seekerCut"), at: z.number().min(0).max(1) }),
 ]);
+
+/** Pile address for draw/return. Default top when omitted at call sites. */
+const pileAddressSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("top") }),
+  z.object({ kind: z.literal("bottom") }),
+  z.object({
+    kind: z.literal("index"),
+    index: z.number().int().nonnegative(),
+  }),
+]);
+
+const defaultPileAddress = { kind: "top" as const };
 
 /** Current-seeker profile only — no seekerId selector. */
 export const readSeekerProfileInputSchema = z.object({});
@@ -91,9 +103,29 @@ export function createPythiaTools(runtime: ReadingRuntime) {
     },
   });
 
+  const draw = createTool({
+    id: "draw",
+    description:
+      "Place one card from the pile onto a desk slot face-down (top / bottom / index). Creates a free slot if id is new.",
+    inputSchema: z.object({
+      slotId: z.string().min(1),
+      address: pileAddressSchema.optional(),
+      role: z.string().optional(),
+    }),
+    execute: async ({ slotId, address, role }) => {
+      const snapshot = runtime.place(
+        slotId,
+        (address ?? defaultPileAddress) as PileAddress,
+        role,
+      );
+      return { snapshot };
+    },
+  });
+
   const drawToPositions = createTool({
     id: "drawToPositions",
-    description: "Draw cards from the pile into empty spread positions face-down.",
+    description:
+      "Fill all empty desk slots from pile top face-down (composes draw/place). Convenience for named spreads.",
     inputSchema: z.object({}),
     execute: async () => {
       runtime.draw();
@@ -101,9 +133,40 @@ export function createPythiaTools(runtime: ReadingRuntime) {
     },
   });
 
+  const returnToPile = createTool({
+    id: "returnToPile",
+    description:
+      "Return one desk card to the pile (top / bottom / index). Slot left empty; card face-down.",
+    inputSchema: z.object({
+      slotId: z.string().min(1),
+      address: pileAddressSchema.optional(),
+    }),
+    execute: async ({ slotId, address }) => {
+      const snapshot = runtime.returnCard(
+        slotId,
+        (address ?? defaultPileAddress) as PileAddress,
+      );
+      return { snapshot };
+    },
+  });
+
+  const rotate = createTool({
+    id: "rotate",
+    description:
+      "Flip orientation (upright ↔ reversed) on one desk card. Pile-segment rotate is a shuffle op.",
+    inputSchema: z.object({
+      slotId: z.string().min(1),
+    }),
+    execute: async ({ slotId }) => {
+      const snapshot = runtime.rotate(slotId);
+      return { snapshot };
+    },
+  });
+
   const openPosition = createTool({
     id: "openPosition",
-    description: "Open (reveal) a face-down card at a table position.",
+    description:
+      "Reveal (open) a face-down card at a desk slot. Identity stays hidden until this call.",
     inputSchema: z.object({
       positionId: z.string(),
     }),
@@ -116,7 +179,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
   const getDeckSnapshot = createTool({
     id: "getDeckSnapshot",
     description:
-      "Inspect table: face-up cards show identity; face-down hide identity.",
+      "Inspect desk: face-up cards show identity; face-down hide identity. Never peeks face-down defId.",
     inputSchema: z.object({}),
     execute: async () => runtime.snapshot(),
   });
@@ -214,7 +277,10 @@ export function createPythiaTools(runtime: ReadingRuntime) {
     confirmDeck,
     beginRitual,
     shuffle,
+    draw,
     drawToPositions,
+    returnToPile,
+    rotate,
     openPosition,
     getDeckSnapshot,
     recallSeekerMemory,

@@ -11,9 +11,17 @@ import {
   drawToPositions,
   getDeckSnapshot,
   openPosition,
+  placeOnDesk,
+  returnToPile,
+  rotateDeskCard,
   selectSpread,
 } from "../ritual/engine.ts";
-import type { DeckState, ShuffleOp, SpreadDef } from "../ritual/types.ts";
+import type {
+  DeckState,
+  PileAddress,
+  ShuffleOp,
+  SpreadDef,
+} from "../ritual/types.ts";
 import {
   confirmDeck,
   createSession,
@@ -48,7 +56,22 @@ export type ReadingRuntime = {
   confirmDeck(deckId: string): void;
   beginRitual(spreadId?: string): void;
   shuffle(ops: ShuffleOp[]): void;
+  /** Fill empty desk slots from pile top (composes place). */
   draw(): void;
+  /** Place one card from pile address onto a desk slot (face-down). */
+  place(
+    slotId: string,
+    address?: PileAddress,
+    role?: string,
+  ): ReturnType<typeof getDeckSnapshot>;
+  /** Return one desk card to the pile at address. */
+  returnCard(
+    slotId: string,
+    address?: PileAddress,
+  ): ReturnType<typeof getDeckSnapshot>;
+  /** Flip orientation on one desk card. */
+  rotate(slotId: string): ReturnType<typeof getDeckSnapshot>;
+  /** Reveal (open) a face-down desk card. */
   open(positionId: string): ReturnType<typeof getDeckSnapshot>;
   snapshot(): ReturnType<typeof getDeckSnapshot> | { empty: true };
   close(): void;
@@ -71,6 +94,15 @@ export function createReadingRuntime(opts: {
   let session = createSession(opts.seekerId, opts.sessionId);
   let deck: DeckState | null = null;
   let memory = opts.initialMemory;
+
+  /** Desk/pile mutators only after beginRitual — avoids lost cards when selectSpread replaces desk. */
+  const requireRitualDeck = (verb: string): DeckState => {
+    if (!deck) throw new Error("Deck not ready");
+    if (session.phase !== "ritual") {
+      throw new Error(`${verb} only in ritual, got ${session.phase}`);
+    }
+    return deck;
+  };
 
   const runtime: ReadingRuntime = {
     get session() {
@@ -119,21 +151,30 @@ export function createReadingRuntime(opts: {
     },
 
     shuffle(ops: ShuffleOp[]) {
-      if (!deck) throw new Error("Deck not ready");
-      if (session.phase !== "ritual") {
-        throw new Error(`Shuffle only in ritual, got ${session.phase}`);
-      }
-      deck = applyShuffleOps(deck, ops);
+      deck = applyShuffleOps(requireRitualDeck("Shuffle"), ops);
     },
 
     draw() {
-      if (!deck) throw new Error("Deck not ready");
-      deck = drawToPositions(deck);
+      deck = drawToPositions(requireRitualDeck("Draw"));
+    },
+
+    place(slotId, address = { kind: "top" }, role = "free") {
+      deck = placeOnDesk(requireRitualDeck("Place"), slotId, address, role);
+      return getDeckSnapshot(deck);
+    },
+
+    returnCard(slotId, address = { kind: "top" }) {
+      deck = returnToPile(requireRitualDeck("Return"), slotId, address);
+      return getDeckSnapshot(deck);
+    },
+
+    rotate(slotId) {
+      deck = rotateDeskCard(requireRitualDeck("Rotate"), slotId);
+      return getDeckSnapshot(deck);
     },
 
     open(positionId: string) {
-      if (!deck) throw new Error("Deck not ready");
-      deck = openPosition(deck, positionId);
+      deck = openPosition(requireRitualDeck("Open"), positionId);
       return getDeckSnapshot(deck);
     },
 
