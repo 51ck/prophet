@@ -224,6 +224,23 @@ export const CHOICE: SpreadDef = {
   ],
 };
 
+export const CELTIC_CROSS: SpreadDef = {
+  id: "celtic-cross",
+  name: "Celtic Cross",
+  positions: [
+    { id: "present", role: "Heart of the matter — present" },
+    { id: "cross", role: "Crossing influence — challenge or catalyst" },
+    { id: "foundation", role: "Foundation — root / basis" },
+    { id: "recent-past", role: "Recent past — what is fading" },
+    { id: "crown", role: "Crown — possible best / conscious aim" },
+    { id: "near-future", role: "Near future — what approaches" },
+    { id: "self", role: "Self — how the seeker stands in this" },
+    { id: "environment", role: "Environment — others / setting" },
+    { id: "hopes-fears", role: "Hopes and fears" },
+    { id: "outcome", role: "Outcome — most likely resolution if the path continues" },
+  ],
+};
+
 /** Named spread replaces the desk layout (spread-kind empty slots). */
 export function selectSpread(state: DeckState, spread: SpreadDef): DeckState {
   const next = cloneState(state);

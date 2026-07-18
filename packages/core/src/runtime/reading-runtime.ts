@@ -6,6 +6,7 @@ import type {
 } from "../memory/store.ts";
 import {
   CARD_OF_DAY,
+  CELTIC_CROSS,
   CHOICE,
   PAST_PRESENT_FUTURE,
   RELATIONSHIP,
@@ -49,6 +50,7 @@ const spreads: Record<string, SpreadDef> = {
   [RELATIONSHIP.id]: RELATIONSHIP,
   [WORK_FINANCE.id]: WORK_FINANCE,
   [CHOICE.id]: CHOICE,
+  [CELTIC_CROSS.id]: CELTIC_CROSS,
 };
 
 /** Phase 1 soft profile — always the runtime session seeker. */
