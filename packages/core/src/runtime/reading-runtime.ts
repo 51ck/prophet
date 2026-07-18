@@ -8,7 +8,6 @@ import {
   THREE_ROADS,
   applyShuffleOps,
   createDeckState,
-  drawToPositions,
   getDeckSnapshot,
   openPosition,
   placeOnDesk,
@@ -56,7 +55,10 @@ export type ReadingRuntime = {
   confirmDeck(deckId: string): void;
   beginRitual(spreadId?: string): void;
   shuffle(ops: ShuffleOp[]): void;
-  /** Fill empty desk slots from pile top (composes place). */
+  /**
+   * Fill empty desk slots from pile top by composing placeOnDesk
+   * (same free verbs as engine T5.6 — not a drawToPositions bypass).
+   */
   draw(): void;
   /** Place one card from pile address onto a desk slot (face-down). */
   place(
@@ -155,7 +157,16 @@ export function createReadingRuntime(opts: {
     },
 
     draw() {
-      deck = drawToPositions(requireRitualDeck("Draw"));
+      // Compose place into each empty slot (T7.4 / T5.6) — same as drawToPositions.
+      let next = requireRitualDeck("Draw");
+      const emptyIds = next.desk
+        .filter((s) => s.card === null)
+        .map((s) => s.id);
+      for (const id of emptyIds) {
+        if (next.pile.length === 0) break;
+        next = placeOnDesk(next, id);
+      }
+      deck = next;
     },
 
     place(slotId, address = { kind: "top" }, role = "free") {
