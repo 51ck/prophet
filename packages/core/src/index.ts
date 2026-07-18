@@ -1,7 +1,12 @@
 export { LIGHT_SEERS_CARDS, LIGHT_SEERS_DECK_ID } from "./deck/light-seers.ts";
 export {
-  THREE_ROADS,
+  CARD_OF_DAY,
+  PAST_PRESENT_FUTURE,
   SINGLE_FOCUS,
+  THREE_ROADS,
+  THOUGHTS_FEELINGS_ACTIONS,
+  TWO_POLES,
+  YES_NO,
   addFreeSlot,
   applyShuffleOp,
   applyShuffleOps,

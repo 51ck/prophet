@@ -120,6 +120,59 @@ export function applyShuffleOps(
   return ops.reduce((s, op) => applyShuffleOp(s, op, random), state);
 }
 
+export const CARD_OF_DAY: SpreadDef = {
+  id: "card-of-day",
+  name: "Card of the Day",
+  positions: [
+    { id: "focus", role: "Focus — daily atmosphere or one piece of counsel" },
+  ],
+};
+
+export const SINGLE_FOCUS: SpreadDef = {
+  id: "single-focus",
+  name: "Single Focus",
+  positions: [{ id: "focus", role: "Focus — the hinge of the question" }],
+};
+
+export const YES_NO: SpreadDef = {
+  id: "yes-no",
+  name: "Yes / No",
+  positions: [
+    { id: "answer", role: "Answer — the direct yes/no lean" },
+    { id: "nuance", role: "Nuance — what colors or complicates the answer" },
+    { id: "advice", role: "Advice — what to hold or do with it" },
+  ],
+};
+
+export const TWO_POLES: SpreadDef = {
+  id: "two-poles",
+  name: "Two Poles",
+  positions: [
+    { id: "pole-a", role: "Pole A — one side of the either/or" },
+    { id: "pole-b", role: "Pole B — the other side" },
+  ],
+};
+
+export const PAST_PRESENT_FUTURE: SpreadDef = {
+  id: "past-present-future",
+  name: "Past — Present — Future",
+  positions: [
+    { id: "past", role: "Past — what led here" },
+    { id: "present", role: "Present — how it sits now" },
+    { id: "future", role: "Future — unfolding to watch" },
+  ],
+};
+
+export const THOUGHTS_FEELINGS_ACTIONS: SpreadDef = {
+  id: "thoughts-feelings-actions",
+  name: "Thoughts — Feelings — Actions",
+  positions: [
+    { id: "thoughts", role: "Thoughts — mind / what is held" },
+    { id: "feelings", role: "Feelings — heart / what is felt" },
+    { id: "actions", role: "Actions — behavior / what is done" },
+  ],
+};
+
 export const THREE_ROADS: SpreadDef = {
   id: "three-roads",
   name: "Three Roads",
@@ -128,12 +181,6 @@ export const THREE_ROADS: SpreadDef = {
     { id: "counsel", role: "Counsel — what to hold or do" },
     { id: "path", role: "Path — unfolding to watch" },
   ],
-};
-
-export const SINGLE_FOCUS: SpreadDef = {
-  id: "single-focus",
-  name: "Single Focus",
-  positions: [{ id: "focus", role: "Focus — the hinge of the question" }],
 };
 
 /** Named spread replaces the desk layout (spread-kind empty slots). */

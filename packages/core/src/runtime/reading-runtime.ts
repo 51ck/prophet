@@ -5,7 +5,13 @@ import type {
   SeekerMemory,
 } from "../memory/store.ts";
 import {
+  CARD_OF_DAY,
+  PAST_PRESENT_FUTURE,
+  SINGLE_FOCUS,
   THREE_ROADS,
+  THOUGHTS_FEELINGS_ACTIONS,
+  TWO_POLES,
+  YES_NO,
   applyShuffleOps,
   createDeckState,
   getDeckSnapshot,
@@ -30,6 +36,12 @@ import {
 } from "../session/session.ts";
 
 const spreads: Record<string, SpreadDef> = {
+  [CARD_OF_DAY.id]: CARD_OF_DAY,
+  [SINGLE_FOCUS.id]: SINGLE_FOCUS,
+  [YES_NO.id]: YES_NO,
+  [TWO_POLES.id]: TWO_POLES,
+  [PAST_PRESENT_FUTURE.id]: PAST_PRESENT_FUTURE,
+  [THOUGHTS_FEELINGS_ACTIONS.id]: THOUGHTS_FEELINGS_ACTIONS,
   [THREE_ROADS.id]: THREE_ROADS,
 };
 
