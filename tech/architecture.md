@@ -108,15 +108,20 @@ Map from [agent.md](../spec/agent.md):
 | Intake / lock question | Agent dialogue + `lockQuestion` |
 | Offer / confirm deck | Agent dialogue + `confirmDeck` |
 | Shuffle ops | `shuffle` (mix, cut, shift, rotate, seekerCut) |
-| Select spread | `selectSpread` |
-| Draw | `drawToPositions` |
+| Select spread | `beginRitual` / select-spread layout |
+| Draw / place | `draw` (pile → one desk slot; top/bottom/index); `drawToPositions` fills empty slots |
+| Return | `returnToPile` (desk → pile; top/bottom/index) |
+| Rotate (desk) | `rotate` (desk card orientation); pile rotate via `shuffle` |
 | Open / reveal | `openPosition` |
+| Inspect snapshot | `getDeckSnapshot` |
 | Interpret | Agent (reads deck content + opened state) |
 | Save memory | `saveSeekerMemory` |
 | Close session | `closeSession` |
 | Refactor memories | `refactorSeekerMemory` |
 | Defer / refuse | Agent + `endWithoutRitual` |
 | Closed ask (options) | `askWithOptions` (channel-agnostic; adapter chrome) |
+
+Ritual/deck tool results return secrecy-safe snapshots only (`getDeckSnapshot` shape): face-down slots hide `defId` + orientation; pile identities never included. `peekDesk` is tests/trusted-only — not a Mastra tool.
 
 ## Deck content
 

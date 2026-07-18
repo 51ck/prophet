@@ -6,7 +6,8 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 
 ## Ownership
 
-- Deck state and shuffle/draw/open mechanics — pile + desk; pile addressing (top / bottom / index); free verbs per [tech/ritual-tasks.md](../../tech/ritual-tasks.md)
+- Deck state and shuffle/draw/open mechanics — pile + desk; pile addressing (top / bottom / index); free verbs per [tech/ritual-tasks.md](../../tech/ritual-tasks.md); Mastra tools: `shuffle`, `draw`, `drawToPositions`, `returnToPile`, `rotate`, `openPosition`, `getDeckSnapshot`
+- Reading runtime session ritual: `beginRitual` = `selectSpread` layout; `draw` fills empty slots by composing `placeOnDesk` (T5.6 / T7.4 — not a separate bypass path)
 - Session state machine
 - Seeker memory store — `SeekerMemory` keyed by seeker id; Phase 1 profile fields `language` (`ru`|`en`), `preferredName`, `selfNotes` plus continuity `notes` / `pastDeckIds`; normalize trims name/self and drops whitespace-only
 - Profile read/write verbs (`readProfile` / `updateProfile` + tools) bound to `session.seekerId` only — no seeker selector
@@ -15,6 +16,7 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 - Presence / fresh session: agent speaks (channel cues `[presence]` / `[new]`); no hardcoded opener scripts
 - Name/self introduce helpers (`needsNameSelf` / `nameSelfAsk`); prompt asks free-prose name + few words after language (once; skip if ask already in thread), fills via `updateSeekerProfile` without meta disclosure
 - Prompt: use preferredName/selfNotes/language fluently; never narrate persistence/CRM; never imply multi-seeker or other profiles (isolation hard rule)
+- Prompt ritual: narrate only ops actually called (shuffle/draw/return/rotate/open); never claim face-down identity; free tools allowed without inventing cards
 - Pythia agent + tool wiring
 - Closed “ask with options” verb (`askWithOptions`: prefer 2–3, max 6; optional skip; no channel chrome) — Pythia prefers it for closed simple asks; open intake / name+self stay free prose; never force-retry until seeker taps — free answer / decline always valid ([spec/telegram-ux.md](../../spec/telegram-ux.md))
 - Light Seer’s structured deck data for Phase 1
@@ -22,6 +24,7 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 ## Local Contracts
 
 - Must not invent card outcomes; tools mutate real deck state only
+- Ritual/deck Mastra tool results use secrecy-safe `getDeckSnapshot` only — never raw `DeckState` / `peekDesk`; face-down `defId` + orientation stay hidden
 - Follow [tech/architecture.md](../../tech/architecture.md) and [spec/](../../spec/AGENTS.md)
 - No channel adapters in this package
 
