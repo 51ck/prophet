@@ -6,6 +6,7 @@ import {
   createAskWithOptions,
 } from "../ask/ask-with-options.ts";
 import type { ReadingRuntime } from "../runtime/reading-runtime.ts";
+import { CATALOG_SPREAD_IDS } from "../ritual/spread-offer.ts";
 import type { PileAddress, ShuffleOp } from "../ritual/types.ts";
 
 const shuffleOpSchema = z.discriminatedUnion("type", [
@@ -84,9 +85,10 @@ export function createPythiaTools(runtime: ReadingRuntime) {
 
   const beginRitual = createTool({
     id: "beginRitual",
-    description: "Enter ritual with a spread (default three-roads).",
+    description:
+      "After Commit only (once): enter ritual with a catalog spread. Prefer fewer cards; card-of-day only on day-card path; sharp one-hinge → single-focus; default lean three-roads. Never call before Commit or again after ritual has begun.",
     inputSchema: z.object({
-      spreadId: z.string().default("three-roads"),
+      spreadId: z.enum(CATALOG_SPREAD_IDS).default("three-roads"),
     }),
     execute: async ({ spreadId }) => {
       runtime.beginRitual(spreadId);

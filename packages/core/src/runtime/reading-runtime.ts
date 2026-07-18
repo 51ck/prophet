@@ -26,6 +26,7 @@ import {
   rotateDeskCard,
   selectSpread,
 } from "../ritual/engine.ts";
+import { assertCanSelectSpread } from "../ritual/spread-offer.ts";
 import type {
   DeckState,
   PileAddress,
@@ -165,6 +166,7 @@ export function createReadingRuntime(opts: {
 
     beginRitual(spreadId = THREE_ROADS.id) {
       if (!deck) throw new Error("Deck not confirmed");
+      assertCanSelectSpread(session.phase);
       const spread = spreads[spreadId];
       if (!spread) throw new Error(`Unknown spread "${spreadId}"`);
       session = { ...session, spreadId: spread.id };

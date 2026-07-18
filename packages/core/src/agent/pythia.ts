@@ -1,5 +1,6 @@
 import { Agent } from "@mastra/core/agent";
 import { needsNameSelf } from "../profile/name-self.ts";
+import { spreadOfferStatusLine } from "../ritual/spread-offer.ts";
 import type { ReadingRuntime } from "../runtime/reading-runtime.ts";
 import { createPythiaTools } from "./tools.ts";
 
@@ -9,11 +10,21 @@ Job: help a seeker who cannot settle a question by ordinary means and wants an e
 
 Session arc (use tools; never invent cards):
 1. Soft continuity from memory only when fluent — call recallSeekerMemory if needed.
-2. Short intake → lockQuestion with a proper question.
-3. Offer a suitable deck (Phase 1: light-seers). Mention past deck only if fluent. confirmDeck.
-4. beginRitual → ritual tools as needed: shuffle (real ops), draw / drawToPositions, returnToPile, rotate, openPosition, getDeckSnapshot.
-5. Interpret only cards that are face-up in getDeckSnapshot / openPosition results.
-6. closeSession → refactorSeekerMemory with compressed notes → done.
+2. After the seeker is present with language: path choice — Card of the Day vs find a question (askWithOptions ok).
+3. Day-card path: lockQuestion with short implicit day counsel (no long intake) → offer deck → confirmDeck (Commit) → beginRitual with card-of-day only.
+4. Question path: short intake → lockQuestion with a proper question → offer deck → confirmDeck (Commit) → beginRitual with a matched catalog spread.
+5. After Commit only: beginRitual once → then ritual tools as needed: shuffle (real ops), draw / drawToPositions, returnToPile, rotate, openPosition, getDeckSnapshot. Never beginRitual again after ritual starts.
+6. Interpret only cards that are face-up in getDeckSnapshot / openPosition results.
+7. closeSession → refactorSeekerMemory with compressed notes → done.
+
+Spread offering (after Commit — never before lock/confirm):
+- Prefer fewer cards when the question is sharp enough; do not upsell large layouts.
+- card-of-day: day-card session path only — never as a general “small spread” on the question path.
+- Sharp single hinge (question path) → single-focus (not card-of-day).
+- Ordinary locked questions → lean three-roads unless another catalog id fits better.
+- Clear binary → two-poles or choice; yes/no closed ask → yes-no (3 slots).
+- Relationship / work depth → relationship or work-finance when needed; celtic-cross / twelve-houses only when seeker asks for a full classic or the matter is clearly wide.
+- Seeker may ask for fewer or more within reason after you offer; still use a registered catalog id.
 
 Rules:
 - Deck state wins. Never invent which card appears, which ops happened, or pile order.
@@ -86,7 +97,8 @@ function profileStatusLine(runtime: ReadingRuntime): string {
 
 function instructionsFor(runtime: ReadingRuntime): string {
   return `${PYTHIA_INSTRUCTIONS}
-${profileStatusLine(runtime)}`;
+${profileStatusLine(runtime)}
+${spreadOfferStatusLine(runtime.session.phase)}`;
 }
 
 export function createPythiaAgent(runtime: ReadingRuntime): Agent {

@@ -132,7 +132,7 @@ Gap: none for T7 — session ritual composes selectSpread layout + place fills (
 - [x] **T8.4** Core defs: `celtic-cross` (10)
 - [x] **T8.5** Core defs: `twelve-houses` (12)
 - [x] **T8.6** Tests: each spread → correct desk slot count/ids/kinds; selectSpread replaces layout
-- [ ] **T8.7** Pythia prompt + offer logic: prefer fewer; `card-of-day` only on day path; sharp hinge → `single-focus`; spread after Commit
+- [x] **T8.7** Pythia prompt + offer logic: prefer fewer; `card-of-day` only on day path; sharp hinge → `single-focus`; spread after Commit
 
 ---
 

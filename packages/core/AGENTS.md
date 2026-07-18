@@ -20,6 +20,7 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 - Name/self introduce helpers (`needsNameSelf` / `nameSelfAsk`); prompt asks free-prose name + few words after language (once; skip if ask already in thread), fills via `updateSeekerProfile` without meta disclosure
 - Prompt: use preferredName/selfNotes/language fluently; never narrate persistence/CRM; never imply multi-seeker or other profiles (isolation hard rule)
 - Prompt ritual: narrate only ops actually called (shuffle/draw/return/rotate/open); never claim face-down identity; free tools allowed without inventing cards
+- Prompt + offer logic (T8.7): prefer fewer cards; `card-of-day` only on day-card path (prompt-only until T9 `sessionPath`); sharp hinge → `single-focus`; `beginRitual` / select spread only in `committed` (not again in `ritual` — would replace desk) — `assertCanSelectSpread` + phase line in instructions; catalog ids via `CATALOG_SPREAD_IDS`
 - Pythia agent + tool wiring
 - Closed “ask with options” verb (`askWithOptions`: prefer 2–3, max 6; optional skip; no channel chrome) — Pythia prefers it for closed simple asks; open intake / name+self stay free prose; never force-retry until seeker taps — free answer / decline always valid ([spec/telegram-ux.md](../../spec/telegram-ux.md))
 - Light Seer’s structured deck data for Phase 1

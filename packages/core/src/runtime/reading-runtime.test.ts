@@ -116,34 +116,25 @@ describe("reading runtime arc", () => {
       },
     );
 
-    test("beginRitual replaces prior spread layout", async () => {
+    test("beginRitual rejects re-select mid-ritual (desk conserved)", async () => {
       const runtime = await runtimeAtCommitted();
       runtime.beginRitual("three-roads");
       runtime.place("situation");
-      expect(runtime.deck!.desk.filter((s) => s.card !== null)).toHaveLength(1);
-      expect(runtime.deck!.desk.map((s) => s.id)).toEqual([
-        "situation",
-        "counsel",
-        "path",
-      ]);
+      const deskBefore = runtime.deck!.desk.map((s) => ({
+        id: s.id,
+        hasCard: s.card !== null,
+      }));
+      const pileLen = runtime.deck!.pile.length;
 
-      runtime.beginRitual("celtic-cross");
-      expect(runtime.session.spreadId).toBe("celtic-cross");
-      expect(runtime.deck!.desk).toHaveLength(10);
-      expect(runtime.deck!.desk.map((s) => s.id)).toEqual(
-        CELTIC_CROSS.positions.map((p) => p.id),
+      expect(() => runtime.beginRitual("celtic-cross")).toThrow(
+        /Spread already applied in ritual/,
       );
-      expect(runtime.deck!.desk.every((s) => s.kind === "spread")).toBe(true);
-      expect(runtime.deck!.desk.every((s) => s.card === null)).toBe(true);
-
-      runtime.beginRitual("twelve-houses");
-      expect(runtime.session.spreadId).toBe("twelve-houses");
-      expect(runtime.deck!.desk).toHaveLength(12);
-      expect(runtime.deck!.desk.map((s) => s.id)).toEqual(
-        TWELVE_HOUSES.positions.map((p) => p.id),
+      expect(runtime.session.spreadId).toBe("three-roads");
+      expect(runtime.session.phase).toBe("ritual");
+      expect(runtime.deck!.desk.map((s) => ({ id: s.id, hasCard: s.card !== null }))).toEqual(
+        deskBefore,
       );
-      expect(runtime.deck!.desk.every((s) => s.kind === "spread")).toBe(true);
-      expect(runtime.deck!.desk.every((s) => s.card === null)).toBe(true);
+      expect(runtime.deck!.pile.length).toBe(pileLen);
     });
   });
 });

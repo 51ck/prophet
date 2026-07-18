@@ -48,6 +48,13 @@ export type {
   TablePosition,
 } from "./ritual/types.ts";
 export {
+  CATALOG_SPREAD_IDS,
+  assertCanSelectSpread,
+  canSelectSpread,
+  spreadOfferStatusLine,
+} from "./ritual/spread-offer.ts";
+export type { CatalogSpreadId } from "./ritual/spread-offer.ts";
+export {
   confirmDeck,
   createSession,
   lockQuestion,
