@@ -13,6 +13,7 @@ import {
   SINGLE_FOCUS,
   THREE_ROADS,
   THOUGHTS_FEELINGS_ACTIONS,
+  TWELVE_HOUSES,
   TWO_POLES,
   WORK_FINANCE,
   YES_NO,
@@ -51,6 +52,7 @@ const spreads: Record<string, SpreadDef> = {
   [WORK_FINANCE.id]: WORK_FINANCE,
   [CHOICE.id]: CHOICE,
   [CELTIC_CROSS.id]: CELTIC_CROSS,
+  [TWELVE_HOUSES.id]: TWELVE_HOUSES,
 };
 
 /** Phase 1 soft profile — always the runtime session seeker. */

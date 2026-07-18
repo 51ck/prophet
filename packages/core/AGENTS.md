@@ -10,7 +10,7 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 - Reading runtime session ritual: `beginRitual` = `selectSpread` layout; `draw` fills empty slots by composing `placeOnDesk` (T5.6 / T7.4 — not a separate bypass path)
 - Simple-tier spreads as fixed `SpreadDef` + runtime map: `card-of-day`, `single-focus`, `yes-no` (3), `two-poles`, `past-present-future`, `thoughts-feelings-actions`, `three-roads` — ids/roles per [spec/spreads.md](../../spec/spreads.md)
 - Thematic spreads as fixed `SpreadDef` + runtime map: `relationship` (7), `work-finance` (6), `choice` (7) — ids/roles per [spec/spreads.md](../../spec/spreads.md)
-- Complex classic spread as fixed `SpreadDef` + runtime map: `celtic-cross` (10) — ids/roles per [spec/spreads.md](../../spec/spreads.md)
+- Complex classic spreads as fixed `SpreadDef` + runtime map: `celtic-cross` (10), `twelve-houses` (12) — ids/roles per [spec/spreads.md](../../spec/spreads.md)
 - Session state machine
 - Seeker memory store — `SeekerMemory` keyed by seeker id; Phase 1 profile fields `language` (`ru`|`en`), `preferredName`, `selfNotes` plus continuity `notes` / `pastDeckIds`; normalize trims name/self and drops whitespace-only
 - Profile read/write verbs (`readProfile` / `updateProfile` + tools) bound to `session.seekerId` only — no seeker selector

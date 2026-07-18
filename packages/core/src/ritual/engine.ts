@@ -241,6 +241,25 @@ export const CELTIC_CROSS: SpreadDef = {
   ],
 };
 
+export const TWELVE_HOUSES: SpreadDef = {
+  id: "twelve-houses",
+  name: "Twelve Houses",
+  positions: [
+    { id: "house-1", role: "Self / vitality" },
+    { id: "house-2", role: "Money / resources" },
+    { id: "house-3", role: "Mind / communication / siblings" },
+    { id: "house-4", role: "Home / roots / family" },
+    { id: "house-5", role: "Pleasure / romance / creation" },
+    { id: "house-6", role: "Work / health / daily duty" },
+    { id: "house-7", role: "Partnerships" },
+    { id: "house-8", role: "Shared resources / deep change" },
+    { id: "house-9", role: "Belief / travel / learning" },
+    { id: "house-10", role: "Career / public standing" },
+    { id: "house-11", role: "Friends / community / hopes" },
+    { id: "house-12", role: "Hidden / rest / release" },
+  ],
+};
+
 /** Named spread replaces the desk layout (spread-kind empty slots). */
 export function selectSpread(state: DeckState, spread: SpreadDef): DeckState {
   const next = cloneState(state);
