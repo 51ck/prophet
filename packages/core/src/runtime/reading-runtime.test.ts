@@ -181,4 +181,58 @@ describe("reading runtime arc", () => {
       );
     });
   });
+
+  describe("question session path (T9.4)", () => {
+    test("path → lock → deck → beginRitual defaults to three-roads", async () => {
+      const dir = await mkdtemp(path.join(tmpdir(), "prophet-mem-"));
+      const store = createFileMemoryStore(dir);
+      const memory = await store.recall("seeker-q");
+      const runtime = createReadingRuntime({
+        seekerId: "seeker-q",
+        sessionId: "sess-q",
+        memoryStore: store,
+        initialMemory: memory,
+      });
+      runtime.start();
+      runtime.setSessionPath("question");
+      runtime.lockQuestion("What blocks my next step at work?");
+      runtime.confirmDeck("light-seers");
+      runtime.beginRitual();
+      expect(runtime.session.phase).toBe("ritual");
+      expect(runtime.session.sessionPath).toBe("question");
+      expect(runtime.session.spreadId).toBe("three-roads");
+      expect(runtime.session.question).toMatch(/blocks my next step/i);
+      expect(runtime.deck!.desk).toHaveLength(3);
+    });
+
+    test("matched catalog spread allowed on question path", async () => {
+      const runtime = await runtimeAtCommitted();
+      expect(runtime.session.sessionPath).toBe("question");
+      runtime.beginRitual("single-focus");
+      expect(runtime.session.spreadId).toBe("single-focus");
+      expect(runtime.session.phase).toBe("ritual");
+    });
+
+    test("unset lockQuestion stamps question path; defaults three-roads", async () => {
+      const dir = await mkdtemp(path.join(tmpdir(), "prophet-mem-"));
+      const store = createFileMemoryStore(dir);
+      const memory = await store.recall("seeker-unset");
+      const runtime = createReadingRuntime({
+        seekerId: "seeker-unset",
+        sessionId: "sess-unset",
+        memoryStore: store,
+        initialMemory: memory,
+      });
+      runtime.start();
+      expect(runtime.session.sessionPath).toBeNull();
+      runtime.lockQuestion("How should I approach this choice?");
+      expect(runtime.session.sessionPath).toBe("question");
+      runtime.confirmDeck("light-seers");
+      expect(() => runtime.beginRitual("card-of-day")).toThrow(
+        /only allowed when sessionPath is day-card/,
+      );
+      runtime.beginRitual();
+      expect(runtime.session.spreadId).toBe("three-roads");
+    });
+  });
 });

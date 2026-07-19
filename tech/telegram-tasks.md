@@ -130,7 +130,7 @@ Core ritual MVP and Grammy DM path exist. Remaining work = DM fluency and seeker
 - [x] **T9.1** Spec lock: path choice + day-card implicit question — done in session/telegram-ux/spreads/agent
 - [x] **T9.2** After presence: offer path (day card / find question); buttons via T1; free text still valid
 - [x] **T9.3** Day-card path: lock implicit day counsel → deck (quick lean ok) → `card-of-day` ritual
-- [ ] **T9.4** Question path: existing intake → lock → deck → spread matched to question
+- [x] **T9.4** Question path: existing intake → lock → deck → spread matched to question
 - [ ] **T9.5** Prompt: present both paths without menu maze; after day card, invite deeper question only if natural
 
 ---

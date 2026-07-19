@@ -13,7 +13,7 @@ Session arc (use tools; never invent cards):
 1. Soft continuity from memory only when fluent — call recallSeekerMemory if needed.
 2. After the seeker is present (language + name/self): path choice — Card of the Day vs find a question. Channel often offers this via askWithOptions after presence; if already offered in thread or sessionPath is set, do not re-ask. Free text always counts — never force-retry until they tap.
 3. Day-card path (sessionPath day-card): lockQuestion with short implicit day counsel for this day (atmosphere / focus / advice — no long intake, no fake specificity) → offer deck with quick lean on preferred/past when fluent (Phase 1: Light Seer's; seeker may still name another) → confirmDeck (Commit) → beginRitual with card-of-day only (never other small spreads).
-4. Question path: short intake → lockQuestion with a proper question → offer deck → confirmDeck (Commit) → beginRitual with a matched catalog spread (not card-of-day).
+4. Question path (sessionPath question, or unset once they open a matter without day-card): short free-prose intake (never askWithOptions) → lockQuestion with a proper question → offer deck → confirmDeck (Commit) → beginRitual with a matched catalog spread (prefer fewer; sharp one-hinge → single-focus; default lean three-roads; never card-of-day). Soft cap: push to lock, defer, or endWithoutRitual — do not wander forever.
 5. After Commit only: beginRitual once → then ritual tools as needed: shuffle (real ops), draw / drawToPositions, returnToPile, rotate, openPosition, getDeckSnapshot. Never beginRitual again after ritual starts.
 6. Interpret only cards that are face-up in getDeckSnapshot / openPosition results.
 7. closeSession → refactorSeekerMemory with compressed notes → done.
@@ -104,9 +104,9 @@ function pathStatusLine(runtime: ReadingRuntime): string {
     return `sessionPath: day-card — lockQuestion with short day counsel (e.g. "${dayCounselQuestion(lang)}"), no intake; offer deck (quick lean pastDeckIds / Light Seer's ok); confirmDeck; beginRitual card-of-day only.`;
   }
   if (path === "question") {
-    return "sessionPath: question — intake → lock → deck → matched catalog spread (not card-of-day).";
+    return "sessionPath: question — free-prose intake (no askWithOptions) toward a proper question → lockQuestion → offer deck → confirmDeck → beginRitual with matched catalog spread (prefer fewer; sharp hinge → single-focus; lean three-roads; never card-of-day). Soft cap: lock, defer, or endWithoutRitual.";
   }
-  return "sessionPath: unset — after presence, channel offers Card of the Day vs find a question (askWithOptions); free text still valid; do not force-retry.";
+  return "sessionPath: unset — after presence, channel offers Card of the Day vs find a question (askWithOptions); free text still valid; do not force-retry. If they choose find-a-question or open a matter without day-card, run question path: free-prose intake → lockQuestion → confirmDeck → beginRitual matched catalog (not card-of-day; prefer fewer; lean three-roads).";
 }
 
 function instructionsFor(runtime: ReadingRuntime): string {

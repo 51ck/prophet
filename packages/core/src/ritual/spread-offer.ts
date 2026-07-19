@@ -37,7 +37,8 @@ export function assertCanSelectSpread(phase: SessionPhase): void {
 }
 
 /**
- * T9.3 / T8.7: day-card path → card-of-day only; card-of-day never on question/unset path.
+ * T9.3 / T9.4 / T8.7: day-card path → card-of-day only;
+ * question path and unset (product: unset ≈ question) never get card-of-day.
  */
 export function assertSpreadForSessionPath(
   spreadId: string,
@@ -60,7 +61,7 @@ export function assertSpreadForSessionPath(
 
 /**
  * Phase-aware offer guidance for Pythia instructions.
- * When sessionPath is set, committed line is path-specific (T9.3).
+ * Committed line is path-specific (T9.3 / T9.4); unset ≈ question for spread choice.
  */
 export function spreadOfferStatusLine(
   phase: SessionPhase,
@@ -70,10 +71,8 @@ export function spreadOfferStatusLine(
     if (sessionPath === "day-card") {
       return `Session phase: committed. Commit done — beginRitual with card-of-day only now.`;
     }
-    if (sessionPath === "question") {
-      return `Session phase: committed. Commit done — beginRitual with a matched catalog spread now (not card-of-day; prefer fewer; lean three-roads unless another fits).`;
-    }
-    return `Session phase: committed. Commit done — choose/apply spread via beginRitual now (prefer fewer; match question; card-of-day only on day-card path).`;
+    // question or unset (T9.4): matched catalog, never card-of-day
+    return `Session phase: committed. Commit done — beginRitual with a matched catalog spread now (not card-of-day; prefer fewer; lean three-roads unless another fits).`;
   }
   if (phase === "ritual") {
     return `Session phase: ritual. Spread already applied — do not beginRitual again (selectSpread would replace the desk). Continue with shuffle/draw/open as needed.`;

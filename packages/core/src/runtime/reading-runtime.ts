@@ -81,6 +81,7 @@ export type ReadingRuntime = {
   start(): void;
   /** Persist day-card vs question path after presence (T9.2). */
   setSessionPath(path: SessionPath): void;
+  /** Lock question; stamps sessionPath to question when unset (T9.4). */
   lockQuestion(question: string): void;
   confirmDeck(deckId: string): void;
   beginRitual(spreadId?: string): void;
@@ -158,6 +159,10 @@ export function createReadingRuntime(opts: {
 
     lockQuestion(question: string) {
       session = lockQuestion(session, question);
+      // Unset path locking a proper question → question path (T9.4).
+      if (session.sessionPath === null) {
+        session = setSessionPath(session, "question");
+      }
       if (session.phase === "intake") {
         session = transition(session, "offerDeck");
       }

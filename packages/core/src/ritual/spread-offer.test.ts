@@ -23,13 +23,13 @@ describe("spread offer (T8.7)", () => {
   test("status line: committed urges beginRitual; ritual forbids re-select", () => {
     const committed = spreadOfferStatusLine("committed");
     expect(committed).toContain("committed");
-    expect(committed).toMatch(/beginRitual now/);
+    expect(committed).toMatch(/beginRitual with a matched catalog spread now/);
     expect(committed).not.toMatch(/do not beginRitual again/);
 
     const ritual = spreadOfferStatusLine("ritual");
     expect(ritual).toContain("ritual");
     expect(ritual).toMatch(/do not beginRitual again/);
-    expect(ritual).not.toMatch(/beginRitual now/);
+    expect(ritual).not.toMatch(/beginRitual with a matched catalog spread now/);
   });
 });
 
@@ -66,5 +66,21 @@ describe("spread for session path (T9.3)", () => {
     const question = spreadOfferStatusLine("committed", "question");
     expect(question).toMatch(/not card-of-day/);
     expect(question).toMatch(/lean three-roads/);
+
+    // T9.4: unset ≈ question for spread choice after Commit
+    const unset = spreadOfferStatusLine("committed", null);
+    expect(unset).toBe(question);
+  });
+});
+
+describe("question session path status (T9.4)", () => {
+  test("catalog spreads allowed on question path", () => {
+    expect(() =>
+      assertSpreadForSessionPath("single-focus", "question"),
+    ).not.toThrow();
+    expect(() =>
+      assertSpreadForSessionPath("three-roads", "question"),
+    ).not.toThrow();
+    expect(() => assertSpreadForSessionPath("yes-no", null)).not.toThrow();
   });
 });

@@ -56,7 +56,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
   const lockQuestion = createTool({
     id: "lockQuestion",
     description:
-      "Lock the question for Commit, then move to deck offer. Day-card path: short implicit day counsel (no long intake, no fake specificity). Question path: proper question after short intake.",
+      "Lock the question for Commit, then move to deck offer. Day-card path: short implicit day counsel (no long intake, no fake specificity). Question path (or unset diving into a matter): proper question after short free-prose intake — sets sessionPath to question when unset.",
     inputSchema: z.object({
       question: z.string().min(1),
     }),
@@ -65,6 +65,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
       return {
         phase: runtime.session.phase,
         question: runtime.session.question,
+        sessionPath: runtime.session.sessionPath,
         pastDeckIds: runtime.memory.pastDeckIds,
       };
     },
@@ -73,7 +74,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
   const confirmDeck = createTool({
     id: "confirmDeck",
     description:
-      "Confirm the offered deck after the question is locked (Commit with deck). Day-card path may lean quickly on preferred/past deck when fluent; seeker may still name another. Phase 1: light-seers only.",
+      "Confirm the offered deck after the question is locked (Commit with deck). Day-card path may lean quickly on preferred/past deck when fluent; seeker may still name another. Question path: offer after lock; Phase 1: light-seers only.",
     inputSchema: z.object({
       deckId: z.string().default("light-seers"),
     }),
@@ -86,7 +87,7 @@ export function createPythiaTools(runtime: ReadingRuntime) {
   const beginRitual = createTool({
     id: "beginRitual",
     description:
-      "After Commit only (once): enter ritual with a catalog spread. Day-card path: card-of-day only (default when omitted). Question path: prefer fewer; sharp one-hinge → single-focus; default lean three-roads; never card-of-day. Never call before Commit or again after ritual has begun.",
+      "After Commit only (once): enter ritual with a catalog spread. Day-card path: card-of-day only (default when omitted). Question path / unset: prefer fewer; sharp one-hinge → single-focus; default lean three-roads; never card-of-day. Never call before Commit or again after ritual has begun.",
     inputSchema: z.object({
       spreadId: z.enum(CATALOG_SPREAD_IDS).optional(),
     }),
