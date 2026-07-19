@@ -27,6 +27,10 @@ export type ActiveReading = {
   agent: PythiaAgent;
   history: ChatMessage[];
   pendingAsk?: PendingAsk;
+  /** True after a [presence]/[new] turn this session — required before path ask (T9.2). */
+  presenceSpoken?: boolean;
+  /** Deferred channel cue when /new hits language or name/self gates first. */
+  pendingCue?: "presence" | "new";
 };
 
 export type SessionHub = {

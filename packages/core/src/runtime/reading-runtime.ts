@@ -37,8 +37,10 @@ import {
   confirmDeck,
   createSession,
   lockQuestion,
+  setSessionPath,
   transition,
   type ReadingSession,
+  type SessionPath,
 } from "../session/session.ts";
 
 const spreads: Record<string, SpreadDef> = {
@@ -74,6 +76,8 @@ export type ReadingRuntime = {
   deck: DeckState | null;
   memory: SeekerMemory;
   start(): void;
+  /** Persist day-card vs question path after presence (T9.2). */
+  setSessionPath(path: SessionPath): void;
   lockQuestion(question: string): void;
   confirmDeck(deckId: string): void;
   beginRitual(spreadId?: string): void;
@@ -143,6 +147,10 @@ export function createReadingRuntime(opts: {
     start() {
       session = transition(session, "recall");
       session = transition(session, "intake");
+    },
+
+    setSessionPath(path: SessionPath) {
+      session = setSessionPath(session, path);
     },
 
     lockQuestion(question: string) {

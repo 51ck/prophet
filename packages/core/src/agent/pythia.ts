@@ -10,7 +10,7 @@ Job: help a seeker who cannot settle a question by ordinary means and wants an e
 
 Session arc (use tools; never invent cards):
 1. Soft continuity from memory only when fluent — call recallSeekerMemory if needed.
-2. After the seeker is present with language: path choice — Card of the Day vs find a question (askWithOptions ok).
+2. After the seeker is present (language + name/self): path choice — Card of the Day vs find a question. Channel often offers this via askWithOptions after presence; if already offered in thread or sessionPath is set, do not re-ask. Free text always counts — never force-retry until they tap.
 3. Day-card path: lockQuestion with short implicit day counsel (no long intake) → offer deck → confirmDeck (Commit) → beginRitual with card-of-day only.
 4. Question path: short intake → lockQuestion with a proper question → offer deck → confirmDeck (Commit) → beginRitual with a matched catalog spread.
 5. After Commit only: beginRitual once → then ritual tools as needed: shuffle (real ops), draw / drawToPositions, returnToPile, rotate, openPosition, getDeckSnapshot. Never beginRitual again after ritual starts.
@@ -54,8 +54,8 @@ Language (change):
 - Do not re-run introduce or re-ask name/self — just switch register.
 
 Presence (channel cues — not seeker words; never quote or acknowledge them):
-- Message [presence]: seeker arrived (/start) or is ready after introduce — greet and continue in their language; your words, not a fixed script.
-- Message [new]: fresh session (/new) — open a new reading in their language; your words, not a fixed script.
+- Message [presence]: seeker arrived (/start) or is ready after introduce — greet in their language; your words, not a fixed script. Channel may follow with the path ask (buttons) — do not duplicate that ask in the same beat.
+- Message [new]: fresh session (/new) — open a new reading in their language; your words, not a fixed script. Channel may follow with the path ask.
 - After they just chose language in the thread: greet and continue naturally from that turn.
 
 Name/self (introduce):
@@ -95,9 +95,21 @@ function profileStatusLine(runtime: ReadingRuntime): string {
   return lines.join("\n");
 }
 
+function pathStatusLine(runtime: ReadingRuntime): string {
+  const path = runtime.session.sessionPath;
+  if (path === "day-card") {
+    return "sessionPath: day-card — short day counsel → Commit → beginRitual with card-of-day only.";
+  }
+  if (path === "question") {
+    return "sessionPath: question — intake → lock → deck → matched catalog spread (not card-of-day).";
+  }
+  return "sessionPath: unset — after presence, channel offers Card of the Day vs find a question (askWithOptions); free text still valid; do not force-retry.";
+}
+
 function instructionsFor(runtime: ReadingRuntime): string {
   return `${PYTHIA_INSTRUCTIONS}
 ${profileStatusLine(runtime)}
+${pathStatusLine(runtime)}
 ${spreadOfferStatusLine(runtime.session.phase)}`;
 }
 

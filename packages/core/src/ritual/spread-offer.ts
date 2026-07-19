@@ -38,7 +38,7 @@ export function assertCanSelectSpread(phase: SessionPhase): void {
 
 /**
  * Phase-aware offer guidance for Pythia instructions.
- * Day-path UX (path choice buttons) is T9; rules here still bind spread choice.
+ * Day-path UX (path choice buttons / sessionPath) is T9.2+; rules here still bind spread choice.
  */
 export function spreadOfferStatusLine(phase: SessionPhase): string {
   if (phase === "committed") {

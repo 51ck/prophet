@@ -58,9 +58,21 @@ export {
   confirmDeck,
   createSession,
   lockQuestion,
+  setSessionPath,
   transition,
 } from "./session/session.ts";
-export type { ReadingSession, SessionPhase } from "./session/session.ts";
+export type {
+  ReadingSession,
+  SessionPath,
+  SessionPhase,
+} from "./session/session.ts";
+export {
+  createPathAsk,
+  isPathAsk,
+  isPathAskPrompt,
+  parseSessionPath,
+  pathAskPrompt,
+} from "./session/path.ts";
 export { createFileMemoryStore } from "./memory/store.ts";
 export type {
   MemoryStore,
