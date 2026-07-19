@@ -9,10 +9,15 @@ export type SessionPhase =
   | "refactor"
   | "ended";
 
+/** Session path after presence (T9) — day card vs find a question. */
+export type SessionPath = "day-card" | "question";
+
 export type ReadingSession = {
   id: string;
   seekerId: string;
   phase: SessionPhase;
+  /** Set after path choice (T9.2); null until chosen or free-text past the ask. */
+  sessionPath: SessionPath | null;
   question: string | null;
   deckId: string | null;
   spreadId: string | null;
@@ -38,11 +43,24 @@ export function createSession(seekerId: string, id: string): ReadingSession {
     id,
     seekerId,
     phase: "idle",
+    sessionPath: null,
     question: null,
     deckId: null,
     spreadId: null,
     createdAt: now,
     updatedAt: now,
+  };
+}
+
+/** Persist path intent after presence (T9.2). */
+export function setSessionPath(
+  session: ReadingSession,
+  path: SessionPath,
+): ReadingSession {
+  return {
+    ...session,
+    sessionPath: path,
+    updatedAt: new Date().toISOString(),
   };
 }
 

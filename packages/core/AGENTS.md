@@ -11,15 +11,20 @@ Channel-agnostic prophet core: ritual engine, session arc, seeker memory, Mastra
 - Simple-tier spreads as fixed `SpreadDef` + runtime map: `card-of-day`, `single-focus`, `yes-no` (3), `two-poles`, `past-present-future`, `thoughts-feelings-actions`, `three-roads` — ids/roles per [spec/spreads.md](../../spec/spreads.md)
 - Thematic spreads as fixed `SpreadDef` + runtime map: `relationship` (7), `work-finance` (6), `choice` (7) — ids/roles per [spec/spreads.md](../../spec/spreads.md)
 - Complex classic spreads as fixed `SpreadDef` + runtime map: `celtic-cross` (10), `twelve-houses` (12) — ids/roles per [spec/spreads.md](../../spec/spreads.md)
-- Session state machine
+- Session state machine — includes optional `sessionPath` (`day-card` | `question` | null) after presence (T9.2); `setSessionPath` persists intent for T9.3/T9.4
 - Seeker memory store — `SeekerMemory` keyed by seeker id; Phase 1 profile fields `language` (`ru`|`en`), `preferredName`, `selfNotes` plus continuity `notes` / `pastDeckIds`; normalize trims name/self and drops whitespace-only
 - Profile read/write verbs (`readProfile` / `updateProfile` + tools) bound to `session.seekerId` only — no seeker selector
 - Language introduce helpers (`createLanguageAsk` / `parseSeekerLanguage` for ru|en button/typed choice only); prompt speaks seeker’s saved language
 - Language change: agent decides intent and calls `updateSeekerProfile` language — no phrase parser; prompt switches register; never re-grill introduce
 - Presence / fresh session: agent speaks (channel cues `[presence]` / `[new]`); no hardcoded opener scripts
 - Name/self introduce helpers (`needsNameSelf` / `nameSelfAsk`); prompt asks free-prose name + few words after language (once; skip if ask already in thread), fills via `updateSeekerProfile` without meta disclosure
+- Session path helpers (`createPathAsk` / `parseSessionPath` / `pathAskPrompt` for day-card vs question; channel offers after presence); `parseSessionPath` accepts exact aliases plus distinctive embedded labels (last match wins; short tokens like `question`/`вопрос` exact-only)
+- Day-card path (T9.3): `dayCounselQuestion` for short implicit lock text; prompt → lock → quick deck lean → `confirmDeck` → `beginRitual` with `card-of-day` only; runtime `assertSpreadForSessionPath` rejects other spreads on day-card and rejects `card-of-day` off that path; omitted `beginRitual` spread defaults to `card-of-day` when `sessionPath` is day-card
+- Question path (T9.4): free-prose intake → `lockQuestion` (stamps `sessionPath` to `question` when unset) → `confirmDeck` → `beginRitual` with matched catalog spread; prefer fewer; sharp hinge → `single-focus`; default lean `three-roads`; never `card-of-day` (unset ≈ question for spread gates)
 - Prompt: use preferredName/selfNotes/language fluently; never narrate persistence/CRM; never imply multi-seeker or other profiles (isolation hard rule)
 - Prompt ritual: narrate only ops actually called (shuffle/draw/return/rotate/open); never claim face-down identity; free tools allowed without inventing cards
+- Prompt + offer logic (T8.7 / T9.2 / T9.3 / T9.4 / T9.5): prefer fewer cards; `card-of-day` only when `sessionPath` is day-card; sharp hinge → `single-focus`; `beginRitual` / select spread only in `committed` (not again in `ritual` — would replace desk) — `assertCanSelectSpread` + `assertSpreadForSessionPath` + phase/`sessionPath` lines in instructions; catalog ids via `CATALOG_SPREAD_IDS`
+- Prompt path voice (T9.5): present day-card vs find-a-question as two ceremonial doors (not a menu maze); after day-card close, invite a deeper question only when natural — never a standing upsell
 - Pythia agent + tool wiring
 - Closed “ask with options” verb (`askWithOptions`: prefer 2–3, max 6; optional skip; no channel chrome) — Pythia prefers it for closed simple asks; open intake / name+self stay free prose; never force-retry until seeker taps — free answer / decline always valid ([spec/telegram-ux.md](../../spec/telegram-ux.md))
 - Light Seer’s structured deck data for Phase 1

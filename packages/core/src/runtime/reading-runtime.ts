@@ -26,6 +26,10 @@ import {
   rotateDeskCard,
   selectSpread,
 } from "../ritual/engine.ts";
+import {
+  assertCanSelectSpread,
+  assertSpreadForSessionPath,
+} from "../ritual/spread-offer.ts";
 import type {
   DeckState,
   PileAddress,
@@ -36,8 +40,10 @@ import {
   confirmDeck,
   createSession,
   lockQuestion,
+  setSessionPath,
   transition,
   type ReadingSession,
+  type SessionPath,
 } from "../session/session.ts";
 
 const spreads: Record<string, SpreadDef> = {
@@ -73,6 +79,9 @@ export type ReadingRuntime = {
   deck: DeckState | null;
   memory: SeekerMemory;
   start(): void;
+  /** Persist day-card vs question path after presence (T9.2). */
+  setSessionPath(path: SessionPath): void;
+  /** Lock question; stamps sessionPath to question when unset (T9.4). */
   lockQuestion(question: string): void;
   confirmDeck(deckId: string): void;
   beginRitual(spreadId?: string): void;
@@ -144,8 +153,16 @@ export function createReadingRuntime(opts: {
       session = transition(session, "intake");
     },
 
+    setSessionPath(path: SessionPath) {
+      session = setSessionPath(session, path);
+    },
+
     lockQuestion(question: string) {
       session = lockQuestion(session, question);
+      // Unset path locking a proper question → question path (T9.4).
+      if (session.sessionPath === null) {
+        session = setSessionPath(session, "question");
+      }
       if (session.phase === "intake") {
         session = transition(session, "offerDeck");
       }
@@ -163,10 +180,15 @@ export function createReadingRuntime(opts: {
       session = transition(session, "committed");
     },
 
-    beginRitual(spreadId = THREE_ROADS.id) {
+    beginRitual(spreadId?: string) {
       if (!deck) throw new Error("Deck not confirmed");
-      const spread = spreads[spreadId];
-      if (!spread) throw new Error(`Unknown spread "${spreadId}"`);
+      assertCanSelectSpread(session.phase);
+      const id =
+        spreadId ??
+        (session.sessionPath === "day-card" ? CARD_OF_DAY.id : THREE_ROADS.id);
+      assertSpreadForSessionPath(id, session.sessionPath);
+      const spread = spreads[id];
+      if (!spread) throw new Error(`Unknown spread "${id}"`);
       session = { ...session, spreadId: spread.id };
       if (session.phase === "committed") {
         session = transition(session, "ritual");

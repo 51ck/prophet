@@ -48,12 +48,33 @@ export type {
   TablePosition,
 } from "./ritual/types.ts";
 export {
+  CATALOG_SPREAD_IDS,
+  assertCanSelectSpread,
+  assertSpreadForSessionPath,
+  canSelectSpread,
+  spreadOfferStatusLine,
+} from "./ritual/spread-offer.ts";
+export type { CatalogSpreadId } from "./ritual/spread-offer.ts";
+export {
   confirmDeck,
   createSession,
   lockQuestion,
+  setSessionPath,
   transition,
 } from "./session/session.ts";
-export type { ReadingSession, SessionPhase } from "./session/session.ts";
+export type {
+  ReadingSession,
+  SessionPath,
+  SessionPhase,
+} from "./session/session.ts";
+export {
+  createPathAsk,
+  dayCounselQuestion,
+  isPathAsk,
+  isPathAskPrompt,
+  parseSessionPath,
+  pathAskPrompt,
+} from "./session/path.ts";
 export { createFileMemoryStore } from "./memory/store.ts";
 export type {
   MemoryStore,
