@@ -19,6 +19,7 @@ import {
 } from "../ritual/engine.ts";
 import type { SpreadDef } from "../ritual/types.ts";
 import { createReadingRuntime } from "../runtime/reading-runtime.ts";
+import { dayCounselQuestion } from "../session/path.ts";
 
 /** All catalog spreads registered T8.2–T8.5 (runtime map). */
 const CATALOG_SPREADS: SpreadDef[] = [
@@ -99,6 +100,9 @@ describe("reading runtime arc", () => {
       "beginRitual %s → correct desk slot count/ids/kinds",
       async (spreadId, spread) => {
         const runtime = await runtimeAtCommitted();
+        if (spreadId === "card-of-day") {
+          runtime.setSessionPath("day-card");
+        }
         runtime.beginRitual(spreadId);
 
         expect(runtime.session.phase).toBe("ritual");
@@ -135,6 +139,46 @@ describe("reading runtime arc", () => {
         deskBefore,
       );
       expect(runtime.deck!.pile.length).toBe(pileLen);
+    });
+  });
+
+  describe("day-card session path (T9.3)", () => {
+    test("path → day counsel lock → deck → beginRitual defaults to card-of-day", async () => {
+      const dir = await mkdtemp(path.join(tmpdir(), "prophet-mem-"));
+      const store = createFileMemoryStore(dir);
+      const memory = await store.recall("seeker-day");
+      const runtime = createReadingRuntime({
+        seekerId: "seeker-day",
+        sessionId: "sess-day",
+        memoryStore: store,
+        initialMemory: memory,
+      });
+      runtime.start();
+      runtime.setSessionPath("day-card");
+      runtime.lockQuestion(dayCounselQuestion("en"));
+      runtime.confirmDeck("light-seers");
+      runtime.beginRitual();
+      expect(runtime.session.phase).toBe("ritual");
+      expect(runtime.session.spreadId).toBe("card-of-day");
+      expect(runtime.session.question).toMatch(/Counsel for this day/i);
+      expect(runtime.deck!.desk).toHaveLength(1);
+      expect(runtime.deck!.desk[0]?.id).toBe("focus");
+    });
+
+    test("rejects non-card-of-day spreads", async () => {
+      const runtime = await runtimeAtCommitted();
+      runtime.setSessionPath("day-card");
+      expect(() => runtime.beginRitual("three-roads")).toThrow(
+        /Day-card path requires spread "card-of-day"/,
+      );
+      expect(runtime.session.phase).toBe("committed");
+    });
+
+    test("card-of-day rejected without day-card path", async () => {
+      const runtime = await runtimeAtCommitted();
+      expect(() => runtime.beginRitual("card-of-day")).toThrow(
+        /only allowed when sessionPath is day-card/,
+      );
     });
   });
 });

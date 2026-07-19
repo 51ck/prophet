@@ -50,6 +50,7 @@ export type {
 export {
   CATALOG_SPREAD_IDS,
   assertCanSelectSpread,
+  assertSpreadForSessionPath,
   canSelectSpread,
   spreadOfferStatusLine,
 } from "./ritual/spread-offer.ts";
@@ -68,6 +69,7 @@ export type {
 } from "./session/session.ts";
 export {
   createPathAsk,
+  dayCounselQuestion,
   isPathAsk,
   isPathAskPrompt,
   parseSessionPath,

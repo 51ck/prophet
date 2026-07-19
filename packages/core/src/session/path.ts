@@ -13,6 +13,17 @@ export function pathAskPrompt(language: SeekerLanguage): string {
   return "How shall we begin — Card of the Day, or find a question?";
 }
 
+/**
+ * Short implicit day-counsel lock text (T9.3).
+ * Counts as the locked question for Commit — no fake specificity.
+ */
+export function dayCounselQuestion(language: SeekerLanguage): string {
+  if (language === "ru") {
+    return "Совет на этот день: атмосфера, фокус или напутствие.";
+  }
+  return "Counsel for this day: atmosphere, focus, or advice.";
+}
+
 /** True when content is a path-ask prompt (either language). */
 export function isPathAskPrompt(content: string): boolean {
   return (

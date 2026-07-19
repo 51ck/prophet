@@ -1,4 +1,4 @@
-import type { SessionPhase } from "../session/session.ts";
+import type { SessionPath, SessionPhase } from "../session/session.ts";
 
 /** Catalog ids registered T8.2–T8.5 — beginRitual accepts only these. */
 export const CATALOG_SPREAD_IDS = [
@@ -37,11 +37,42 @@ export function assertCanSelectSpread(phase: SessionPhase): void {
 }
 
 /**
- * Phase-aware offer guidance for Pythia instructions.
- * Day-path UX (path choice buttons / sessionPath) is T9.2+; rules here still bind spread choice.
+ * T9.3 / T8.7: day-card path → card-of-day only; card-of-day never on question/unset path.
  */
-export function spreadOfferStatusLine(phase: SessionPhase): string {
+export function assertSpreadForSessionPath(
+  spreadId: string,
+  sessionPath: SessionPath | null,
+): void {
+  if (sessionPath === "day-card") {
+    if (spreadId !== "card-of-day") {
+      throw new Error(
+        `Day-card path requires spread "card-of-day", got "${spreadId}"`,
+      );
+    }
+    return;
+  }
+  if (spreadId === "card-of-day") {
+    throw new Error(
+      'Spread "card-of-day" only allowed when sessionPath is day-card',
+    );
+  }
+}
+
+/**
+ * Phase-aware offer guidance for Pythia instructions.
+ * When sessionPath is set, committed line is path-specific (T9.3).
+ */
+export function spreadOfferStatusLine(
+  phase: SessionPhase,
+  sessionPath: SessionPath | null = null,
+): string {
   if (phase === "committed") {
+    if (sessionPath === "day-card") {
+      return `Session phase: committed. Commit done — beginRitual with card-of-day only now.`;
+    }
+    if (sessionPath === "question") {
+      return `Session phase: committed. Commit done — beginRitual with a matched catalog spread now (not card-of-day; prefer fewer; lean three-roads unless another fits).`;
+    }
     return `Session phase: committed. Commit done — choose/apply spread via beginRitual now (prefer fewer; match question; card-of-day only on day-card path).`;
   }
   if (phase === "ritual") {

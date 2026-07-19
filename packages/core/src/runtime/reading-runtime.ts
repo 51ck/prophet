@@ -26,7 +26,10 @@ import {
   rotateDeskCard,
   selectSpread,
 } from "../ritual/engine.ts";
-import { assertCanSelectSpread } from "../ritual/spread-offer.ts";
+import {
+  assertCanSelectSpread,
+  assertSpreadForSessionPath,
+} from "../ritual/spread-offer.ts";
 import type {
   DeckState,
   PileAddress,
@@ -172,11 +175,15 @@ export function createReadingRuntime(opts: {
       session = transition(session, "committed");
     },
 
-    beginRitual(spreadId = THREE_ROADS.id) {
+    beginRitual(spreadId?: string) {
       if (!deck) throw new Error("Deck not confirmed");
       assertCanSelectSpread(session.phase);
-      const spread = spreads[spreadId];
-      if (!spread) throw new Error(`Unknown spread "${spreadId}"`);
+      const id =
+        spreadId ??
+        (session.sessionPath === "day-card" ? CARD_OF_DAY.id : THREE_ROADS.id);
+      assertSpreadForSessionPath(id, session.sessionPath);
+      const spread = spreads[id];
+      if (!spread) throw new Error(`Unknown spread "${id}"`);
       session = { ...session, spreadId: spread.id };
       if (session.phase === "committed") {
         session = transition(session, "ritual");

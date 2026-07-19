@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { createAskWithOptions } from "../ask/ask-with-options.ts";
 import {
   createPathAsk,
+  dayCounselQuestion,
   isPathAsk,
   isPathAskPrompt,
   parseSessionPath,
@@ -109,5 +110,12 @@ describe("setSessionPath", () => {
     expect(s.sessionPath).toBeNull();
     expect(setSessionPath(s, "day-card").sessionPath).toBe("day-card");
     expect(setSessionPath(s, "question").sessionPath).toBe("question");
+  });
+});
+
+describe("dayCounselQuestion (T9.3)", () => {
+  test("short implicit day counsel en|ru", () => {
+    expect(dayCounselQuestion("en")).toMatch(/Counsel for this day/i);
+    expect(dayCounselQuestion("ru")).toMatch(/Совет на этот день/);
   });
 });
