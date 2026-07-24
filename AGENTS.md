@@ -87,3 +87,13 @@ When the user requests a durable behavior change, record it here or in the relev
 - [tech/](tech/AGENTS.md) — architecture + in-repo ticket system + theme boards. Does not weaken `spec/` authenticity.
 - [packages/core/](packages/core/AGENTS.md) — channel-agnostic Pythia core (ritual, session, memory, agent)
 - [packages/telegram/](packages/telegram/AGENTS.md) — Grammy DM adapter
+
+## Agent skills
+
+### Issue tracker
+
+Issues live as in-repo ticket boards (`tech/*-tasks.md`, `T<n>.<m>` IDs) — GitHub Issues are optional glue only. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Multi-context layout — root `CONTEXT-MAP.md` + per-package `CONTEXT.md`/`docs/adr/` under `packages/core` and `packages/telegram`. See `docs/agents/domain.md`.
