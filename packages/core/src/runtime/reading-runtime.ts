@@ -1,4 +1,5 @@
-import { LIGHT_SEERS_CARDS, LIGHT_SEERS_DECK_ID } from "../deck/light-seers.ts";
+import { LIGHT_SEERS_DECK_ID } from "../deck/light-seers.ts";
+import { DECKS, type CatalogDeckId } from "../deck/registry.ts";
 import type {
   MemoryStore,
   SeekerLanguage,
@@ -170,13 +171,12 @@ export function createReadingRuntime(opts: {
 
     confirmDeck(deckId: string) {
       const id = deckId || LIGHT_SEERS_DECK_ID;
-      if (id !== LIGHT_SEERS_DECK_ID) {
-        throw new Error(
-          `Phase 1 only supports deck "${LIGHT_SEERS_DECK_ID}", got "${id}"`,
-        );
+      const cards = DECKS[id as CatalogDeckId];
+      if (!cards) {
+        throw new Error(`Unknown deck "${id}"`);
       }
       session = confirmDeck(session, id);
-      deck = createDeckState(LIGHT_SEERS_DECK_ID, LIGHT_SEERS_CARDS);
+      deck = createDeckState(id, cards);
       session = transition(session, "committed");
     },
 
