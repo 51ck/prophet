@@ -70,7 +70,7 @@ Good tests here check external behavior — what `confirmDeck`/tool results retu
 
 - [x] **T10.1** Spec lock: full Rider–Waite body in `spec/decks/rider-waite.md` (identity, structure, orientation, meanings, imagery) per `deck-and-ritual.md`'s required-fields list
 - [x] **T10.2** Core: deck registry (`DECKS` map + `CATALOG_DECK_IDS`); `confirmDeck` reads the registry instead of the hardcoded single-deck guard
-- [ ] **T10.3** Core: Rider–Waite `CardDef[]` list, registered in `DECKS` (depends on T10.1 for real content, T10.2 for the registry to register into)
+- [x] **T10.3** Core: Rider–Waite `CardDef[]` list, registered in `DECKS` (depends on T10.1 for real content, T10.2 for the registry to register into)
 - [ ] **T10.4** Core: `getCardMeaning(deckId, cardId)` lookup module; retrofit Light Seer's existing spec meanings into it too
 - [ ] **T10.5** Core: wire meaning (+ imagery cue) into face-up desk cards only, in `getDeckSnapshot`/`openPosition` results; face-down untouched
 - [ ] **T10.6** Prompt: Pythia reads opened-card meaning as grounding (not verbatim); deck offer instruction mentions Rider–Waite
