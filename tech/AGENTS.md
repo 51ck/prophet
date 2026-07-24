@@ -42,4 +42,5 @@ Does not own product vision or ritual authenticity rules (`spec/`).
 - [tickets.md](tickets.md) — in-repo ticket system (IDs, boards, agent loop)
 - [telegram-tasks.md](telegram-tasks.md) — Telegram board: T0–T3, T9 (adapter, format, buttons, introduce/profile, session path)
 - [ritual-tasks.md](ritual-tasks.md) — Ritual board: T4–T8 (desk/pile, verbs, tests, tools, spreads catalog)
+- [decks-tasks.md](decks-tasks.md) — Deck catalog board: T10 (Rider–Waite pilot, deck registry + on-demand card meaning)
 - [../packages/core/AGENTS.md](../packages/core/AGENTS.md) — core package

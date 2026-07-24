@@ -8,6 +8,7 @@ import type {
   ShuffleOp,
   SpreadDef,
 } from "./types.ts";
+import { getCardMeaning, type CardMeaning } from "../deck/meanings.ts";
 
 function cloneState(state: DeckState): DeckState {
   return {
@@ -512,6 +513,7 @@ export function getDeckSnapshot(state: DeckState): {
     faceUp: boolean;
     defId: string | null;
     orientation: Orientation | null;
+    meaning: CardMeaning | null;
   }[];
 } {
   return {
@@ -524,6 +526,9 @@ export function getDeckSnapshot(state: DeckState): {
       faceUp: p.card?.faceUp ?? false,
       defId: p.card?.faceUp ? (p.card.defId ?? null) : null,
       orientation: p.card?.faceUp ? (p.card.orientation ?? null) : null,
+      meaning: p.card?.faceUp
+        ? (getCardMeaning(state.deckId, p.card.defId) ?? null)
+        : null,
     })),
   };
 }

@@ -14,7 +14,7 @@ Parent owns shuffle/draw authenticity and selection flow. Spreads live in [sprea
 ## Local Contracts
 
 - Stay implementation-free (no storage schemas, no stack)
-- Phase 1: Light Seer’s fully described; others stubs until Phase 2
+- Phase 1: Light Seer’s fully described. Phase 2: full bodies land deck by deck (Rider–Waite first, T10); remaining stay stubs until their own slice
 - Meanings must support the deck’s locked voice (see catalog)
 - Do not invent card outcomes — only describe cards the ritual can draw
 
@@ -27,7 +27,7 @@ Parent owns shuffle/draw authenticity and selection flow. Spreads live in [sprea
 Idea documents (not nested DOX folders):
 
 - [light-seers.md](light-seers.md) — Phase 1 full body; prophet’s preferred
-- [rider-waite.md](rider-waite.md) — stub (classic)
+- [rider-waite.md](rider-waite.md) — full body (classic); T10 pilot deck
 - [thoth.md](thoth.md) — stub (deep esoteric)
 - [wild-unknown.md](wild-unknown.md) — stub (intuitive / emotional)
 - [marseille.md](marseille.md) — stub (traditional)
