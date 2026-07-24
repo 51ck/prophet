@@ -73,7 +73,7 @@ Good tests here check external behavior — what `confirmDeck`/tool results retu
 - [x] **T10.3** Core: Rider–Waite `CardDef[]` list, registered in `DECKS` (depends on T10.1 for real content, T10.2 for the registry to register into)
 - [x] **T10.4** Core: `getCardMeaning(deckId, cardId)` lookup module; retrofit Light Seer's existing spec meanings into it too
 - [x] **T10.5** Core: wire meaning (+ imagery cue) into face-up desk cards only, in `getDeckSnapshot`/`openPosition` results; face-down untouched
-- [ ] **T10.6** Prompt: Pythia reads opened-card meaning as grounding (not verbatim); deck offer instruction mentions Rider–Waite
+- [x] **T10.6** Prompt: Pythia reads opened-card meaning as grounding (not verbatim); deck offer instruction mentions Rider–Waite
 - [ ] **T10.7** Tests: registry confirm/reject, meaning-lookup unit tests, secrecy-boundary extension, card-list integrity
 
 ---
