@@ -235,4 +235,45 @@ describe("reading runtime arc", () => {
       expect(runtime.session.spreadId).toBe("three-roads");
     });
   });
+
+  describe("deck registry (T10.7)", () => {
+    test("accepts rider-waite deck", async () => {
+      const dir = await mkdtemp(path.join(tmpdir(), "prophet-mem-"));
+      const store = createFileMemoryStore(dir);
+      const memory = await store.recall("seeker-rw");
+      const runtime = createReadingRuntime({
+        seekerId: "seeker-rw",
+        sessionId: "sess-rw",
+        memoryStore: store,
+        initialMemory: memory,
+      });
+      runtime.start();
+      runtime.lockQuestion("What blocks my next step at work?");
+      runtime.confirmDeck("rider-waite");
+      expect(runtime.session.phase).toBe("committed");
+
+      runtime.beginRitual();
+      const snap = runtime.snapshot();
+      if ("empty" in snap) throw new Error("expected deck snapshot");
+      expect(snap.pileCount).toBe(78);
+    });
+
+    test("rejects unknown deck", async () => {
+      const dir = await mkdtemp(path.join(tmpdir(), "prophet-mem-"));
+      const store = createFileMemoryStore(dir);
+      const memory = await store.recall("seeker-bad-deck");
+      const runtime = createReadingRuntime({
+        seekerId: "seeker-bad-deck",
+        sessionId: "sess-bad-deck",
+        memoryStore: store,
+        initialMemory: memory,
+      });
+      runtime.start();
+      runtime.lockQuestion("What blocks my next step at work?");
+
+      expect(() => runtime.confirmDeck("not-a-real-deck")).toThrow(
+        /Unknown deck/,
+      );
+    });
+  });
 });

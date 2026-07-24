@@ -49,7 +49,9 @@ describe("agent tool secrecy (T6.3)", () => {
     )) as { snapshot: DeckSnapshot };
     expect(begun.snapshot).toMatchObject({ pileCount: 78 });
     expect(
-      begun.snapshot.desk.every((t) => t.defId === null && !t.faceUp),
+      begun.snapshot.desk.every(
+        (t) => t.defId === null && !t.faceUp && t.meaning === null,
+      ),
     ).toBe(true);
 
     const shuffled = (await tools.shuffle.execute!(
@@ -68,7 +70,11 @@ describe("agent tool secrecy (T6.3)", () => {
     expect(drawn.snapshot.desk).toHaveLength(3);
     expect(
       drawn.snapshot.desk.every(
-        (t) => t.defId === null && !t.faceUp && t.orientation === null,
+        (t) =>
+          t.defId === null &&
+          !t.faceUp &&
+          t.orientation === null &&
+          t.meaning === null,
       ),
     ).toBe(true);
     expect(drawn.snapshot).not.toHaveProperty("pile");
@@ -87,10 +93,14 @@ describe("agent tool secrecy (T6.3)", () => {
     const sit = opened.snapshot.desk.find((t) => t.id === "situation");
     expect(sit?.faceUp).toBe(true);
     expect(sit?.defId).toBeTruthy();
+    expect(sit?.meaning).toBeTruthy();
+    expect(sit?.meaning?.upright.length).toBeGreaterThan(0);
+    expect(sit?.meaning?.reversed.length).toBeGreaterThan(0);
+    expect(sit?.meaning?.imagery.length).toBeGreaterThan(0);
     expect(
       opened.snapshot.desk
         .filter((t) => t.id !== "situation")
-        .every((t) => t.defId === null && !t.faceUp),
+        .every((t) => t.defId === null && !t.faceUp && t.meaning === null),
     ).toBe(true);
   });
 
